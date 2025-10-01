@@ -80,15 +80,46 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        'fade-in-slide-up': {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'float': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-10px)' },
+        },
+        'glitch': {
+          '0%': { transform: 'translate(0)' },
+          '20%': { transform: 'translate(-3px, 3px)' },
+          '40%': { transform: 'translate(-3px, -3px)' },
+          '60%': { transform: 'translate(3px, 3px)' },
+          '80%': { transform: 'translate(3px, -3px)' },
+          '100%': { transform: 'translate(0)' },
+        },
+        'glitch-anim-1': {
+          '0%': { clip: 'rect(42px, 9999px, 44px, 0)' },
+          '25%': { clip: 'rect(0, 9999px, 0, 0)' },
+          '50%': { clip: 'rect(80px, 9999px, 82px, 0)' },
+          '75%': { clip: 'rect(0, 9999px, 0, 0)' },
+          '100%': { clip: 'rect(60px, 9999px, 62px, 0)' },
+        },
+        'glitch-anim-2': {
+          '0%': { clip: 'rect(65px, 9999px, 67px, 0)' },
+          '25%': { clip: 'rect(0, 9999px, 0, 0)' },
+          '50%': { clip: 'rect(10px, 9999px, 12px, 0)' },
+          '75%': { clip: 'rect(0, 9999px, 0, 0)' },
+          '100%': { clip: 'rect(90px, 9999px, 92px, 0)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in': 'fade-in 0.5s ease-out',
+        'fade-in-slide-up': 'fade-in-slide-up 0.6s ease-out forwards',
+        'float': 'float 3s ease-in-out infinite',
+        'glitch': 'glitch 2.5s infinite',
       },
     },
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
-
-    
