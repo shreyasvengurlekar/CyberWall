@@ -35,10 +35,10 @@ export function Header() {
         </nav>
         <div className="flex flex-1 items-center justify-end space-x-2">
           <Button variant="ghost" asChild>
-            <Link href="/dashboard">Log In</Link>
+            <Link href="#">Log In</Link>
           </Button>
           <Button asChild>
-            <Link href="/dashboard">Sign Up</Link>
+            <Link href="#">Sign Up</Link>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
