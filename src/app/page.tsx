@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Contact, ScanLine, Shield, WandSparkles } from 'lucide-react';
+import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
@@ -30,7 +30,27 @@ const features = [
 export default function Home({ searchQuery }: { searchQuery?: string }) {
   const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
   const pricingImage = PlaceHolderImages.find(p => p.id === 'pricing-hero');
+  const [showBackToTop, setShowBackToTop] = React.useState(false);
 
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -48,7 +68,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
-                    <Link href="/signup">Get Started for Free</Link>
+                    <Link href="/dashboard">Get Started for Free</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg">
                     <Link href="#features">Learn More</Link>
@@ -145,7 +165,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                   </ul>
                 </CardContent>
                 <div className="p-6 pt-0">
-                  <Button asChild className="w-full"><Link href="/signup">Get Started</Link></Button>
+                  <Button asChild className="w-full"><Link href="/dashboard">Get Started</Link></Button>
                 </div>
               </Card>
             </div>
@@ -184,12 +204,23 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             </div>
             <div className="mx-auto w-full max-w-sm space-y-2">
                <Button asChild size="lg" className="w-full">
-                  <Link href="/signup">Start Scanning Now</Link>
+                  <Link href="/dashboard">Start Scanning Now</Link>
                 </Button>
             </div>
           </div>
         </section>
       </main>
+
+       {showBackToTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 h-12 w-12 rounded-full shadow-lg"
+          size="icon"
+        >
+          <ArrowUp className="h-6 w-6" />
+          <span className="sr-only">Go to top</span>
+        </Button>
+      )}
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const { toast } = useToast();
+  const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -34,9 +36,12 @@ export default function LoginPage() {
     console.log(values);
     toast({
       title: 'Login Successful',
-      description: 'Welcome back!',
+      description: 'Welcome back! Redirecting to dashboard...',
     });
     form.reset();
+    setTimeout(() => {
+      router.push('/dashboard');
+    }, 2000);
   }
 
   return (

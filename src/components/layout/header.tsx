@@ -57,8 +57,8 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         
         <div className="flex flex-1 items-center justify-end gap-4">
           {/* Desktop Search */}
-          <div className="hidden sm:flex items-center gap-2 flex-1 justify-end">
-            <div ref={searchRef} className={cn("relative w-full max-w-xs transition-all duration-300 flex items-center gap-2", !isSearchOpen && "max-w-0 opacity-0")}>
+          <div ref={searchRef} className="hidden sm:flex items-center gap-2 flex-1 justify-end">
+            <div className={cn("relative w-full max-w-xs transition-all duration-300 flex items-center gap-2", !isSearchOpen && "max-w-0 opacity-0")}>
               <div className='relative w-full'>
                 <Input
                   ref={inputRef}
