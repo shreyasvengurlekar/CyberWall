@@ -190,17 +190,17 @@ export default function AboutPage() {
           </p>
           <div className="flex justify-center gap-4">
             <Button variant="outline" size="icon" asChild>
-                <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                <a href="https://github.com/shreyasvengurlekar" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                     <Github />
                 </a>
             </Button>
             <Button variant="outline" size="icon" asChild>
-                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                <a href="https://www.linkedin.com/in/shreyasvengurlekar" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                     <Linkedin />
                 </a>
             </Button>
              <Button variant="outline" size="icon" asChild>
-                <a href="mailto:contact@example.com" aria-label="Email">
+                <a href="mailto:shreyasvengurlekar2004@gmail.com" aria-label="Email">
                     <Mail />
                 </a>
             </Button>
