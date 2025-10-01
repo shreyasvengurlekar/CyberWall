@@ -26,10 +26,8 @@ export function Header() {
         setIsSearchOpen(false);
       }
     }
-    // Bind the event listener
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Unbind the event listener on clean up
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [searchRef]);
@@ -45,9 +43,9 @@ export function Header() {
           </Link>
         </div>
         
-        <div ref={searchRef} className="flex flex-1 items-center justify-end gap-4">
+        <div className="flex flex-1 items-center justify-end gap-4">
           {/* Desktop Search */}
-          <div className="hidden sm:flex items-center gap-2 flex-1 justify-end">
+          <div ref={searchRef} className="hidden sm:flex items-center gap-2 flex-1 justify-end">
             <div className={cn("relative w-full max-w-xs transition-all duration-300", !isSearchOpen && "w-0 opacity-0")}>
               <Input
                 type="search"
