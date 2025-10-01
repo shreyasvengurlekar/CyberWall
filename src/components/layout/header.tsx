@@ -14,6 +14,7 @@ import { usePathname } from 'next/navigation';
 const navLinks = [
   { href: '/services', label: 'Services' },
   { href: '/#pricing', label: 'Pricing' },
+  { href: '/about', label: 'About' },
   { href: '/#contact', label: 'Contact' },
 ];
 
@@ -49,7 +50,10 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   
   React.useEffect(() => {
     setIsSearchOpen(false);
-  }, [pathname]);
+    if(setSearchQuery){
+      setSearchQuery('');
+    }
+  }, [pathname, setSearchQuery]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -93,7 +97,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <Link
                     key={link.href}
                     href={link.href}
-                    className="font-medium text-muted-foreground transition-colors hover:text-foreground"
+                    className="font-medium text-muted-foreground transition-colors hover:text-primary"
                     >
                     {link.label}
                     </Link>

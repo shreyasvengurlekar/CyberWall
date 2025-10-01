@@ -1,0 +1,145 @@
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Github, Linkedin, Mail, Download, Code, Cpu, Lightbulb } from 'lucide-react';
+
+export default function AboutPage() {
+  return (
+    <div className="bg-background animate-fade-in">
+      <div className="container mx-auto max-w-5xl py-20 md:py-32 px-4 md:px-6">
+        {/* --- Hero Section --- */}
+        <section className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
+          <div className="relative">
+            <Image
+              src="https://picsum.photos/seed/avatar/200/200"
+              alt="Cartoon avatar"
+              width={200}
+              height={200}
+              className="rounded-full shadow-2xl border-4 border-primary/50"
+              data-ai-hint="cartoon avatar"
+            />
+          </div>
+          <div className="text-center md:text-left">
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tighter text-foreground mb-2">
+              About Me
+            </h1>
+            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl">
+              I'm a passionate student developer on a mission to build secure and innovative web applications. This project is a culmination of my journey into the world of cybersecurity and AI.
+            </p>
+            <div className="mt-6 flex justify-center md:justify-start gap-4">
+              <Button asChild>
+                <a href="/resume.pdf" download="resume.pdf">
+                  <Download className="mr-2" /> Download Resume
+                </a>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link href="/#contact">Get in Touch</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* --- My Journey Section --- */}
+        <section className="mb-20">
+            <h2 className="text-3xl font-bold text-center mb-12 tracking-tight">My Journey</h2>
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+                <div className="space-y-4">
+                    <p className="text-muted-foreground leading-relaxed">
+                        My fascination with technology began with a simple "Hello, World!" program. That spark of creation led me down a path of endless curiosity. As I delved deeper into web development, I became acutely aware of the digital vulnerabilities that businesses and users face every day.
+                    </p>
+                    <p className="text-muted-foreground leading-relaxed">
+                        This project, CyberWall Scanner, was born from a desire to make web security more accessible and understandable. I wanted to create a tool that not only identifies threats but also educates users on how to fix them. By integrating cutting-edge AI, the scanner provides intelligent remediation advice, turning complex security data into actionable steps.
+                    </p>
+                </div>
+                <div className="flex justify-center">
+                    <Image 
+                        src="https://picsum.photos/seed/journey/500/350"
+                        alt="Tech journey illustration"
+                        width={500}
+                        height={350}
+                        className="rounded-lg shadow-xl"
+                        data-ai-hint="technology journey"
+                    />
+                </div>
+            </div>
+        </section>
+
+        {/* --- Quote Section --- */}
+        <section className="my-20 text-center">
+          <blockquote className="text-2xl md:text-3xl font-semibold italic text-foreground relative">
+            <span className="absolute -top-4 -left-4 text-8xl text-primary/10 -z-10">“</span>
+            "Always learning, always creating."
+            <span className="absolute -bottom-8 -right-4 text-8xl text-primary/10 -z-10">”</span>
+          </blockquote>
+        </section>
+
+
+        {/* --- Tech & Skills Section --- */}
+        <section className="mb-20">
+            <h2 className="text-3xl font-bold text-center mb-12 tracking-tight">Technologies & Skills</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <Card className="text-center hover:shadow-primary/10 hover:-translate-y-1 transition-all">
+                    <CardHeader>
+                        <div className="mx-auto bg-primary/10 rounded-full p-4 w-fit mb-2">
+                           <Code className="w-10 h-10 text-primary"/>
+                        </div>
+                        <CardTitle>Frontend</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground">React, Next.js, TypeScript, Tailwind CSS, ShadCN/UI</p>
+                    </CardContent>
+                </Card>
+                 <Card className="text-center hover:shadow-primary/10 hover:-translate-y-1 transition-all">
+                    <CardHeader>
+                        <div className="mx-auto bg-primary/10 rounded-full p-4 w-fit mb-2">
+                           <Cpu className="w-10 h-10 text-primary"/>
+                        </div>
+                        <CardTitle>AI & Backend</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground">Genkit, Firebase, Zod, Node.js</p>
+                    </CardContent>
+                </Card>
+                 <Card className="text-center hover:shadow-primary/10 hover:-translate-y-1 transition-all">
+                    <CardHeader>
+                        <div className="mx-auto bg-primary/10 rounded-full p-4 w-fit mb-2">
+                           <Lightbulb className="w-10 h-10 text-primary"/>
+                        </div>
+                        <CardTitle>Skills</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground">UI/UX Design, Web Security Principles, Agile Development</p>
+                    </CardContent>
+                </Card>
+            </div>
+        </section>
+
+        {/* --- Connect Section --- */}
+        <section className="text-center bg-secondary/50 rounded-lg p-12">
+          <h2 className="text-3xl font-bold mb-4">Let's Connect</h2>
+          <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
+            I'm always open to discussing new projects, creative ideas, or opportunities to be part of an amazing team.
+          </p>
+          <div className="flex justify-center gap-4">
+            <Button variant="outline" size="icon" asChild>
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
+                    <Github />
+                </a>
+            </Button>
+            <Button variant="outline" size="icon" asChild>
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+                    <Linkedin />
+                </a>
+            </Button>
+             <Button variant="outline" size="icon" asChild>
+                <a href="mailto:contact@example.com" aria-label="Email">
+                    <Mail />
+                </a>
+            </Button>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+}
