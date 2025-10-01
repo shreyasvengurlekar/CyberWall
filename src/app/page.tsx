@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp } from 'lucide-react';
+import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp, UserPlus, FileText } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
@@ -26,6 +26,24 @@ const features = [
     description: 'Receive easy-to-understand reports that prioritize findings, helping you focus on what matters most.',
   },
 ];
+
+const howItWorksSteps = [
+  {
+    icon: <UserPlus className="w-10 h-10 text-primary" />,
+    title: 'Sign Up & Connect',
+    description: 'Create your account in seconds and provide the URL of the application you want to scan. No complex setup required.',
+  },
+  {
+    icon: <ScanLine className="w-10 h-10 text-primary" />,
+    title: 'Run Your Scan',
+    description: 'With a single click, initiate a comprehensive security scan. Our engine will analyze your application for vulnerabilities.',
+  },
+  {
+    icon: <FileText className="w-10 h-10 text-primary" />,
+    title: 'Get Results & Remediate',
+    description: 'Receive a detailed report with prioritized findings and AI-powered guidance to fix issues quickly and efficiently.',
+  },
+]
 
 export default function Home({ searchQuery }: { searchQuery?: string }) {
   const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
@@ -119,8 +137,34 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
           </div>
         </section>
 
+        {/* How It Works Section */}
+        <section id="how-it-works" className="w-full py-20 md:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">How It Works</div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
+                <Highlight query={searchQuery ?? ''}>Get Started in Three Simple Steps</Highlight>
+              </h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                <Highlight query={searchQuery ?? ''}>Our intuitive platform makes it easy to start securing your web applications today.</Highlight>
+              </p>
+            </div>
+            <div className="mx-auto grid items-start gap-8 sm:max-w-4xl md:gap-12 lg:max-w-5xl lg:grid-cols-3">
+              {howItWorksSteps.map((step, index) => (
+                 <div key={index} className="flex flex-col items-center text-center gap-4">
+                  <div className="bg-primary/10 rounded-full p-4 mb-4">
+                    {step.icon}
+                  </div>
+                  <h3 className="text-xl font-bold"><Highlight query={searchQuery ?? ''}>{step.title}</Highlight></h3>
+                  <p className="text-muted-foreground"><Highlight query={searchQuery ?? ''}>{step.description}</Highlight></p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Pricing Section */}
-        <section id="pricing" className="w-full py-20 md:py-32">
+        <section id="pricing" className="w-full py-20 md:py-32 bg-secondary/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Pricing</div>
