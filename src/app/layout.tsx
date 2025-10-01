@@ -7,7 +7,6 @@ import { Footer } from '@/components/layout/footer';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Inter } from 'next/font/google';
 import * as React from 'react';
-import { usePathname } from 'next/navigation';
 import { PageLoader } from '@/components/page-loader';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -18,13 +17,6 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [searchQuery, setSearchQuery] = React.useState('');
-  const [isLoading, setIsLoading] = React.useState(false);
-  const pathname = usePathname();
-
-  React.useEffect(() => {
-    // Hide loader on initial load and when path changes
-    setIsLoading(false);
-  }, [pathname]);
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -39,14 +31,16 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <PageLoader isLoading={isLoading} />
           <div className="flex flex-col min-h-screen animate-fade-in">
             <Header 
               searchQuery={searchQuery} 
               setSearchQuery={setSearchQuery} 
-              setIsLoading={setIsLoading} 
             />
-            <main className="flex-1">{React.cloneElement(children as React.ReactElement, { searchQuery, setIsLoading })}</main>
+            <main className="flex-1">
+               <React.Suspense fallback={<PageLoader />}>
+                {React.cloneElement(children as React.ReactElement, { searchQuery })}
+              </React.Suspense>
+            </main>
             <Footer />
           </div>
           <Toaster />

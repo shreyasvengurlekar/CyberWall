@@ -4,12 +4,9 @@ import * as React from 'react';
 import { Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface PageLoaderProps {
-  isLoading: boolean;
-}
-
-export function PageLoader({ isLoading }: PageLoaderProps) {
+export function PageLoader() {
   const [showLongLoadMessage, setShowLongLoadMessage] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(true); // Assume loading starts immediately
 
   React.useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -25,6 +22,14 @@ export function PageLoader({ isLoading }: PageLoaderProps) {
     };
   }, [isLoading]);
 
+   React.useEffect(() => {
+    // This is a simple way to hide the loader after a delay,
+    // as Suspense will handle the actual content readiness.
+    const timer = setTimeout(() => setIsLoading(false), 4000); // Max wait time
+    return () => clearTimeout(timer);
+  }, []);
+
+
   return (
     <div
       className={cn(
@@ -37,7 +42,7 @@ export function PageLoader({ isLoading }: PageLoaderProps) {
           <Shield className="w-16 h-16 text-primary animate-shield-pulse" />
         </div>
         <div className="w-48 h-1.5 bg-border rounded-full overflow-hidden">
-          {isLoading && <div className="h-full bg-primary animate-loader-progress rounded-full"></div>}
+          <div className="h-full bg-primary animate-loader-progress rounded-full"></div>
         </div>
         <div className="h-6 mt-2 text-center">
             {showLongLoadMessage && (
