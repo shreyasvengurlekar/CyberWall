@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Contact, DollarSign, ScanLine, Shield, WandSparkles } from 'lucide-react';
+import { Check, Contact, ScanLine, Shield, WandSparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -24,13 +24,13 @@ const features = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen bg-background">
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-20 md:py-32 lg:py-40 bg-background">
           <div className="container px-4 md:px-6">
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16 items-center">
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
                   Fortify Your Web Applications
                 </h1>
@@ -72,10 +72,10 @@ export default function Home() {
             </div>
             <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               {features.map((feature, index) => (
-                <Card key={index} className="h-full">
-                  <CardHeader className="flex flex-row items-start gap-4">
+                <Card key={index} className="h-full hover:shadow-lg transition-shadow">
+                  <CardHeader className="flex flex-row items-center gap-4">
                     {feature.icon}
-                    <CardTitle>{feature.title}</CardTitle>
+                    <CardTitle className="text-xl">{feature.title}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground">{feature.description}</p>
@@ -99,34 +99,34 @@ export default function Home() {
             <div className="mx-auto grid max-w-sm gap-8 lg:max-w-4xl lg:grid-cols-2">
               <Card className="flex flex-col">
                 <CardHeader>
-                  <CardTitle>Free</CardTitle>
+                  <CardTitle className="text-2xl">Free</CardTitle>
                   <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                 </CardHeader>
                 <CardContent className="flex-1 space-y-4">
                   <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> 1 User</li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Basic Scanning</li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Limited Reports</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> 1 User</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> Basic Scanning</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> Limited Reports</li>
                   </ul>
                 </CardContent>
                 <div className="p-6 pt-0">
-                  <Button asChild className="w-full"><Link href="/signup">Sign Up</Link></Button>
+                  <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
                 </div>
               </Card>
-              <Card className="flex flex-col border-primary shadow-lg">
+              <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg">
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle>Pro</CardTitle>
+                    <CardTitle className="text-2xl">Pro</CardTitle>
                     <div className="text-sm font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-full">Most Popular</div>
                   </div>
                   <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                 </CardHeader>
                 <CardContent className="flex-1 space-y-4">
                   <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> 5 Users</li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Advanced Scanning</li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> AI Remediation</li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Detailed Reports</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> 5 Users</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> Advanced Scanning</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> AI Remediation</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> Detailed Reports</li>
                   </ul>
                 </CardContent>
                 <div className="p-6 pt-0">
