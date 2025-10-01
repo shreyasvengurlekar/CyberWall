@@ -16,9 +16,16 @@ const navLinks = [
   { href: '#contact', label: 'Contact' },
 ];
 
-export function Header() {
+type HeaderProps = {
+  searchQuery?: string;
+  setSearchQuery?: (query: string) => void;
+};
+
+
+export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const searchRef = React.useRef<HTMLDivElement>(null);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -32,6 +39,11 @@ export function Header() {
     };
   }, [searchRef]);
 
+  React.useEffect(() => {
+    if (isSearchOpen) {
+      inputRef.current?.focus();
+    }
+  }, [isSearchOpen]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -45,15 +57,20 @@ export function Header() {
         
         <div className="flex flex-1 items-center justify-end gap-4">
           {/* Desktop Search */}
-          <div ref={searchRef} className="hidden sm:flex items-center gap-2 flex-1 justify-end">
-            <div className={cn("relative w-full max-w-xs transition-all duration-300", !isSearchOpen && "w-0 opacity-0")}>
-              <Input
-                type="search"
-                placeholder="Search..."
-                className="w-full pl-10"
-                aria-hidden={!isSearchOpen}
-              />
-               <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <div className="hidden sm:flex items-center gap-2 flex-1 justify-end">
+            <div ref={searchRef} className={cn("relative w-full max-w-xs transition-all duration-300 flex items-center gap-2", !isSearchOpen && "max-w-0 opacity-0")}>
+              <div className='relative w-full'>
+                <Input
+                  ref={inputRef}
+                  type="search"
+                  placeholder="Search..."
+                  className="w-full pl-10"
+                  aria-hidden={!isSearchOpen}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery?.(e.target.value)}
+                />
+                 <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+              </div>
             </div>
              <Button
                 variant="ghost"
@@ -106,7 +123,13 @@ export function Header() {
                     <span className="font-bold">CyberWall</span>
                     </Link>
                     <div className="relative">
-                      <Input type="search" placeholder="Search..." className="w-full pr-10" />
+                      <Input 
+                        type="search" 
+                        placeholder="Search..." 
+                        className="w-full pr-10"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery?.(e.target.value)}
+                      />
                       <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                     </div>
                     {navLinks.map((link) => (
