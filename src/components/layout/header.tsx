@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Menu, Search, ScanLine } from 'lucide-react';
+import { Shield, Menu, Search, ScanLine, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
