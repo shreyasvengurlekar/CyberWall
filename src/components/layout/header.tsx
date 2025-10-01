@@ -21,14 +21,21 @@ const navLinks = [
 type HeaderProps = {
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
+  setIsLoading?: (isLoading: boolean) => void;
 };
 
 
-export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
+export function Header({ searchQuery, setSearchQuery, setIsLoading }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const searchRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const pathname = usePathname();
+
+  const handleLinkClick = (href: string) => {
+    if (pathname !== href && setIsLoading) {
+      setIsLoading(true);
+    }
+  };
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -59,7 +66,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center">
         <div className={cn("mr-4 hidden items-center md:flex")}>
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" onClick={() => handleLinkClick('/')} className="flex items-center gap-2 group">
             <Shield className="h-6 w-6 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
             <span className="font-bold">CyberWall</span>
           </Link>
@@ -97,6 +104,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <Link
                     key={link.href}
                     href={link.href}
+                    onClick={() => handleLinkClick(link.href)}
                     className="font-medium text-muted-foreground transition-colors hover:text-primary"
                     >
                     {link.label}
@@ -106,10 +114,10 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
             <ThemeToggle />
             <div className='hidden sm:flex items-center gap-2'>
               <Button variant="ghost" asChild>
-                  <Link href="/login">Log In</Link>
+                  <Link href="/login" onClick={() => handleLinkClick('/login')}>Log In</Link>
               </Button>
               <Button asChild>
-                  <Link href="/signup">Sign Up</Link>
+                  <Link href="/signup" onClick={() => handleLinkClick('/signup')}>Sign Up</Link>
               </Button>
             </div>
           </div>
@@ -126,7 +134,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                 <SheetContent side="right">
                 <div className="grid gap-4 py-6">
                     <SheetClose asChild>
-                      <Link href="/" className="flex items-center gap-2 mb-4">
+                      <Link href="/" onClick={() => handleLinkClick('/')} className="flex items-center gap-2 mb-4">
                         <Shield className="h-6 w-6 text-primary" />
                         <span className="font-bold">CyberWall</span>
                       </Link>
@@ -145,6 +153,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <SheetClose asChild key={link.href}>
                         <Link
                         href={link.href}
+                        onClick={() => handleLinkClick(link.href)}
                         className="flex w-full items-center py-2 text-lg font-semibold"
                         >
                         {link.label}
@@ -154,12 +163,12 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <div className="flex flex-col gap-2 mt-4">
                       <SheetClose asChild>
                         <Button asChild>
-                            <Link href="/signup">Sign Up</Link>
+                            <Link href="/signup" onClick={() => handleLinkClick('/signup')}>Sign Up</Link>
                         </Button>
                       </SheetClose>
                       <SheetClose asChild>
                         <Button asChild variant="outline">
-                            <Link href="/login">Log In</Link>
+                            <Link href="/login" onClick={() => handleLinkClick('/login')}>Log In</Link>
                         </Button>
                       </SheetClose>
                     </div>
