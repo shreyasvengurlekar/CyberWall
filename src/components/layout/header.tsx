@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Menu, Search } from 'lucide-react';
+import { Shield, Menu, Search, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -12,9 +12,11 @@ import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
 const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/#features', label: 'Features' },
+  { href: '/#how-it-works', label: 'How It Works' },
   { href: '/services', label: 'Services' },
   { href: '/#pricing', label: 'Pricing' },
-  { href: '/#testimonials', label: 'Testimonials' },
   { href: '/about', label: 'About' },
 ];
 
@@ -105,11 +107,11 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
             </nav>
             <ThemeToggle />
             <div className='hidden sm:flex items-center gap-2'>
+              <Button asChild>
+                <Link href="/dashboard"><ScanLine className="mr-2 h-4 w-4" /> Scan Now</Link>
+              </Button>
               <Button variant="ghost" asChild>
                   <Link href="/login">Log In</Link>
-              </Button>
-              <Button asChild>
-                  <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
           </div>
@@ -162,6 +164,11 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <div className="flex flex-col gap-2 mt-4">
                       <SheetClose asChild>
                         <Button asChild>
+                            <Link href="/dashboard">Scan Now</Link>
+                        </Button>
+                      </SheetClose>
+                       <SheetClose asChild>
+                        <Button asChild variant="outline">
                             <Link href="/signup">Sign Up</Link>
                         </Button>
                       </SheetClose>
