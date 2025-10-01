@@ -6,7 +6,7 @@ export default function NotFound() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[calc(100vh-14rem)] text-center px-4 overflow-hidden">
       <div className="relative animate-fade-in-slide-up">
-        <ShieldAlert className="w-24 h-24 text-primary/80 mb-4 animate-float mx-auto" />
+        <ShieldAlert className="w-24 h-24 text-primary/80 mb-4 animate-bounce mx-auto" />
         <h1 className="text-9xl font-bold text-primary tracking-tighter animate-glitch" data-text="404">404</h1>
         <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Page Not Found</h2>
         <p className="mt-4 text-lg text-muted-foreground max-w-md">
