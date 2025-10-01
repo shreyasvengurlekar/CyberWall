@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Menu, Search, ScanLine, RefreshCw } from 'lucide-react';
+import { Shield, Menu, Search, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { ThemeToggle } from '../theme-toggle';
 import { cn } from '@/lib/utils';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -31,7 +31,6 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const searchRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const pathname = usePathname();
-  const router = useRouter();
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -57,10 +56,6 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
       setSearchQuery('');
     }
   }, [pathname, setSearchQuery]);
-
-  const handleRefresh = () => {
-    router.push('/');
-  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -111,9 +106,6 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                 ))}
             </nav>
             <ThemeToggle />
-            <Button variant="ghost" size="icon" onClick={handleRefresh} aria-label="Refresh and go to Homepage">
-              <RefreshCw className="h-5 w-5" />
-            </Button>
             <div className='hidden sm:flex items-center gap-2'>
               <Button asChild>
                 <Link href="/dashboard"><ScanLine className="mr-2 h-4 w-4" /> Scan Now</Link>
