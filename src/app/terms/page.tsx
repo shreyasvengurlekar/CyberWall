@@ -1,12 +1,5 @@
-'use client';
-import { useState, useEffect } from 'react';
-
 export default function TermsOfServicePage() {
-  const [date, setDate] = useState('');
-
-  useEffect(() => {
-    setDate(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
-  }, []);
+  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
   return (
     <div className="container max-w-4xl mx-auto py-12 md:py-20 px-4 md:px-6">
