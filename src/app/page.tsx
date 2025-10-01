@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp, UserPlus, FileText } from 'lucide-react';
+import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp, UserPlus, FileText, Briefcase } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
@@ -113,7 +113,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
         <section id="features" className="w-full py-20 md:py-32 bg-secondary/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Key Features</div>
+              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Key Features</div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                 <Highlight query={searchQuery ?? ''}>Everything You Need to Secure Your Code</Highlight>
               </h2>
@@ -123,7 +123,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             </div>
             <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               {features.map((feature, index) => (
-                <Card key={index} className="h-full hover:shadow-lg transition-shadow">
+                <Card key={index} className="h-full hover:shadow-lg transition-shadow bg-card">
                   <CardHeader className="flex flex-row items-center gap-4">
                     {feature.icon}
                     <CardTitle className="text-xl"><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
@@ -141,7 +141,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
         <section id="how-it-works" className="w-full py-20 md:py-32">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">How It Works</div>
+              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">How It Works</div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                 <Highlight query={searchQuery ?? ''}>Get Started in Three Simple Steps</Highlight>
               </h2>
@@ -149,16 +149,19 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Highlight query={searchQuery ?? ''}>Our intuitive platform makes it easy to start securing your web applications today.</Highlight>
               </p>
             </div>
-            <div className="mx-auto grid items-start gap-8 sm:max-w-4xl md:gap-12 lg:max-w-5xl lg:grid-cols-3">
-              {howItWorksSteps.map((step, index) => (
-                 <div key={index} className="flex flex-col items-center text-center gap-4">
-                  <div className="bg-primary/10 rounded-full p-4 mb-4">
-                    {step.icon}
+            <div className="relative">
+              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-border -translate-y-1/2" aria-hidden="true"></div>
+              <div className="relative mx-auto grid items-start gap-8 sm:max-w-4xl md:gap-12 lg:max-w-5xl lg:grid-cols-3">
+                {howItWorksSteps.map((step, index) => (
+                  <div key={index} className="flex flex-col items-center text-center gap-4 p-6 rounded-lg bg-background">
+                    <div className="bg-primary/10 rounded-full p-4 mb-4 ring-8 ring-background">
+                      {step.icon}
+                    </div>
+                    <h3 className="text-xl font-bold"><Highlight query={searchQuery ?? ''}>{step.title}</Highlight></h3>
+                    <p className="text-muted-foreground"><Highlight query={searchQuery ?? ''}>{step.description}</Highlight></p>
                   </div>
-                  <h3 className="text-xl font-bold"><Highlight query={searchQuery ?? ''}>{step.title}</Highlight></h3>
-                  <p className="text-muted-foreground"><Highlight query={searchQuery ?? ''}>{step.description}</Highlight></p>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -167,7 +170,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
         <section id="pricing" className="w-full py-20 md:py-32 bg-secondary/50">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Pricing</div>
+              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Pricing</div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
                 <Highlight query={searchQuery ?? ''}>Simple, Transparent Pricing</Highlight>
               </h2>
@@ -175,66 +178,67 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Highlight query={searchQuery ?? ''}>Choose the plan that's right for you. Get started for free.</Highlight>
               </p>
             </div>
-            <div className="grid gap-8 lg:grid-cols-2 items-center">
-                <div className="mx-auto grid max-w-sm gap-8 lg:max-w-4xl lg:grid-cols-2">
-                    <Card className="flex flex-col transition-transform hover:scale-105">
-                        <CardHeader>
-                        <CardTitle className="text-2xl">Free</CardTitle>
-                        <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                        </CardHeader>
-                        <CardContent className="flex-1 space-y-4">
-                        <ul className="space-y-2 text-muted-foreground">
-                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>1 User</Highlight></li>
-                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Basic Scanning</Highlight></li>
-                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Limited Reports</Highlight></li>
-                        </ul>
-                        </CardContent>
-                        <div className="p-6 pt-0">
-                        <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
-                        </div>
-                    </Card>
-                    <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105">
-                        <CardHeader>
-                        <div className="flex justify-between items-center">
-                            <CardTitle className="text-2xl">Pro</CardTitle>
-                            <div className="text-sm font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-full">Most Popular</div>
-                        </div>
-                        <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                        </CardHeader>
-                        <CardContent className="flex-1 space-y-4">
-                        <ul className="space-y-2 text-muted-foreground">
-                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>5 Users</Highlight></li>
-                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Advanced Scanning</Highlight></li>
-                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>AI Remediation</Highlight></li>
-                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Detailed Reports</Highlight></li>
-                        </ul>
-                        </CardContent>
-                        <div className="p-6 pt-0">
-                        <Button asChild className="w-full"><Link href="/dashboard">Get Started</Link></Button>
-                        </div>
-                    </Card>
-                </div>
-                <div className="flex justify-center">
-                {pricingImage && (
-                    <Image
-                        src={pricingImage.imageUrl}
-                        alt="Pricing"
-                        width={500}
-                        height={350}
-                        className="rounded-xl shadow-2xl"
-                        data-ai-hint={pricingImage.imageHint}
-                    />
-                )}
-                </div>
+            <div className="grid gap-8 lg:grid-cols-3 max-w-5xl mx-auto">
+                <Card className="flex flex-col transition-transform hover:scale-105">
+                    <CardHeader>
+                    <CardTitle className="text-2xl">Free</CardTitle>
+                    <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-4">
+                    <ul className="space-y-2 text-muted-foreground">
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>1 User</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Basic Scanning</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Limited Reports</Highlight></li>
+                    </ul>
+                    </CardContent>
+                    <div className="p-6 pt-0">
+                    <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
+                    </div>
+                </Card>
+                <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-8 py-1 font-semibold" style={{clipPath: 'polygon(0 0, 100% 0, 100% 100%, 25% 100%)'}}>Popular</div>
+                    <CardHeader className="pt-12">
+                    <CardTitle className="text-2xl">Pro</CardTitle>
+                    <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-4">
+                    <ul className="space-y-2 text-muted-foreground">
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>5 Users</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Advanced Scanning</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>AI Remediation</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Detailed Reports</Highlight></li>
+                    </ul>
+                    </CardContent>
+                    <div className="p-6 pt-0">
+                    <Button asChild className="w-full"><Link href="/dashboard">Get Started</Link></Button>
+                    </div>
+                </Card>
+                 <Card className="flex flex-col transition-transform hover:scale-105">
+                    <CardHeader>
+                    <CardTitle className="text-2xl flex items-center gap-2">Business <Briefcase /></CardTitle>
+                    <p className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    </CardHeader>
+                    <CardContent className="flex-1 space-y-4">
+                    <ul className="space-y-2 text-muted-foreground">
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Unlimited Users</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>All Pro Features</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Team Collaboration</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Priority Support</Highlight></li>
+                    </ul>
+                    </CardContent>
+                    <div className="p-6 pt-0">
+                    <Button asChild className="w-full" variant="outline"><Link href="/signup">Contact Sales</Link></Button>
+                    </div>
+                </Card>
             </div>
           </div>
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="w-full py-20 md:py-32 bg-secondary/50">
+        <section id="contact" className="w-full py-20 md:py-32">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
-              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary mb-4"><Contact className="w-5 h-5 inline-block mr-1" />Contact Us</div>
+              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary mb-4"><Contact className="w-5 h-5 inline-block mr-1" />Contact Us</div>
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
                 <Highlight query={searchQuery ?? ''}>Get in Touch</Highlight>
               </h2>
@@ -250,7 +254,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
 
 
         {/* CTA Section */}
-        <section className="w-full py-20 md:py-32">
+        <section className="w-full py-20 md:py-32 bg-secondary/50">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
