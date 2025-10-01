@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function DashboardPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-14rem)] text-center px-4">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-14rem)] text-center px-4 animate-fade-in">
         <h1 className="text-5xl font-bold text-primary tracking-tighter">Welcome to CyberWall</h1>
         <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Dashboard Coming Soon</h2>
         <p className="mt-4 text-lg text-muted-foreground max-w-xl">

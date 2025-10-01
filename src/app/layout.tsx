@@ -30,7 +30,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="flex flex-col min-h-screen">
+          <div className="flex flex-col min-h-screen animate-fade-in">
             <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
             <main className="flex-1">{React.cloneElement(children as React.ReactElement, { searchQuery })}</main>
             <Footer />

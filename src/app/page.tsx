@@ -122,7 +122,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             </div>
             <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               {features.map((feature, index) => (
-                <Card key={index} className="h-full hover:shadow-lg transition-shadow bg-card">
+                <Card key={index} className="h-full hover:shadow-primary/10 hover:-translate-y-1 transition-all bg-card">
                   <CardHeader className="flex flex-row items-center gap-4">
                     {feature.icon}
                     <CardTitle className="text-xl"><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
@@ -178,7 +178,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
               </p>
             </div>
             <div className="grid gap-8 lg:grid-cols-3 max-w-5xl mx-auto">
-                <Card className="flex flex-col transition-transform hover:scale-105">
+                <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Free</h3>
                     <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
@@ -194,7 +194,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
                     </div>
                 </Card>
-                <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105 relative overflow-hidden">
+                <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-[1.03] relative overflow-hidden">
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-8 py-1 font-semibold" style={{clipPath: 'polygon(0 0, 100% 0, 100% 100%, 25% 100%)'}}>Popular</div>
                     <CardHeader className="pt-12">
                     <h3 className="text-2xl font-semibold">Pro</h3>
@@ -212,7 +212,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     <Button asChild className="w-full"><Link href="/dashboard">Get Started</Link></Button>
                     </div>
                 </Card>
-                 <Card className="flex flex-col transition-transform hover:scale-105">
+                 <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Business</h3>
                     <p className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></p>

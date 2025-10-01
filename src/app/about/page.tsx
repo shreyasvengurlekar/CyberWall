@@ -55,7 +55,7 @@ export default function AboutPage() {
               alt="Cartoon avatar"
               width={200}
               height={200}
-              className="rounded-full shadow-2xl border-4 border-primary/50"
+              className="rounded-full shadow-2xl border-4 border-primary/50 transition-all duration-300 hover:shadow-primary/20 hover:scale-105"
               data-ai-hint="cartoon avatar"
             />
           </div>
@@ -120,7 +120,7 @@ export default function AboutPage() {
                                </div>
                             </div>
                             <div className={`w-[calc(50%-2.5rem)] ${index % 2 === 0 ? 'float-left text-right' : 'float-right text-left'}`}>
-                                <Card className="p-6 opacity-0 animate-fade-in transition-all hover:shadow-primary/10 hover:-translate-y-1" style={{animationDelay: `${index * 150}ms`, animationFillMode: 'forwards'}}>
+                                <Card className="p-6 transition-all hover:shadow-primary/10 hover:-translate-y-1" >
                                   <h3 className="text-xl font-bold mb-2">{step.title}</h3>
                                   <p className="text-muted-foreground">{step.description}</p>
                                 </Card>
@@ -210,5 +210,3 @@ export default function AboutPage() {
     </div>
   );
 }
-
-    
