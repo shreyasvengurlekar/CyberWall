@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, ScanLine, Shield, WandSparkles, UserPlus, FileText, Star, Quote } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Check, ScanLine, Shield, WandSparkles, UserPlus, FileText, Star, Quote, Mail, DollarSign, Info } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
@@ -81,7 +81,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
   const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
 
   const plugin = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: true, stopOnMouseEnter: true })
+    Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })
   )
 
   return (
@@ -309,18 +309,42 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
 
         {/* Contact Section */}
         <section id="contact" className="w-full py-20 md:py-32 bg-muted">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                <Highlight query={searchQuery ?? ''}>Get in Touch</Highlight>
-              </h2>
-              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                <Highlight query={searchQuery ?? ''}>Have questions about our service or pricing? We're happy to help.</Highlight>
-              </p>
-              <Button asChild size="lg">
-                <Link href="mailto:support@cyberwall.com">Email Us</Link>
-              </Button>
-            </div>
+          <div className="container px-4 md:px-6">
+            <Card className="max-w-4xl mx-auto shadow-xl">
+              <CardHeader className="text-center p-8">
+                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
+                  <Highlight query={searchQuery ?? ''}>Get in Touch</Highlight>
+                </h2>
+                <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed">
+                  <Highlight query={searchQuery ?? ''}>Have questions? We're here to help.</Highlight>
+                </p>
+              </CardHeader>
+              <CardContent className="p-8 pt-0">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <Card className="flex flex-col items-center text-center p-6 hover:shadow-primary/10 hover:-translate-y-1 transition-all">
+                    <div className="p-3 bg-primary/10 rounded-full mb-4">
+                      <Mail className="w-8 h-8 text-primary"/>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-1">General Inquiries</h3>
+                    <a href="mailto:info@cyberwall.com" className="text-primary hover:underline">info@cyberwall.com</a>
+                  </Card>
+                  <Card className="flex flex-col items-center text-center p-6 hover:shadow-primary/10 hover:-translate-y-1 transition-all">
+                    <div className="p-3 bg-primary/10 rounded-full mb-4">
+                      <DollarSign className="w-8 h-8 text-primary"/>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-1">Sales</h3>
+                    <a href="mailto:sales@cyberwall.com" className="text-primary hover:underline">sales@cyberwall.com</a>
+                  </Card>
+                  <Card className="flex flex-col items-center text-center p-6 hover:shadow-primary/10 hover:-translate-y-1 transition-all">
+                    <div className="p-3 bg-primary/10 rounded-full mb-4">
+                      <Info className="w-8 h-8 text-primary"/>
+                    </div>
+                    <h3 className="text-xl font-semibold mb-1">Support</h3>
+                    <a href="mailto:support@cyberwall.com" className="text-primary hover:underline">support@cyberwall.com</a>
+                  </Card>
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </section>
 
@@ -347,5 +371,3 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
     </div>
   );
 }
-
-    
