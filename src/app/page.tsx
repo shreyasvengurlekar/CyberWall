@@ -125,7 +125,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Card key={index} className="h-full hover:shadow-lg transition-shadow bg-card">
                   <CardHeader className="flex flex-row items-center gap-4">
                     {feature.icon}
-                    <CardTitle><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
+                    <CardTitle className="text-xl"><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground"><Highlight query={searchQuery ?? ''}>{feature.description}</Highlight></p>
@@ -180,7 +180,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             <div className="grid gap-8 lg:grid-cols-3 max-w-5xl mx-auto">
                 <Card className="flex flex-col transition-transform hover:scale-105">
                     <CardHeader>
-                    <CardTitle>Free</CardTitle>
+                    <h3 className="text-2xl font-semibold">Free</h3>
                     <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
@@ -197,7 +197,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105 relative overflow-hidden">
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-8 py-1 font-semibold" style={{clipPath: 'polygon(0 0, 100% 0, 100% 100%, 25% 100%)'}}>Popular</div>
                     <CardHeader className="pt-12">
-                    <CardTitle>Pro</CardTitle>
+                    <h3 className="text-2xl font-semibold">Pro</h3>
                     <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
@@ -214,7 +214,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 </Card>
                  <Card className="flex flex-col transition-transform hover:scale-105">
                     <CardHeader>
-                    <CardTitle>Business</CardTitle>
+                    <h3 className="text-2xl font-semibold">Business</h3>
                     <p className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
@@ -277,9 +277,9 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
           onClick={scrollToTop}
           className="fixed bottom-8 right-8 h-12 w-12 rounded-full shadow-lg"
           size="icon"
+          aria-label="Go to top"
         >
           <ArrowUp className="h-6 w-6" />
-          <span className="sr-only">Go to top</span>
         </Button>
       )}
     </div>

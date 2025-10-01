@@ -14,7 +14,7 @@ export default function DashboardPage() {
                 <Link href="/">Go back home</Link>
             </Button>
             <Button variant="ghost" asChild>
-                <Link href="#contact">Contact support <span aria-hidden="true">&rarr;</span></Link>
+                <Link href="/#contact">Contact support <span aria-hidden="true">&rarr;</span></Link>
             </Button>
         </div>
     </div>

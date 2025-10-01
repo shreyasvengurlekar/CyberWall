@@ -12,8 +12,8 @@ import { cn } from '@/lib/utils';
 
 const navLinks = [
   { href: '/services', label: 'Services' },
-  { href: '#pricing', label: 'Pricing' },
-  { href: '#contact', label: 'Contact' },
+  { href: '/#pricing', label: 'Pricing' },
+  { href: '/#contact', label: 'Contact' },
 ];
 
 type HeaderProps = {
@@ -57,8 +57,8 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         
         <div className="flex flex-1 items-center justify-end gap-2">
           {/* Desktop Search */}
-          <div ref={searchRef} className={cn("relative w-full transition-all duration-300 hidden sm:flex items-center gap-2 justify-end flex-1", isSearchOpen && "max-w-full")}>
-              <div className={cn('relative w-full transition-all duration-300', !isSearchOpen ? 'max-w-0 opacity-0' : 'max-w-md')}>
+          <div className="relative hidden sm:flex items-center gap-2 justify-end flex-1">
+              <div ref={searchRef} className={cn('relative w-full transition-all duration-300', !isSearchOpen ? 'max-w-0 opacity-0' : 'max-w-md')}>
                 <Input
                   ref={inputRef}
                   type="search"
@@ -74,10 +74,9 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                   variant="ghost"
                   size="icon"
                   onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className='hidden sm:inline-flex'
+                  aria-label="Toggle Search"
                 >
                   <Search className="h-5 w-5" />
-                  <span className="sr-only">Toggle Search</span>
               </Button>
           </div>
          
@@ -110,9 +109,8 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
           <div className="flex items-center sm:hidden">
             <Sheet>
                 <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
+                <Button variant="outline" size="icon" aria-label="Toggle Menu">
                     <Menu className="h-5 w-5" />
-                    <span className="sr-only">Toggle Menu</span>
                 </Button>
                 </SheetTrigger>
                 <SheetContent side="right">
