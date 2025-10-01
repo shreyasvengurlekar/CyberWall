@@ -71,7 +71,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     <Link href="/dashboard">Get Started for Free</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg">
-                    <Link href="#features">Learn More</Link>
+                    <Link href="/services">Learn More</Link>
                   </Button>
                 </div>
               </div>
@@ -131,43 +131,57 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Highlight query={searchQuery ?? ''}>Choose the plan that's right for you. Get started for free.</Highlight>
               </p>
             </div>
-            <div className="mx-auto grid max-w-sm gap-8 lg:max-w-4xl lg:grid-cols-2">
-              <Card className="flex flex-col transition-transform hover:scale-105">
-                <CardHeader>
-                  <CardTitle className="text-2xl">Free</CardTitle>
-                  <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                </CardHeader>
-                <CardContent className="flex-1 space-y-4">
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>1 User</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Basic Scanning</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Limited Reports</Highlight></li>
-                  </ul>
-                </CardContent>
-                <div className="p-6 pt-0">
-                  <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
+            <div className="grid gap-8 lg:grid-cols-2 items-center">
+                <div className="mx-auto grid max-w-sm gap-8 lg:max-w-4xl lg:grid-cols-2">
+                    <Card className="flex flex-col transition-transform hover:scale-105">
+                        <CardHeader>
+                        <CardTitle className="text-2xl">Free</CardTitle>
+                        <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                        </CardHeader>
+                        <CardContent className="flex-1 space-y-4">
+                        <ul className="space-y-2 text-muted-foreground">
+                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>1 User</Highlight></li>
+                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Basic Scanning</Highlight></li>
+                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Limited Reports</Highlight></li>
+                        </ul>
+                        </CardContent>
+                        <div className="p-6 pt-0">
+                        <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
+                        </div>
+                    </Card>
+                    <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105">
+                        <CardHeader>
+                        <div className="flex justify-between items-center">
+                            <CardTitle className="text-2xl">Pro</CardTitle>
+                            <div className="text-sm font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-full">Most Popular</div>
+                        </div>
+                        <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                        </CardHeader>
+                        <CardContent className="flex-1 space-y-4">
+                        <ul className="space-y-2 text-muted-foreground">
+                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>5 Users</Highlight></li>
+                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Advanced Scanning</Highlight></li>
+                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>AI Remediation</Highlight></li>
+                            <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Detailed Reports</Highlight></li>
+                        </ul>
+                        </CardContent>
+                        <div className="p-6 pt-0">
+                        <Button asChild className="w-full"><Link href="/dashboard">Get Started</Link></Button>
+                        </div>
+                    </Card>
                 </div>
-              </Card>
-              <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105">
-                <CardHeader>
-                  <div className="flex justify-between items-center">
-                    <CardTitle className="text-2xl">Pro</CardTitle>
-                    <div className="text-sm font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-full">Most Popular</div>
-                  </div>
-                  <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
-                </CardHeader>
-                <CardContent className="flex-1 space-y-4">
-                  <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>5 Users</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Advanced Scanning</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>AI Remediation</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Detailed Reports</Highlight></li>
-                  </ul>
-                </CardContent>
-                <div className="p-6 pt-0">
-                  <Button asChild className="w-full"><Link href="/dashboard">Get Started</Link></Button>
+                <div className="flex justify-center">
+                {pricingImage && (
+                    <Image
+                        src={pricingImage.imageUrl}
+                        alt="Pricing"
+                        width={500}
+                        height={350}
+                        className="rounded-xl shadow-2xl"
+                        data-ai-hint={pricingImage.imageHint}
+                    />
+                )}
                 </div>
-              </Card>
             </div>
           </div>
         </section>
