@@ -1,9 +1,11 @@
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { ShieldAlert } from 'lucide-react';
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-14rem)] text-center px-4">
+    <div className="flex flex-col items-center justify-center min-h-[calc(100vh-14rem)] text-center px-4 animate-fade-in">
+      <ShieldAlert className="w-24 h-24 text-primary/80 mb-4 animate-bounce" />
       <h1 className="text-9xl font-bold text-primary tracking-tighter">404</h1>
       <h2 className="mt-4 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">Page Not Found</h2>
       <p className="mt-4 text-lg text-muted-foreground max-w-md">
