@@ -10,6 +10,7 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/s
 import { ThemeToggle } from '../theme-toggle';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
+import { Card } from '@/components/ui/card';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -20,6 +21,21 @@ const navLinks = [
   { href: '/about', label: 'About' },
 ];
 
+const searchableTerms = [
+  'Vulnerability Scanning',
+  'AI-Powered Remediation',
+  'Actionable Reporting',
+  'SQL Injection',
+  'Cross-Site Scripting (XSS)',
+  'Broken Authentication',
+  'Security Misconfiguration',
+  'Pricing',
+  'Features',
+  'Testimonials',
+  'About',
+  'Services'
+];
+
 type HeaderProps = {
   searchQuery?: string;
   setSearchQuery?: (query: string) => void;
@@ -28,6 +44,7 @@ type HeaderProps = {
 
 export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const [suggestions, setSuggestions] = React.useState<string[]>([]);
   const searchRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const pathname = usePathname();
@@ -36,6 +53,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsSearchOpen(false);
+        setSuggestions([]);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -55,7 +73,27 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
     if(setSearchQuery){
       setSearchQuery('');
     }
+    setSuggestions([]);
   }, [pathname, setSearchQuery]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const query = e.target.value;
+    setSearchQuery?.(query);
+    if (query.length > 1) {
+      const filteredSuggestions = searchableTerms.filter(term =>
+        term.toLowerCase().includes(query.toLowerCase())
+      );
+      setSuggestions(filteredSuggestions);
+    } else {
+      setSuggestions([]);
+    }
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    setSearchQuery?.(suggestion);
+    setSuggestions([]);
+    inputRef.current?.focus();
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -70,7 +108,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         <div className="flex flex-1 items-center justify-end gap-2">
           {/* Desktop Search */}
           <div className="relative hidden sm:flex items-center gap-2 justify-end flex-1">
-              <div ref={searchRef} className={cn('relative w-full transition-all duration-300', !isSearchOpen ? 'max-w-0 opacity-0' : 'max-w-sm')}>
+              <div ref={searchRef} className={cn('relative transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0' : 'w-full max-w-sm')}>
                 <Input
                   ref={inputRef}
                   type="search"
@@ -78,9 +116,25 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                   className="w-full pl-10"
                   aria-hidden={!isSearchOpen}
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery?.(e.target.value)}
+                  onChange={handleSearchChange}
+                  onFocus={() => setIsSearchOpen(true)}
                 />
                  <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                 {suggestions.length > 0 && (
+                    <Card className="absolute top-full mt-2 w-full max-h-60 overflow-y-auto z-10">
+                      <ul>
+                        {suggestions.map((suggestion, index) => (
+                          <li
+                            key={index}
+                            className="px-4 py-2 hover:bg-muted cursor-pointer"
+                            onClick={() => handleSuggestionClick(suggestion)}
+                          >
+                            {suggestion}
+                          </li>
+                        ))}
+                      </ul>
+                    </Card>
+                  )}
               </div>
                <Button
                   variant="ghost"
@@ -142,9 +196,24 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                         placeholder="Search..." 
                         className="w-full pr-10"
                         value={searchQuery}
-                        onChange={(e) => setSearchQuery?.(e.target.value)}
+                        onChange={handleSearchChange}
                       />
                       <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                       {suggestions.length > 0 && (
+                        <Card className="absolute top-full mt-2 w-full max-h-48 overflow-y-auto z-10">
+                          <ul>
+                            {suggestions.map((suggestion, index) => (
+                              <li
+                                key={index}
+                                className="px-4 py-2 hover:bg-muted cursor-pointer"
+                                onClick={() => handleSuggestionClick(suggestion)}
+                              >
+                                {suggestion}
+                              </li>
+                            ))}
+                          </ul>
+                        </Card>
+                      )}
                     </div>
                     {navLinks.map((link) => (
                     <SheetClose asChild key={link.href}>
