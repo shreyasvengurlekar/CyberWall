@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { Highlight } from '@/components/highlight';
+import { PlaceHolderImages } from '@/lib/placeholder-images';
 
 
 const features = [
@@ -27,6 +28,9 @@ const features = [
 ];
 
 export default function Home({ searchQuery }: { searchQuery?: string }) {
+  const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
+  const pricingImage = PlaceHolderImages.find(p => p.id === 'pricing-hero');
+
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -52,14 +56,16 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 </div>
               </div>
               <div className="flex justify-center">
-                <Image
-                  src="https://picsum.photos/seed/cyber-hero/600/400"
-                  alt="Cybersecurity"
-                  width={600}
-                  height={400}
-                  className="rounded-xl shadow-2xl"
-                  data-ai-hint="cybersecurity abstract"
-                />
+                {heroImage && (
+                  <Image
+                    src={heroImage.imageUrl}
+                    alt="Cybersecurity"
+                    width={600}
+                    height={400}
+                    className="rounded-xl shadow-2xl"
+                    data-ai-hint={heroImage.imageHint}
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -106,7 +112,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
               </p>
             </div>
             <div className="mx-auto grid max-w-sm gap-8 lg:max-w-4xl lg:grid-cols-2">
-              <Card className="flex flex-col">
+              <Card className="flex flex-col transition-transform hover:scale-105">
                 <CardHeader>
                   <CardTitle className="text-2xl">Free</CardTitle>
                   <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
@@ -122,7 +128,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                   <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
                 </div>
               </Card>
-              <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg">
+              <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105">
                 <CardHeader>
                   <div className="flex justify-between items-center">
                     <CardTitle className="text-2xl">Pro</CardTitle>
