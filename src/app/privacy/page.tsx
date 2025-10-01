@@ -1,11 +1,19 @@
+'use client';
+
+import * as React from 'react';
+
 export default function PrivacyPolicyPage() {
-  const date = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+  const [date, setDate] = React.useState('');
+
+  React.useEffect(() => {
+    setDate(new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }));
+  }, []);
 
   return (
     <div className="container max-w-4xl mx-auto py-12 md:py-20 px-4 md:px-6">
       <div className="space-y-6">
         <h1 className="text-4xl font-bold">Privacy Policy</h1>
-        <p className="text-muted-foreground">Last updated: {date}</p>
+        {date && <p className="text-muted-foreground">Last updated: {date}</p>}
 
         <div className="space-y-4">
           <h2 className="text-2xl font-bold">1. Introduction</h2>

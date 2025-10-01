@@ -11,7 +11,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
-import { Footer } from '@/components/layout/footer';
 import { ThemeToggle } from '@/components/theme-toggle';
 
 const formSchema = z.object({
@@ -107,7 +106,6 @@ export default function LoginPage() {
           </Card>
         </div>
       </div>
-      <Footer />
     </div>
   );
 }

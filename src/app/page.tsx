@@ -47,7 +47,6 @@ const howItWorksSteps = [
 
 export default function Home({ searchQuery }: { searchQuery?: string }) {
   const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
-  const pricingImage = PlaceHolderImages.find(p => p.id === 'pricing-hero');
   const [showBackToTop, setShowBackToTop] = React.useState(false);
 
   React.useEffect(() => {
