@@ -1,8 +1,10 @@
+'use client';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Github, Linkedin, Mail, Download, Code, Cpu, Lightbulb, Rocket, Bug, Layers, DraftingCompass, BookOpen, ClipboardList } from 'lucide-react';
+import * as React from 'react';
 
 const timelineSteps = [
   {
@@ -44,6 +46,12 @@ const timelineSteps = [
 
 
 export default function AboutPage() {
+    const [isClient, setIsClient] = React.useState(false);
+
+    React.useEffect(() => {
+        setIsClient(true);
+    }, []);
+
   return (
     <div className="bg-background animate-fade-in">
       <div className="container mx-auto max-w-5xl py-20 md:py-32 px-4 md:px-6">
@@ -112,14 +120,14 @@ export default function AboutPage() {
                 <div className="absolute left-1/2 -ml-[2px] h-full w-1 bg-border" aria-hidden="true"></div>
                 
                 <div className="space-y-16">
-                    {timelineSteps.map((step, index) => (
-                        <div key={index} className="relative group">
+                    {isClient && timelineSteps.map((step, index) => (
+                        <div key={index} className="relative flex justify-center">
                              <div className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 bg-background w-20 h-20 rounded-full">
                                <div className="flex items-center justify-center bg-primary/10 rounded-full w-16 h-16 ring-8 ring-background transition-all group-hover:ring-primary/10 group-hover:scale-110">
                                    {step.icon}
                                </div>
                             </div>
-                            <div className={`w-[calc(50%-2.5rem)] ${index % 2 === 0 ? 'float-left text-right' : 'float-right text-left'}`}>
+                            <div className={`w-[calc(50%-2.5rem)] ${index % 2 === 0 ? 'mr-auto text-right' : 'ml-auto text-left'}`}>
                                 <Card className="p-6 transition-all hover:shadow-primary/10 hover:-translate-y-1" >
                                   <h3 className="text-xl font-bold mb-2">{step.title}</h3>
                                   <p className="text-muted-foreground">{step.description}</p>

@@ -120,7 +120,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Highlight query={searchQuery ?? ''}>Our platform combines automated scanning with intelligent analysis to provide a complete security solution.</Highlight>
               </p>
             </div>
-            <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
+            <div className="mx-auto grid items-start gap-8 sm:max-w-4xl md:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               {features.map((feature, index) => (
                 <Card key={index} className="h-full hover:shadow-primary/10 hover:-translate-y-1 transition-all bg-card">
                   <CardHeader className="flex flex-row items-center gap-4">
