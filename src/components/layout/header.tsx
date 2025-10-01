@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { ThemeToggle } from '../theme-toggle';
 import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 
 const navLinks = [
   { href: '/services', label: 'Services' },
@@ -26,6 +27,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const searchRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const pathname = usePathname();
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -44,6 +46,10 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
       inputRef.current?.focus();
     }
   }, [isSearchOpen]);
+  
+  React.useEffect(() => {
+    setIsSearchOpen(false);
+  }, [pathname]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -58,7 +64,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         <div className="flex flex-1 items-center justify-end gap-2">
           {/* Desktop Search */}
           <div className="relative hidden sm:flex items-center gap-2 justify-end flex-1">
-              <div ref={searchRef} className={cn('relative w-full transition-all duration-300', !isSearchOpen ? 'max-w-0 opacity-0' : 'max-w-md')}>
+              <div ref={searchRef} className={cn('relative w-full transition-all duration-300', !isSearchOpen ? 'max-w-0 opacity-0' : 'max-w-sm')}>
                 <Input
                   ref={inputRef}
                   type="search"
@@ -87,7 +93,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <Link
                     key={link.href}
                     href={link.href}
-                    className="relative text-muted-foreground transition-colors hover:text-foreground after:absolute after:bottom-[-2px] after:left-0 after:h-0.5 after:w-full after:scale-x-0 after:bg-primary after:transition-transform after:duration-300 after:ease-in-out hover:drop-shadow-[0_0_2px_hsl(var(--primary))] origin-center"
+                    className="font-medium text-muted-foreground transition-colors hover:text-foreground"
                     >
                     {link.label}
                     </Link>
@@ -115,10 +121,12 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                 </SheetTrigger>
                 <SheetContent side="right">
                 <div className="grid gap-4 py-6">
-                    <Link href="/" className="flex items-center gap-2 mb-4">
-                    <Shield className="h-6 w-6 text-primary" />
-                    <span className="font-bold">CyberWall</span>
-                    </Link>
+                    <SheetClose asChild>
+                      <Link href="/" className="flex items-center gap-2 mb-4">
+                        <Shield className="h-6 w-6 text-primary" />
+                        <span className="font-bold">CyberWall</span>
+                      </Link>
+                    </SheetClose>
                     <div className="relative">
                       <Input 
                         type="search" 
@@ -141,13 +149,13 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     ))}
                     <div className="flex flex-col gap-2 mt-4">
                       <SheetClose asChild>
-                        <Button asChild variant="outline">
-                            <Link href="/login">Log In</Link>
+                        <Button asChild>
+                            <Link href="/signup">Sign Up</Link>
                         </Button>
                       </SheetClose>
                       <SheetClose asChild>
-                        <Button asChild>
-                            <Link href="/signup">Sign Up</Link>
+                        <Button asChild variant="outline">
+                            <Link href="/login">Log In</Link>
                         </Button>
                       </SheetClose>
                     </div>
