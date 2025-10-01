@@ -8,6 +8,7 @@ import * as React from 'react';
 import { Highlight } from '@/components/highlight';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import Autoplay from "embla-carousel-autoplay"
 
 const features = [
   {
@@ -78,6 +79,10 @@ const testimonials = [
 
 export default function Home({ searchQuery }: { searchQuery?: string }) {
   const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
+
+  const plugin = React.useRef(
+    Autoplay({ delay: 2000, stopOnInteraction: true, stopOnMouseEnter: true })
+  )
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -188,11 +193,14 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     </p>
                 </div>
                  <Carousel
+                    plugins={[plugin.current]}
                     opts={{
                         align: "start",
                         loop: true,
                     }}
                     className="w-full max-w-4xl mx-auto"
+                    onMouseEnter={plugin.current.stop}
+                    onMouseLeave={plugin.current.reset}
                     >
                     <CarouselContent>
                         {testimonials.map((testimonial, index) => (
