@@ -47,27 +47,6 @@ const howItWorksSteps = [
 
 export default function Home({ searchQuery }: { searchQuery?: string }) {
   const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
-  const [showBackToTop, setShowBackToTop] = React.useState(false);
-
-  React.useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 300) {
-        setShowBackToTop(true);
-      } else {
-        setShowBackToTop(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -254,7 +233,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
 
         {/* CTA Section */}
         <section className="w-full py-20 md:py-32 bg-secondary/50">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+          <div className="container grid items-center justify-center gap-4 px-4 text-center md-px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
                 <Highlight query={searchQuery ?? ''}>Ready to Secure Your Application?</Highlight>
@@ -271,17 +250,6 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
           </div>
         </section>
       </main>
-
-       {showBackToTop && (
-        <Button
-          onClick={scrollToTop}
-          className="fixed bottom-8 right-8 h-12 w-12 rounded-full shadow-lg"
-          size="icon"
-          aria-label="Go to top"
-        >
-          <ArrowUp className="h-6 w-6" />
-        </Button>
-      )}
     </div>
   );
 }

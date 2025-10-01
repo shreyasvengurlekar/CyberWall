@@ -1,12 +1,39 @@
-import Link from "next/link";
-import { Shield, Github, Linkedin, Instagram } from "lucide-react";
+'use client';
+
+import Link from 'next/link';
+import { Shield, Github, Linkedin, Mail, ArrowUp } from 'lucide-react';
+import * as React from 'react';
+import { Button } from '@/components/ui/button';
 
 export function Footer() {
   const socialLinks = [
-    { icon: <Github className="h-5 w-5" />, href: "https://github.com", label: "GitHub" },
-    { icon: <Linkedin className="h-5 w-5" />, href: "https://linkedin.com", label: "LinkedIn" },
-    { icon: <Instagram className="h-5 w-5" />, href: "https://instagram.com", label: "Instagram" },
+    { icon: <Github className="h-5 w-5" />, href: 'https://github.com/shreyasvengurlekar', label: 'GitHub' },
+    { icon: <Linkedin className="h-5 w-5" />, href: 'https://www.linkedin.com/in/shreyasvengurlekar', label: 'LinkedIn' },
+    { icon: <Mail className="h-5 w-5" />, href: 'mailto:shreyasvengurlekar2004@gmail.com', label: 'Email' },
   ];
+
+  const [showBackToTop, setShowBackToTop] = React.useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 300) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  };
+
   return (
     <footer className="border-t bg-background">
       <div className="container py-8">
@@ -22,12 +49,12 @@ export function Footer() {
           </div>
 
           <div className="flex flex-col items-center gap-4">
-             <div className="flex gap-4 text-sm text-muted-foreground">
-                <Link href="/services" className="hover:text-foreground">Services</Link>
-                <Link href="/#pricing" className="hover:text-foreground">Pricing</Link>
-                <Link href="/about" className="hover:text-foreground">About</Link>
-                <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
-                <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
+            <div className="flex gap-4 text-sm text-muted-foreground">
+              <Link href="/services" className="hover:text-foreground">Services</Link>
+              <Link href="/#pricing" className="hover:text-foreground">Pricing</Link>
+              <Link href="/about" className="hover:text-foreground">About</Link>
+              <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
+              <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
             </div>
             <div className="flex items-center gap-4">
               {socialLinks.map((link) => (
@@ -46,6 +73,16 @@ export function Footer() {
           </div>
         </div>
       </div>
+      {showBackToTop && (
+        <Button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 h-12 w-12 rounded-full shadow-lg"
+          size="icon"
+          aria-label="Go to top"
+        >
+          <ArrowUp className="h-6 w-6" />
+        </Button>
+      )}
     </footer>
   );
 }
