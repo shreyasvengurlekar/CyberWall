@@ -26,8 +26,7 @@ const features = [
   },
 ];
 
-export default function Home() {
-  const [searchQuery, setSearchQuery] = React.useState('');
+export default function Home({ searchQuery }: { searchQuery?: string }) {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -38,10 +37,10 @@ export default function Home() {
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16 items-center">
               <div className="space-y-6">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                  <Highlight query={searchQuery}>Fortify Your Web Applications</Highlight>
+                  <Highlight query={searchQuery ?? ''}>Fortify Your Web Applications</Highlight>
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl">
-                  <Highlight query={searchQuery}>CyberWall Scanner provides powerful, AI-driven security analysis to help you identify and remediate vulnerabilities before they become a threat.</Highlight>
+                  <Highlight query={searchQuery ?? ''}>CyberWall Scanner provides powerful, AI-driven security analysis to help you identify and remediate vulnerabilities before they become a threat.</Highlight>
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
@@ -72,10 +71,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Key Features</div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                <Highlight query={searchQuery}>Everything You Need to Secure Your Code</Highlight>
+                <Highlight query={searchQuery ?? ''}>Everything You Need to Secure Your Code</Highlight>
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                <Highlight query={searchQuery}>Our platform combines automated scanning with intelligent analysis to provide a complete security solution.</Highlight>
+                <Highlight query={searchQuery ?? ''}>Our platform combines automated scanning with intelligent analysis to provide a complete security solution.</Highlight>
               </p>
             </div>
             <div className="mx-auto grid items-start gap-8 sm:max-w-4xl sm:grid-cols-1 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
@@ -83,10 +82,10 @@ export default function Home() {
                 <Card key={index} className="h-full hover:shadow-lg transition-shadow">
                   <CardHeader className="flex flex-row items-center gap-4">
                     {feature.icon}
-                    <CardTitle className="text-xl"><Highlight query={searchQuery}>{feature.title}</Highlight></CardTitle>
+                    <CardTitle className="text-xl"><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground"><Highlight query={searchQuery}>{feature.description}</Highlight></p>
+                    <p className="text-muted-foreground"><Highlight query={searchQuery ?? ''}>{feature.description}</Highlight></p>
                   </CardContent>
                 </Card>
               ))}
@@ -100,10 +99,10 @@ export default function Home() {
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Pricing</div>
               <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">
-                <Highlight query={searchQuery}>Simple, Transparent Pricing</Highlight>
+                <Highlight query={searchQuery ?? ''}>Simple, Transparent Pricing</Highlight>
               </h2>
               <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                <Highlight query={searchQuery}>Choose the plan that's right for you. Get started for free.</Highlight>
+                <Highlight query={searchQuery ?? ''}>Choose the plan that's right for you. Get started for free.</Highlight>
               </p>
             </div>
             <div className="mx-auto grid max-w-sm gap-8 lg:max-w-4xl lg:grid-cols-2">
@@ -114,9 +113,9 @@ export default function Home() {
                 </CardHeader>
                 <CardContent className="flex-1 space-y-4">
                   <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery}>1 User</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery}>Basic Scanning</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery}>Limited Reports</Highlight></li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>1 User</Highlight></li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Basic Scanning</Highlight></li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Limited Reports</Highlight></li>
                   </ul>
                 </CardContent>
                 <div className="p-6 pt-0">
@@ -133,10 +132,10 @@ export default function Home() {
                 </CardHeader>
                 <CardContent className="flex-1 space-y-4">
                   <ul className="space-y-2 text-muted-foreground">
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery}>5 Users</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery}>Advanced Scanning</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery}>AI Remediation</Highlight></li>
-                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery}>Detailed Reports</Highlight></li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>5 Users</Highlight></li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Advanced Scanning</Highlight></li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>AI Remediation</Highlight></li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Detailed Reports</Highlight></li>
                   </ul>
                 </CardContent>
                 <div className="p-6 pt-0">
@@ -153,10 +152,10 @@ export default function Home() {
             <div className="space-y-3">
               <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary mb-4"><Contact className="w-5 h-5 inline-block mr-1" />Contact Us</div>
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                <Highlight query={searchQuery}>Get in Touch</Highlight>
+                <Highlight query={searchQuery ?? ''}>Get in Touch</Highlight>
               </h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                <Highlight query={searchQuery}>Have questions about our service or pricing? We're happy to help.</Highlight>
+                <Highlight query={searchQuery ?? ''}>Have questions about our service or pricing? We're happy to help.</Highlight>
               </p>
               <Button asChild size="lg">
                 <Link href="mailto:support@cyberwall.com">Email Us</Link>
@@ -171,10 +170,10 @@ export default function Home() {
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                <Highlight query={searchQuery}>Ready to Secure Your Application?</Highlight>
+                <Highlight query={searchQuery ?? ''}>Ready to Secure Your Application?</Highlight>
               </h2>
               <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                <Highlight query={searchQuery}>Sign up today and start your first scan in minutes. No credit card required.</Highlight>
+                <Highlight query={searchQuery ?? ''}>Sign up today and start your first scan in minutes. No credit card required.</Highlight>
               </p>
             </div>
             <div className="mx-auto w-full max-w-sm space-y-2">
