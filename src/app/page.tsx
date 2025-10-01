@@ -1,7 +1,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp, UserPlus, FileText, Briefcase } from 'lucide-react';
+import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp, UserPlus, FileText } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
@@ -125,7 +125,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Card key={index} className="h-full hover:shadow-lg transition-shadow bg-card">
                   <CardHeader className="flex flex-row items-center gap-4">
                     {feature.icon}
-                    <CardTitle className="text-xl"><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
+                    <CardTitle><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground"><Highlight query={searchQuery ?? ''}>{feature.description}</Highlight></p>
@@ -180,7 +180,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             <div className="grid gap-8 lg:grid-cols-3 max-w-5xl mx-auto">
                 <Card className="flex flex-col transition-transform hover:scale-105">
                     <CardHeader>
-                    <CardTitle className="text-2xl">Free</CardTitle>
+                    <CardTitle>Free</CardTitle>
                     <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
@@ -197,7 +197,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-105 relative overflow-hidden">
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-8 py-1 font-semibold" style={{clipPath: 'polygon(0 0, 100% 0, 100% 100%, 25% 100%)'}}>Popular</div>
                     <CardHeader className="pt-12">
-                    <CardTitle className="text-2xl">Pro</CardTitle>
+                    <CardTitle>Pro</CardTitle>
                     <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
@@ -214,7 +214,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 </Card>
                  <Card className="flex flex-col transition-transform hover:scale-105">
                     <CardHeader>
-                    <CardTitle className="text-2xl flex items-center gap-2">Business <Briefcase /></CardTitle>
+                    <CardTitle>Business</CardTitle>
                     <p className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
