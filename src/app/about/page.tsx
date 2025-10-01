@@ -2,7 +2,46 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Github, Linkedin, Mail, Download, Code, Cpu, Lightbulb } from 'lucide-react';
+import { Github, Linkedin, Mail, Download, Code, Cpu, Lightbulb, Rocket, Bug, Layers, DraftingCompass, BookOpen, ClipboardList } from 'lucide-react';
+
+const timelineSteps = [
+  {
+    icon: <ClipboardList className="w-8 h-8 text-primary" />,
+    title: 'Idea & Planning',
+    description: 'The journey began with a spark of an idea: to create an educational tool for web security. I spent time brainstorming features, defining the scope, and creating a roadmap for the project.',
+  },
+  {
+    icon: <BookOpen className="w-8 h-8 text-primary" />,
+    title: 'Research & Learning',
+    description: 'Diving deep into the world of web vulnerabilities, AI-powered code analysis, and modern frontend technologies like Next.js and Tailwind CSS to build a solid foundation.',
+  },
+  {
+    icon: <DraftingCompass className="w-8 h-8 text-primary" />,
+    title: 'Designing the Structure',
+    description: 'Architecting the application, from the component structure in React to the UI/UX flow. The goal was a clean, intuitive, and scalable design from the ground up.',
+  },
+  {
+    icon: <Cpu className="w-8 h-8 text-primary" />,
+    title: 'Building with AI & Internet',
+    description: 'Leveraging Genkit for AI-powered remediation advice and sourcing modern design patterns to accelerate the development process and build intelligent features.',
+  },
+  {
+    icon: <Layers className="w-8 h-8 text-primary" />,
+    title: 'Adding Animations & Features',
+    description: 'Implementing the core features like vulnerability scanning, reporting, and adding smooth animations and transitions to create a polished, futuristic user experience.',
+  },
+  {
+    icon: <Bug className="w-8 h-8 text-primary" />,
+    title: 'Testing & Fixing Issues',
+    description: 'Rigorous testing across browsers and devices to hunt down bugs, fix layout issues, and ensure the application is stable, responsive, and reliable for all users.',
+  },
+  {
+    icon: <Rocket className="w-8 h-8 text-primary" />,
+    title: 'Final Launch',
+    description: 'Polishing the final details, optimizing for performance and SEO, and deploying the project for the world to see. The learning journey continues!',
+  },
+];
+
 
 export default function AboutPage() {
   return (
@@ -64,6 +103,34 @@ export default function AboutPage() {
                 </div>
             </div>
         </section>
+        
+        {/* --- Project Timeline Section --- */}
+        <section className="mb-20">
+            <h2 className="text-3xl font-bold text-center mb-16 tracking-tight">Project Timeline</h2>
+            <div className="relative">
+                {/* The vertical line */}
+                <div className="absolute left-1/2 -ml-[2px] h-full w-1 bg-border" aria-hidden="true"></div>
+                
+                <div className="space-y-16">
+                    {timelineSteps.map((step, index) => (
+                        <div key={index} className="relative group">
+                             <div className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 bg-background w-20 h-20 rounded-full">
+                               <div className="flex items-center justify-center bg-primary/10 rounded-full w-16 h-16 ring-8 ring-background transition-all group-hover:ring-primary/10 group-hover:scale-110">
+                                   {step.icon}
+                               </div>
+                            </div>
+                            <div className={`w-[calc(50%-2.5rem)] ${index % 2 === 0 ? 'float-left text-right' : 'float-right text-left'}`}>
+                                <Card className="p-6 opacity-0 animate-fade-in transition-all hover:shadow-primary/10 hover:-translate-y-1" style={{animationDelay: `${index * 150}ms`, animationFillMode: 'forwards'}}>
+                                  <h3 className="text-xl font-bold mb-2">{step.title}</h3>
+                                  <p className="text-muted-foreground">{step.description}</p>
+                                </Card>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+
 
         {/* --- Quote Section --- */}
         <section className="my-20 text-center">
@@ -143,3 +210,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
+    
