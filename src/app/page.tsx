@@ -1,13 +1,13 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, Contact, ScanLine, Shield, WandSparkles, ArrowUp, UserPlus, FileText } from 'lucide-react';
+import { Check, ScanLine, Shield, WandSparkles, UserPlus, FileText, Star, Quote } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { Highlight } from '@/components/highlight';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
-
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 const features = [
   {
@@ -44,6 +44,37 @@ const howItWorksSteps = [
     description: 'Receive a detailed report with prioritized findings and AI-powered guidance to fix issues quickly and efficiently.',
   },
 ]
+
+const testimonials = [
+  {
+    name: 'Sarah J.',
+    role: 'Lead Developer',
+    testimonial: 'CyberWall Scanner transformed our security workflow. The AI remediation advice is a game-changer and has saved us countless hours. Highly recommended!',
+    avatar: 'https://picsum.photos/seed/testimonial1/100/100',
+    aiHint: 'female developer',
+  },
+  {
+    name: 'Mike R.',
+    role: 'CTO, TechCorp',
+    testimonial: 'As a startup, security is critical. This tool provided us with enterprise-level scanning at a fraction of the cost. The reports are incredibly detailed yet easy to understand.',
+    avatar: 'https://picsum.photos/seed/testimonial2/100/100',
+    aiHint: 'male executive',
+  },
+  {
+    name: 'Emily Chen',
+    role: 'Cybersecurity Analyst',
+    testimonial: 'I was impressed by the breadth of vulnerabilities it detected. It\'s now an essential part of our CI/CD pipeline for continuous security monitoring.',
+    avatar: 'https://picsum.photos/seed/testimonial3/100/100',
+    aiHint: 'female analyst',
+  },
+   {
+    name: 'David L.',
+    role: 'Freelance Web Developer',
+    testimonial: 'The best part is how educational it is. It doesn\'t just find flaws, it teaches you how to fix them securely. An invaluable tool for any developer.',
+    avatar: 'https://picsum.photos/seed/testimonial4/100/100',
+    aiHint: 'male developer',
+  },
+];
 
 export default function Home({ searchQuery }: { searchQuery?: string }) {
   const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
@@ -102,11 +133,13 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             <div className="mx-auto grid items-start gap-8 sm:max-w-4xl md:grid-cols-2 md:gap-12 lg:max-w-5xl lg:grid-cols-3">
               {features.map((feature, index) => (
                 <Card key={index} className="h-full hover:shadow-primary/10 hover:-translate-y-1 transition-all bg-card">
-                  <CardHeader className="flex flex-row items-center gap-4">
-                    {feature.icon}
+                  <CardHeader className="flex flex-col items-center text-center gap-4">
+                     <div className="bg-primary/10 rounded-full p-4">
+                        {feature.icon}
+                    </div>
                     <CardTitle className="text-xl"><Highlight query={searchQuery ?? ''}>{feature.title}</Highlight></CardTitle>
                   </CardHeader>
-                  <CardContent>
+                  <CardContent className="text-center">
                     <p className="text-muted-foreground"><Highlight query={searchQuery ?? ''}>{feature.description}</Highlight></p>
                   </CardContent>
                 </Card>
@@ -128,7 +161,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
               </p>
             </div>
             <div className="relative">
-              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-border -translate-y-1/2" aria-hidden="true"></div>
+              <div className="absolute top-1/2 left-0 w-full h-0.5 bg-border -translate-y-1/2 max-lg:hidden" aria-hidden="true"></div>
               <div className="relative mx-auto grid items-start gap-8 sm:max-w-4xl md:gap-12 lg:max-w-5xl lg:grid-cols-3">
                 {howItWorksSteps.map((step, index) => (
                   <div key={index} className="flex flex-col items-center text-center gap-4 p-6 rounded-lg bg-background">
@@ -143,9 +176,63 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             </div>
           </div>
         </section>
+        
+        {/* Testimonials Section */}
+        <section id="testimonials" className="w-full py-20 md:py-32 bg-secondary/50">
+            <div className="container px-4 md:px-6">
+                 <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+                    <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Testimonials</div>
+                    <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">What Our Users Say</h2>
+                    <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                        Trusted by developers and security professionals worldwide.
+                    </p>
+                </div>
+                 <Carousel
+                    opts={{
+                        align: "start",
+                        loop: true,
+                    }}
+                    className="w-full max-w-4xl mx-auto"
+                    >
+                    <CarouselContent>
+                        {testimonials.map((testimonial, index) => (
+                        <CarouselItem key={index} className="md:basis-1/2">
+                            <div className="p-1 h-full">
+                               <Card className="h-full flex flex-col justify-between p-6 bg-card/80 backdrop-blur-sm">
+                                    <div>
+                                        <div className="flex items-center gap-2 mb-2">
+                                            {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />)}
+                                        </div>
+                                        <p className="text-muted-foreground italic mb-4">"{testimonial.testimonial}"</p>
+                                    </div>
+                                    <div className="flex items-center gap-4 mt-auto">
+                                        <Image 
+                                            src={testimonial.avatar}
+                                            alt={testimonial.name}
+                                            width={50}
+                                            height={50}
+                                            className="rounded-full"
+                                            data-ai-hint={testimonial.aiHint}
+                                        />
+                                        <div>
+                                            <p className="font-semibold">{testimonial.name}</p>
+                                            <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+                                        </div>
+                                    </div>
+                               </Card>
+                            </div>
+                        </CarouselItem>
+                        ))}
+                    </CarouselContent>
+                    <CarouselPrevious />
+                    <CarouselNext />
+                </Carousel>
+            </div>
+        </section>
+
 
         {/* Pricing Section */}
-        <section id="pricing" className="w-full py-20 md:py-32 bg-secondary/50">
+        <section id="pricing" className="w-full py-20 md:py-32">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Pricing</div>
@@ -174,7 +261,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     </div>
                 </Card>
                 <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-[1.03] relative overflow-hidden">
-                    <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-8 py-1 font-semibold" style={{clipPath: 'polygon(0 0, 100% 0, 100% 100%, 25% 100%)'}}>Popular</div>
+                    <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 text-sm font-semibold" style={{clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)'}}>Popular</div>
                     <CardHeader className="pt-12">
                     <h3 className="text-2xl font-semibold">Pro</h3>
                     <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
@@ -205,7 +292,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     </ul>
                     </CardContent>
                     <div className="p-6 pt-0">
-                    <Button asChild className="w-full" variant="outline"><Link href="/signup">Contact Sales</Link></Button>
+                    <Button asChild className="w-full" variant="outline"><Link href="/#contact">Contact Sales</Link></Button>
                     </div>
                 </Card>
             </div>
@@ -213,10 +300,9 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
         </section>
 
         {/* Contact Section */}
-        <section id="contact" className="w-full py-20 md:py-32">
+        <section id="contact" className="w-full py-20 md:py-32 bg-secondary/50">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
             <div className="space-y-3">
-              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary mb-4"><Contact className="w-5 h-5 inline-block mr-1" />Contact Us</div>
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
                 <Highlight query={searchQuery ?? ''}>Get in Touch</Highlight>
               </h2>
@@ -232,7 +318,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
 
 
         {/* CTA Section */}
-        <section className="w-full py-20 md:py-32 bg-secondary/50">
+        <section className="w-full py-20 md:py-32">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md-px-6">
             <div className="space-y-3">
               <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
@@ -253,3 +339,5 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
     </div>
   );
 }
+
+    

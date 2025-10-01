@@ -14,8 +14,8 @@ import { usePathname } from 'next/navigation';
 const navLinks = [
   { href: '/services', label: 'Services' },
   { href: '/#pricing', label: 'Pricing' },
+  { href: '/#testimonials', label: 'Testimonials' },
   { href: '/about', label: 'About' },
-  { href: '/#contact', label: 'Contact' },
 ];
 
 type HeaderProps = {
@@ -160,6 +160,15 @@ export function Header({ searchQuery, setSearchQuery, setIsLoading }: HeaderProp
                         </Link>
                     </SheetClose>
                     ))}
+                     <SheetClose asChild>
+                        <Link
+                        href="/#contact"
+                        onClick={() => handleLinkClick('/#contact')}
+                        className="flex w-full items-center py-2 text-lg font-semibold"
+                        >
+                        Contact
+                        </Link>
+                    </SheetClose>
                     <div className="flex flex-col gap-2 mt-4">
                       <SheetClose asChild>
                         <Button asChild>
@@ -181,3 +190,5 @@ export function Header({ searchQuery, setSearchQuery, setIsLoading }: HeaderProp
     </header>
   );
 }
+
+    
