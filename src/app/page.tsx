@@ -259,9 +259,9 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>1 User</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Basic Scanning</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Limited Reports</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>1 User</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>Basic Scanning</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>Limited Reports</Highlight></li>
                     </ul>
                     </CardContent>
                     <div className="p-6 pt-0">
@@ -276,10 +276,10 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>5 Users</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Advanced Scanning</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>AI Remediation</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Detailed Reports</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>5 Users</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>Advanced Scanning</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>AI Remediation</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>Detailed Reports</Highlight></li>
                     </ul>
                     </CardContent>
                     <div className="p-6 pt-0">
@@ -293,10 +293,10 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Unlimited Users</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>All Pro Features</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Team Collaboration</Highlight></li>
-                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-accent" /> <Highlight query={searchQuery ?? ''}>Priority Support</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>Unlimited Users</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>All Pro Features</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>Team Collaboration</Highlight></li>
+                        <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> <Highlight query={searchQuery ?? ''}>Priority Support</Highlight></li>
                     </ul>
                     </CardContent>
                     <div className="p-6 pt-0">
@@ -351,19 +351,21 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
 
         {/* CTA Section */}
         <section className="w-full py-20 md:py-32">
-          <div className="container grid items-center justify-center gap-4 px-4 text-center md-px-6">
-            <div className="space-y-3">
-              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
-                <Highlight query={searchQuery ?? ''}>Ready to Secure Your Application?</Highlight>
-              </h2>
-              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                <Highlight query={searchQuery ?? ''}>Sign up today and start your first scan in minutes. No credit card required.</Highlight>
-              </p>
-            </div>
-            <div className="mx-auto w-full max-w-sm space-y-2">
-               <Button asChild size="lg" className="w-full">
-                  <Link href="/dashboard">Start Scanning Now</Link>
-                </Button>
+          <div className="container px-4 text-center md:px-6">
+            <div className="bg-muted p-10 md:p-16 rounded-2xl border max-w-4xl mx-auto">
+              <div className="space-y-4">
+                <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">
+                  <Highlight query={searchQuery ?? ''}>Ready to Secure Your Application?</Highlight>
+                </h2>
+                <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                  <Highlight query={searchQuery ?? ''}>Sign up today and start your first scan in minutes. No credit card required.</Highlight>
+                </p>
+              </div>
+              <div className="mx-auto mt-8 w-full max-w-sm space-y-2">
+                 <Button asChild size="lg" className="w-full">
+                    <Link href="/dashboard">Start Scanning Now</Link>
+                  </Button>
+              </div>
             </div>
           </div>
         </section>
