@@ -55,9 +55,9 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
           </Link>
         </div>
         
-        <div ref={searchRef} className="flex flex-1 items-center justify-end gap-2">
+        <div className="flex flex-1 items-center justify-end gap-2">
           {/* Desktop Search */}
-          <div className={cn("relative w-full max-w-xs transition-all duration-300 hidden sm:flex items-center gap-2 justify-end flex-1", isSearchOpen && "max-w-md")}>
+          <div ref={searchRef} className={cn("relative w-full max-w-xs transition-all duration-300 hidden sm:flex items-center gap-2 justify-end flex-1", isSearchOpen && "max-w-md")}>
               <div className={cn('relative w-full transition-all duration-300', !isSearchOpen ? 'max-w-0 opacity-0' : 'max-w-xs')}>
                 <Input
                   ref={inputRef}
@@ -70,17 +70,17 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                 />
                  <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
               </div>
+               <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  className='hidden sm:inline-flex'
+                >
+                  <Search className="h-5 w-5" />
+                  <span className="sr-only">Toggle Search</span>
+              </Button>
           </div>
-          <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSearchOpen(!isSearchOpen)}
-              className='hidden sm:inline-flex'
-            >
-              <Search className="h-5 w-5" />
-              <span className="sr-only">Toggle Search</span>
-            </Button>
-
+         
           <div className="flex items-center gap-2">
              {/* Desktop Navigation */}
             <nav className="hidden items-center gap-6 text-sm lg:flex">
