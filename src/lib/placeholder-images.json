@@ -5,6 +5,12 @@
       "description": "Abstract cybersecurity-themed image for the dashboard hero section.",
       "imageUrl": "https://images.unsplash.com/photo-1750020113720-70f9c87982e9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjeWJlcnNlY3VyaXR5JTIwYWJzdHJhY3R8ZW58MHx8fHwxNzU5Mjk1MDA5fDA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "cybersecurity abstract"
+    },
+    {
+      "id": "pricing-hero",
+      "description": "Abstract image representing pricing and value.",
+      "imageUrl": "https://images.unsplash.com/photo-1505608287685-5d03198b5312?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxmaW5hbmNlJTIwYWJzdHJhY3R8ZW58MHx8fHwxNzU5MjU3NTYwfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "finance abstract"
     }
   ]
 }

@@ -4,15 +4,15 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-14rem)] py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
         <Card>
           <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">Log In</CardTitle>
+            <CardTitle className="text-3xl font-bold">Forgot Password?</CardTitle>
             <CardDescription>
-              Enter your credentials to access your account.
+              Enter your email and we&apos;ll send you a link to reset your password.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -21,23 +21,14 @@ export default function LoginPage() {
                 <Label htmlFor="email">Email</Label>
                 <Input id="email" type="email" placeholder="name@example.com" required />
               </div>
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
-                  <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                    Forgot password?
-                  </Link>
-                </div>
-                <Input id="password" type="password" required />
-              </div>
               <Button type="submit" className="w-full">
-                Log In
+                Send Reset Link
               </Button>
             </form>
             <div className="mt-6 text-center text-sm">
-              Don&apos;t have an account?{' '}
-              <Link href="/signup" className="text-primary hover:underline">
-                Sign Up
+              Remember your password?{' '}
+              <Link href="/login" className="text-primary hover:underline">
+                Log In
               </Link>
             </div>
           </CardContent>
