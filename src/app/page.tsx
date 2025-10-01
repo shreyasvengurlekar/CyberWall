@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check, ScanLine, Shield, WandSparkles } from 'lucide-react';
+import { Check, Contact, DollarSign, ScanLine, Shield, WandSparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -39,7 +39,7 @@ export default function Home() {
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
-                    <Link href="#">Get Started for Free</Link>
+                    <Link href="/signup">Get Started for Free</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg">
                     <Link href="#features">Learn More</Link>
@@ -86,6 +86,74 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Pricing Section */}
+        <section id="pricing" className="w-full py-20 md:py-32">
+          <div className="container px-4 md:px-6">
+            <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
+              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary">Pricing</div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Simple, Transparent Pricing</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Choose the plan that's right for you. Get started for free.
+              </p>
+            </div>
+            <div className="mx-auto grid max-w-sm gap-8 lg:max-w-4xl lg:grid-cols-2">
+              <Card className="flex flex-col">
+                <CardHeader>
+                  <CardTitle>Free</CardTitle>
+                  <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                </CardHeader>
+                <CardContent className="flex-1 space-y-4">
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> 1 User</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Basic Scanning</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Limited Reports</li>
+                  </ul>
+                </CardContent>
+                <div className="p-6 pt-0">
+                  <Button asChild className="w-full"><Link href="/signup">Sign Up</Link></Button>
+                </div>
+              </Card>
+              <Card className="flex flex-col border-primary shadow-lg">
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <CardTitle>Pro</CardTitle>
+                    <div className="text-sm font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-full">Most Popular</div>
+                  </div>
+                  <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                </CardHeader>
+                <CardContent className="flex-1 space-y-4">
+                  <ul className="space-y-2 text-muted-foreground">
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> 5 Users</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Advanced Scanning</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> AI Remediation</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-primary" /> Detailed Reports</li>
+                  </ul>
+                </CardContent>
+                <div className="p-6 pt-0">
+                  <Button asChild className="w-full"><Link href="/signup">Get Started</Link></Button>
+                </div>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section id="contact" className="w-full py-20 md:py-32 bg-secondary/50">
+          <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
+            <div className="space-y-3">
+              <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary mb-4"><Contact className="w-5 h-5 inline-block mr-1" />Contact Us</div>
+              <h2 className="text-3xl font-bold tracking-tighter md:text-4xl/tight">Get in Touch</h2>
+              <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Have questions about our service or pricing? We're happy to help.
+              </p>
+              <Button asChild size="lg">
+                <Link href="mailto:support@cyberwall.com">Email Us</Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+
         {/* CTA Section */}
         <section className="w-full py-20 md:py-32">
           <div className="container grid items-center justify-center gap-4 px-4 text-center md:px-6">
@@ -97,7 +165,7 @@ export default function Home() {
             </div>
             <div className="mx-auto w-full max-w-sm space-y-2">
                <Button asChild size="lg" className="w-full">
-                  <Link href="#">Start Scanning Now</Link>
+                  <Link href="/signup">Start Scanning Now</Link>
                 </Button>
             </div>
           </div>

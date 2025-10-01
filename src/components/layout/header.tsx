@@ -37,10 +37,10 @@ export function Header() {
         <div className="flex flex-1 items-center justify-end space-x-2">
           <ThemeToggle />
           <Button variant="ghost" asChild>
-            <Link href="#">Log In</Link>
+            <Link href="/login">Log In</Link>
           </Button>
           <Button asChild>
-            <Link href="#">Sign Up</Link>
+            <Link href="/signup">Sign Up</Link>
           </Button>
           <Sheet>
             <SheetTrigger asChild>
