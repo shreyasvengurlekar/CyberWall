@@ -119,7 +119,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
         </section>
 
         {/* Features Section */}
-        <section id="features" className="w-full py-20 md:py-32 bg-secondary/50">
+        <section id="features" className="w-full py-20 md:py-32">
           <div className="container px-4 md:px-6">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm font-semibold text-primary">Key Features</div>
