@@ -75,7 +75,7 @@ export default function ServicesPage() {
         <div className="mx-auto grid items-start gap-8 sm:max-w-4xl md:gap-12 lg:max-w-5xl lg:grid-cols-3">
           {services.map((service) => (
             <Link key={service.title} href={service.href} className="h-full">
-              <Card className="h-full group transition-all duration-300 hover:shadow-primary/20 hover:shadow-lg hover:-translate-y-2">
+              <Card className="h-full group transition-all duration-300 hover:shadow-primary/20 hover:shadow-lg hover:-translate-y-2 bg-card/50 backdrop-blur-sm">
                 <CardHeader className="flex flex-row items-center justify-between gap-4">
                   <div className='flex items-center gap-4'>
                     {service.icon}

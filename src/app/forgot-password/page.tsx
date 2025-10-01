@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="flex items-center justify-center min-h-[calc(100vh-14rem)] py-20 md:py-32 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md space-y-8">
-        <Card className="shadow-2xl">
+        <Card className="shadow-2xl transition-all hover:shadow-primary/20">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold">Forgot Password?</CardTitle>
             <CardDescription>

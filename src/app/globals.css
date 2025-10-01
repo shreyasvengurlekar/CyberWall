@@ -39,16 +39,16 @@
     --popover-foreground: 0 0% 98%;
     --primary: 226 65% 55%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 217 32.6% 17.5%;
+    --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 217 32.6% 17.5%;
+    --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
     --accent: 175 90% 35%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
-    --border: 217 32.6% 17.5%;
-    --input: 217 32.6% 17.5%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
     --ring: 226 65% 55%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
@@ -63,13 +63,13 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-body antialiased;
+    @apply bg-background text-foreground;
+  }
+  .dark body {
+    background-image: radial-gradient(circle at top left, hsl(var(--primary) / 0.05), transparent 30%);
   }
   section {
     @apply animate-fade-in-slide-up;
-  }
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-headline font-bold;
   }
 }
 
