@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Shield, Menu, Search, X } from 'lucide-react';
@@ -88,12 +87,14 @@ export function Header() {
   }, [searchRef, closeAndClearSearch]);
 
   React.useEffect(() => {
+    // When search opens, focus the input
     if (isSearchOpen && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isSearchOpen]);
   
   React.useEffect(() => {
+    // Close search on page navigation
     closeAndClearSearch();
   }, [pathname, closeAndClearSearch]);
   
@@ -138,6 +139,7 @@ export function Header() {
       if (activeSuggestionIndex > -1) {
         handleSuggestionClick(suggestions[activeSuggestionIndex]);
       } else if (suggestions.length > 0) {
+        // Default to first suggestion if none is highlighted
         handleSuggestionClick(suggestions[0]);
       }
     }
@@ -149,7 +151,7 @@ export function Header() {
   };
   
   const SearchComponent = () => (
-    <div className='relative'>
+     <div className='relative w-full'>
       <Input
         ref={inputRef}
         type="search"
@@ -185,54 +187,52 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        {/* Mobile Nav */}
-        <div className="flex items-center md:hidden">
-            <Sheet>
-                <SheetTrigger asChild>
-                <Button variant="outline" size="icon" className="mr-2" aria-label="Toggle Menu">
-                    <Menu className="h-5 w-5" />
-                </Button>
-                </SheetTrigger>
-                <SheetContent side="left">
-                    <div className="grid gap-4 py-6">
-                        <SheetClose asChild>
-                        <Link href="/" className="mb-4 flex items-center gap-2">
-                            <Shield className="h-8 w-8 text-primary" />
-                            <span className="text-2xl font-bold">CyberWall</span>
+        {/* Mobile Nav Trigger */}
+        <Sheet>
+            <SheetTrigger asChild>
+            <Button variant="outline" size="icon" className="mr-2 md:hidden" aria-label="Toggle Menu">
+                <Menu className="h-5 w-5" />
+            </Button>
+            </SheetTrigger>
+            <SheetContent side="left">
+                <div className="grid gap-4 py-6">
+                    <SheetClose asChild>
+                    <Link href="/" className="mb-4 flex items-center gap-2">
+                        <Shield className="h-8 w-8 text-primary" />
+                        <span className="text-2xl font-bold">CyberWall</span>
+                    </Link>
+                    </SheetClose>
+                    {navLinks.map((link) => (
+                    <SheetClose asChild key={link.href}>
+                        <Link
+                        href={link.href}
+                        className="flex w-full items-center py-2 text-lg font-semibold"
+                        >
+                        {link.label}
                         </Link>
+                    </SheetClose>
+                    ))}
+                    <div className="mt-4 flex flex-col gap-2">
+                        <SheetClose asChild>
+                            <Button asChild>
+                            <Link href="/dashboard">Scan Now</Link>
+                            </Button>
                         </SheetClose>
-                        {navLinks.map((link) => (
-                        <SheetClose asChild key={link.href}>
-                            <Link
-                            href={link.href}
-                            className="flex w-full items-center py-2 text-lg font-semibold"
-                            >
-                            {link.label}
-                            </Link>
+                         <SheetClose asChild>
+                            <Button asChild variant="ghost">
+                            <Link href="/login">Log In</Link>
+                            </Button>
                         </SheetClose>
-                        ))}
-                        <div className="mt-4 flex flex-col gap-2">
-                            <SheetClose asChild>
-                                <Button asChild>
-                                <Link href="/dashboard">Scan Now</Link>
-                                </Button>
-                            </SheetClose>
-                             <SheetClose asChild>
-                                <Button asChild variant="ghost">
-                                <Link href="/login">Log In</Link>
-                                </Button>
-                            </SheetClose>
-                            <SheetClose asChild>
-                                <Button asChild variant="outline">
-                                <Link href="/signup">Sign Up</Link>
-                                </Button>
-                            </SheetClose>
-                        </div>
+                        <SheetClose asChild>
+                            <Button asChild variant="outline">
+                            <Link href="/signup">Sign Up</Link>
+                            </Button>
+                        </SheetClose>
                     </div>
-                </SheetContent>
-            </Sheet>
-        </div>
-        
+                </div>
+            </SheetContent>
+        </Sheet>
+
         {/* Desktop Logo & Nav */}
         <div className="hidden md:flex items-center gap-6">
              <Link href="/" className="group flex items-center gap-2">
@@ -251,45 +251,71 @@ export function Header() {
                 ))}
             </nav>
         </div>
+        
+        {/* Mobile Logo (centered) */}
+        <div className="flex-1 flex justify-center md:hidden">
+             <Link href="/" className="group flex items-center gap-2">
+                <Shield className="h-7 w-7 text-primary" />
+                <span className="text-xl font-bold">CyberWall</span>
+            </Link>
+        </div>
 
-        {/* Search and Actions */}
-        <div className="flex flex-1 items-center justify-end gap-2" ref={searchRef}>
-            {/* Mobile Search */}
-            <div className={cn('md:hidden absolute top-16 left-0 right-0 p-4 bg-background border-b', isSearchOpen ? 'block' : 'hidden' )}>
-                <SearchComponent />
-            </div>
-
+        {/* Actions & Search */}
+        <div className="flex items-center justify-end gap-2" ref={searchRef}>
             {/* Desktop Search */}
-             <div className="hidden md:flex items-center justify-end">
-                <div className={cn("relative flex items-center transition-all duration-300 w-64", isSearchOpen ? "block" : "hidden")}>
-                  <SearchComponent />
+            <div className="hidden md:flex items-center">
+                 <div
+                    className={cn(
+                        "relative flex items-center transition-all duration-300",
+                        isSearchOpen ? "w-64" : "w-0"
+                    )}
+                    >
+                    {isSearchOpen && <SearchComponent />}
                 </div>
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleToggleSearch}
+                    aria-label="Toggle Search"
+                >
+                    {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                </Button>
+            </div>
+            
+            {/* Mobile Search */}
+            <div className="flex md:hidden">
+                 <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleToggleSearch}
+                    aria-label="Toggle Search"
+                >
+                    {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                </Button>
             </div>
 
-            <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleToggleSearch}
-                aria-label="Toggle Search"
-            >
-                {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
-            </Button>
-            
-          <ThemeToggle />
+            <ThemeToggle />
 
-          <div className='hidden md:flex items-center gap-2'>
-            <Button asChild>
-              <Link href="/dashboard">Scan Now</Link>
-            </Button>
-            <Button asChild variant="ghost">
-              <Link href="/login">Log In</Link>
-            </Button>
-            <Button asChild variant="outline">
-              <Link href="/signup">Sign Up</Link>
-            </Button>
-          </div>
+            <div className='hidden md:flex items-center gap-2'>
+                <Button asChild>
+                <Link href="/dashboard">Scan Now</Link>
+                </Button>
+                <Button asChild variant="ghost">
+                <Link href="/login">Log In</Link>
+                </Button>
+                <Button asChild variant="outline">
+                <Link href="/signup">Sign Up</Link>
+                </Button>
+            </div>
         </div>
       </div>
+      
+       {/* Mobile Search Flyout */}
+      {isSearchOpen && (
+        <div className='md:hidden p-4 border-t' ref={searchRef}>
+          <SearchComponent />
+        </div>
+      )}
     </header>
   );
 }

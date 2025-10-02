@@ -10,13 +10,11 @@ type SearchContextType = {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export function SearchProvider({ children }: { children: ReactNode }) {
-  const [internalQuery, setInternalQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   const value = {
-    // Pass the real query to consumers like the Header
-    searchQuery: internalQuery,
-    // Let consumers update the query
-    setSearchQuery: setInternalQuery,
+    searchQuery,
+    setSearchQuery,
   };
 
   return (
