@@ -10,23 +10,17 @@ type SearchContextType = {
 const SearchContext = createContext<SearchContextType | undefined>(undefined);
 
 export function SearchProvider({ children }: { children: ReactNode }) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [internalQuery, setInternalQuery] = useState('');
 
-  // Always pass an empty query to consumers to disable highlighting
   const value = {
-    searchQuery: '',
-    setSearchQuery,
-  }
-
-  // The actual query is managed internally for the search suggestion feature
-  const internalValue = {
-    searchQuery,
-    setSearchQuery,
-  }
-
+    // Pass the real query to consumers like the Header
+    searchQuery: internalQuery,
+    // Let consumers update the query
+    setSearchQuery: setInternalQuery,
+  };
 
   return (
-    <SearchContext.Provider value={{ searchQuery, setSearchQuery }}>
+    <SearchContext.Provider value={value}>
       {children}
     </SearchContext.Provider>
   );
