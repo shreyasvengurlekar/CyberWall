@@ -93,6 +93,13 @@ export function Header() {
         setSuggestions([]);
     }
   }, [pathname, setSearchQuery]);
+  
+    const handleToggleSearch = () => {
+    setIsSearchOpen(prev => !prev);
+    if (!isSearchOpen && inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -128,11 +135,10 @@ export function Header() {
         prevIndex <= 0 ? suggestions.length - 1 : prevIndex - 1
       );
     } else if (e.key === 'Enter') {
+      e.preventDefault();
       if (activeSuggestionIndex > -1) {
-        e.preventDefault();
         handleSuggestionClick(suggestions[activeSuggestionIndex]);
       } else if (suggestions.length > 0) {
-        e.preventDefault();
         handleSuggestionClick(suggestions[0]);
       }
     }
@@ -148,6 +154,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
+        {/* Mobile menu */}
         <div className="flex items-center md:hidden">
             <Sheet>
                 <SheetTrigger asChild>
@@ -203,6 +210,7 @@ export function Header() {
             </Sheet>
         </div>
         
+        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
              <Link href="/" className="group flex items-center gap-2">
                 <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
@@ -223,32 +231,52 @@ export function Header() {
 
         <div className="flex flex-1 items-center justify-end gap-2">
           <div className="relative" ref={searchRef}>
-            <div className="hidden md:block">
-              <Input
-                ref={inputRef}
-                type="search"
-                placeholder="Search..."
-                className="w-full max-w-sm pl-10"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyDown={handleKeyDown}
-                onFocus={() => setIsSearchOpen(true)}
-              />
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+            <div className='md:hidden'>
+               <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsSearchOpen(prev => !prev)}
+                  aria-label="Toggle Search"
+                >
+                  {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                </Button>
+            </div>
+            
+            <div className="hidden md:flex items-center gap-2">
+                <div
+                    className={cn(
+                        "flex items-center gap-2 transition-all duration-300",
+                        isSearchOpen ? "w-64" : "w-0"
+                    )}
+                    >
+                    <div className={cn("relative w-full", isSearchOpen ? 'opacity-100' : 'opacity-0')}>
+                        <Input
+                            ref={inputRef}
+                            type="search"
+                            placeholder="Search..."
+                            className={cn(
+                                "w-full pl-10 transition-all duration-300",
+                                isSearchOpen ? "w-full" : "w-0"
+                            )}
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            onKeyDown={handleKeyDown}
+                        />
+                        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                    </div>
+                </div>
+                 <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={handleToggleSearch}
+                    aria-label="Toggle Search"
+                    >
+                    {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+                </Button>
             </div>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsSearchOpen(prev => !prev)}
-              aria-label="Toggle Search"
-              className="md:hidden"
-            >
-              {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
-            </Button>
-
             {isSearchOpen && (
-              <div className="absolute top-full mt-2 w-screen max-w-sm -right-4 md:right-auto md:w-full md:max-w-sm md:-right-0">
+              <div className="absolute top-full mt-2 w-screen max-w-sm -right-4 md:right-0 md:w-full md:max-w-sm">
                   <div className="relative p-4 md:p-0">
                       <div className="md:hidden w-full">
                            <Input
