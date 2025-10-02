@@ -6,7 +6,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
 import { Highlight } from '@/components/highlight';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay"
 
@@ -78,7 +77,6 @@ const testimonials = [
 ];
 
 export default function Home({ searchQuery }: { searchQuery?: string }) {
-  const heroImage = PlaceHolderImages.find(p => p.id === 'dashboard-hero');
 
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })
@@ -108,17 +106,20 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 </div>
               </div>
               <div className="flex justify-center items-center">
-                {heroImage && (
-                  <Image
-                    src={heroImage.imageUrl}
-                    alt={heroImage.description}
-                    width={600}
-                    height={400}
-                    className="rounded-xl shadow-2xl"
-                    data-ai-hint={heroImage.imageHint}
-                    priority
-                  />
-                )}
+                <div className="relative flex h-64 w-64 items-center justify-center md:h-80 md:w-80">
+                    {/* Animated Rings */}
+                    <div className="absolute h-full w-full rounded-full bg-primary/10 animate-expand-fade" style={{ animationDelay: '0s' }} />
+                    <div className="absolute h-full w-full rounded-full bg-primary/10 animate-expand-fade" style={{ animationDelay: '1s' }} />
+                    <div className="absolute h-full w-full rounded-full bg-primary/10 animate-expand-fade" style={{ animationDelay: '2s' }} />
+                    
+                    {/* Glitching Rings */}
+                    <div className="absolute h-4/5 w-4/5 rounded-full border-2 border-dashed border-primary/50 animate-ring-glitch-1" />
+                    <div className="absolute h-full w-full rounded-full border-2 border-primary/30 animate-ring-glitch-2" />
+                    <div className="absolute h-2/3 w-2/3 rounded-full border-2 border-dashed border-primary/50 animate-ring-glitch-3" />
+
+                    {/* Central Shield */}
+                    <Shield className="w-32 h-32 md:w-48 md:h-48 text-primary drop-shadow-[0_0_10px_hsl(var(--primary))]" />
+                </div>
               </div>
             </div>
           </div>
@@ -374,5 +375,3 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
     </div>
   );
 }
-
-    
