@@ -148,8 +148,8 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
       <div className="container flex h-16 items-center">
         <div className={cn("mr-4 hidden items-center md:flex")}>
           <Link href="/" className="flex items-center gap-2 group">
-            <Shield className="h-6 w-6 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
-            <span className="font-bold">CyberWall</span>
+            <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
+            <span className="font-bold text-xl">CyberWall</span>
           </Link>
         </div>
         
@@ -238,8 +238,8 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                 <div className="grid gap-4 py-6">
                     <SheetClose asChild>
                       <Link href="/" className="flex items-center gap-2 mb-4">
-                        <Shield className="h-6 w-6 text-primary" />
-                        <span className="font-bold">CyberWall</span>
+                        <Shield className="h-8 w-8 text-primary" />
+                        <span className="font-bold text-xl">CyberWall</span>
                       </Link>
                     </SheetClose>
                     <div className="relative">
