@@ -87,14 +87,12 @@ export function Header() {
   }, [searchRef, closeAndClearSearch]);
 
   React.useEffect(() => {
-    // When search opens, focus the input
     if (isSearchOpen && inputRef.current) {
       inputRef.current.focus();
     }
   }, [isSearchOpen]);
   
   React.useEffect(() => {
-    // Close search on page navigation
     closeAndClearSearch();
   }, [pathname, closeAndClearSearch]);
   
@@ -139,7 +137,6 @@ export function Header() {
       if (activeSuggestionIndex > -1) {
         handleSuggestionClick(suggestions[activeSuggestionIndex]);
       } else if (suggestions.length > 0) {
-        // Default to first suggestion if none is highlighted
         handleSuggestionClick(suggestions[0]);
       }
     }
@@ -261,9 +258,9 @@ export function Header() {
         </div>
 
         {/* Actions & Search */}
-        <div className="flex items-center justify-end gap-2" ref={searchRef}>
+        <div className="flex flex-1 items-center justify-end gap-2" ref={searchRef}>
             {/* Desktop Search */}
-            <div className="hidden md:flex items-center">
+            <div className="hidden md:flex items-center justify-end">
                  <div
                     className={cn(
                         "relative flex items-center transition-all duration-300",
