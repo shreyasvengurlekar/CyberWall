@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Shield, Menu, Search, X } from 'lucide-react';
@@ -60,6 +61,7 @@ const searchableTerms = [
 export function Header() {
   const { searchQuery, setSearchQuery } = useSearch();
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<{term: string, path: string}[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = React.useState(-1);
   const searchRef = React.useRef<HTMLDivElement>(null);
@@ -67,39 +69,43 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
 
+  const closeAndClearSearch = React.useCallback(() => {
+    setIsSearchOpen(false);
+    setIsMobileSearchOpen(false);
+    setSearchQuery('');
+    setSuggestions([]);
+    setActiveSuggestionIndex(-1);
+  }, [setSearchQuery]);
+
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsSearchOpen(false);
-        setSuggestions([]);
+        closeAndClearSearch();
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [searchRef]);
+  }, [searchRef, closeAndClearSearch]);
 
   React.useEffect(() => {
-    if (isSearchOpen && inputRef.current) {
+    if ((isSearchOpen || isMobileSearchOpen) && inputRef.current) {
       inputRef.current.focus();
     }
-  }, [isSearchOpen]);
+  }, [isSearchOpen, isMobileSearchOpen]);
   
   React.useEffect(() => {
-    if (pathname) {
-        setIsSearchOpen(false);
-        setSearchQuery('');
-        setSuggestions([]);
-    }
-  }, [pathname, setSearchQuery]);
+    closeAndClearSearch();
+  }, [pathname, closeAndClearSearch]);
   
-    const handleToggleSearch = () => {
+  const handleToggleDesktopSearch = () => {
     setIsSearchOpen(prev => !prev);
-    if (!isSearchOpen && inputRef.current) {
-      inputRef.current.focus();
-    }
   };
+  
+  const handleToggleMobileSearch = () => {
+    setIsMobileSearchOpen(prev => !prev);
+  }
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
@@ -117,8 +123,7 @@ export function Header() {
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Escape') {
-      setSuggestions([]);
-      setIsSearchOpen(false);
+      closeAndClearSearch();
       return;
     }
     
@@ -146,15 +151,13 @@ export function Header() {
 
   const handleSuggestionClick = (suggestion: {term: string, path: string}) => {
     router.push(suggestion.path);
-    setSearchQuery('');
-    setSuggestions([]);
-    setIsSearchOpen(false);
+    closeAndClearSearch();
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        {/* Mobile menu */}
+        {/* Mobile menu & Logo */}
         <div className="flex items-center md:hidden">
             <Sheet>
                 <SheetTrigger asChild>
@@ -180,14 +183,6 @@ export function Header() {
                             </Link>
                         </SheetClose>
                         ))}
-                        <SheetClose asChild>
-                        <Link
-                            href="/#contact"
-                            className="flex w-full items-center py-2 text-lg font-semibold"
-                        >
-                            Contact
-                        </Link>
-                        </SheetClose>
                         <div className="mt-4 flex flex-col gap-2">
                             <SheetClose asChild>
                                 <Button asChild>
@@ -229,91 +224,93 @@ export function Header() {
             </nav>
         </div>
 
-        <div className="flex flex-1 items-center justify-end gap-2">
-          <div className="relative" ref={searchRef}>
-            <div className='md:hidden'>
-               <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setIsSearchOpen(prev => !prev)}
-                  aria-label="Toggle Search"
-                >
-                  {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
-                </Button>
-            </div>
-            
-            <div className="hidden md:flex items-center gap-2">
-                <div
-                    className={cn(
-                        "flex items-center gap-2 transition-all duration-300",
-                        isSearchOpen ? "w-64" : "w-0"
-                    )}
-                    >
-                    <div className={cn("relative w-full", isSearchOpen ? 'opacity-100' : 'opacity-0')}>
-                        <Input
-                            ref={inputRef}
-                            type="search"
-                            placeholder="Search..."
-                            className={cn(
-                                "w-full pl-10 transition-all duration-300",
-                                isSearchOpen ? "w-full" : "w-0"
-                            )}
-                            value={searchQuery}
-                            onChange={handleSearchChange}
-                            onKeyDown={handleKeyDown}
-                        />
-                        <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                    </div>
-                </div>
-                 <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={handleToggleSearch}
-                    aria-label="Toggle Search"
-                    >
-                    {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
-                </Button>
-            </div>
+        <div className="flex flex-1 items-center justify-end gap-2" ref={searchRef}>
+          {/* Mobile Search */}
+          <div className='md:hidden'>
+             <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleToggleMobileSearch}
+                aria-label="Toggle Search"
+              >
+                {isMobileSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+              </Button>
+          </div>
 
-            {isSearchOpen && (
-              <div className="absolute top-full mt-2 w-screen max-w-sm -right-4 md:right-0 md:w-full md:max-w-sm">
+          {/* Desktop Search */}
+          <div className="hidden md:flex items-center justify-end">
+            <div className={cn("relative flex items-center transition-all duration-300", isSearchOpen ? 'w-64' : 'w-0')}>
+              <div className={cn("absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none", isSearchOpen ? 'opacity-100' : 'opacity-0')}>
+                <Search className="h-5 w-5 text-muted-foreground" />
+              </div>
+              <Input
+                ref={inputRef}
+                type="search"
+                placeholder="Search..."
+                className={cn(
+                  "h-10 pl-10 transition-all duration-300",
+                  isSearchOpen ? 'w-full opacity-100' : 'w-0 opacity-0'
+                )}
+                value={searchQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleKeyDown}
+                disabled={!isSearchOpen}
+              />
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleToggleDesktopSearch}
+              aria-label="Toggle Search"
+            >
+              {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+            </Button>
+          </div>
+          
+          {/* Search Suggestions (shared between mobile and desktop) */}
+           {(isMobileSearchOpen || isSearchOpen) && (
+              <div className={cn(
+                "absolute top-full mt-2 w-screen max-w-sm -right-4 md:right-auto md:w-64",
+                 isMobileSearchOpen ? 'block' : 'hidden md:block'
+              )}>
                   <div className="relative p-4 md:p-0">
-                      <div className="md:hidden w-full">
-                           <Input
-                              ref={inputRef}
-                              type="search"
-                              placeholder="Search..."
-                              className="w-full pl-10"
-                              value={searchQuery}
-                              onChange={handleSearchChange}
-                              onKeyDown={handleKeyDown}
-                            />
-                            <Search className="absolute left-7 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                      </div>
+                      {isMobileSearchOpen && (
+                          <div className="relative md:hidden w-full mb-2">
+                              <Input
+                                ref={inputRef}
+                                type="search"
+                                placeholder="Search..."
+                                className="w-full pl-10"
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                onKeyDown={handleKeyDown}
+                              />
+                              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                          </div>
+                      )}
                       {suggestions.length > 0 && (
                           <Card className="absolute top-full z-10 mt-2 w-full max-h-60 overflow-y-auto">
-                          <ul>
-                              {suggestions.map((suggestion, index) => (
-                              <li
-                                  key={index}
-                                  className={cn(
-                                  "cursor-pointer px-4 py-2 hover:bg-muted",
-                                  index === activeSuggestionIndex && "bg-muted"
-                                  )}
-                                  onClick={() => handleSuggestionClick(suggestion)}
-                                  onMouseEnter={() => setActiveSuggestionIndex(index)}
-                              >
-                                  {suggestion.term}
-                              </li>
-                              ))}
-                          </ul>
+                              <ul>
+                                  {suggestions.map((suggestion, index) => (
+                                  <li
+                                      key={index}
+                                      className={cn(
+                                      "cursor-pointer px-4 py-2 hover:bg-muted",
+                                      index === activeSuggestionIndex && "bg-muted"
+                                      )}
+                                      onClick={() => handleSuggestionClick(suggestion)}
+                                      onMouseEnter={() => setActiveSuggestionIndex(index)}
+                                  >
+                                      {suggestion.term}
+                                  </li>
+                                  ))}
+                              </ul>
                           </Card>
                       )}
                   </div>
               </div>
             )}
-          </div>
-
+            
           <ThemeToggle />
 
           <div className='hidden md:flex items-center gap-2'>
@@ -332,3 +329,5 @@ export function Header() {
     </header>
   );
 }
+
+    
