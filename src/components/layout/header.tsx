@@ -225,8 +225,8 @@ export function Header() {
 
         {/* Search & Actions */}
         <div className="flex flex-1 items-center justify-end gap-2" ref={searchRef}>
-            <div className={cn("relative w-full max-w-xs md:w-auto", isSearchOpen ? "block" : "hidden md:block")}>
-                 <div className={cn('md:absolute md:right-12 md:w-full md:max-w-sm md:transition-all md:duration-300', !isSearchOpen ? 'md:w-0 md:opacity-0 md:pointer-events-none' : 'md:opacity-100')}>
+            <div className={cn("absolute left-0 top-16 z-20 w-full bg-background/95 p-4 transition-all duration-300 md:relative md:top-auto md:z-auto md:w-auto md:bg-transparent md:p-0", isSearchOpen ? "opacity-100 visible" : "opacity-0 invisible md:visible")}>
+                <div className="relative md:w-full md:max-w-sm">
                     <Input
                         ref={inputRef}
                         type="search"
@@ -265,9 +265,9 @@ export function Header() {
               size="icon"
               onClick={() => setIsSearchOpen(prev => !prev)}
               aria-label="Toggle Search"
+              className="md:hidden"
             >
-              {isSearchOpen && <X className="h-5 w-5" />}
-              {!isSearchOpen && <Search className="h-5 w-5" />}
+              {isSearchOpen ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
             </Button>
 
           <ThemeToggle />
@@ -288,5 +288,3 @@ export function Header() {
     </header>
   );
 }
-
-    
