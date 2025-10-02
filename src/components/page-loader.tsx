@@ -38,8 +38,9 @@ export function PageLoader() {
       )}
     >
       <div className="flex flex-col items-center gap-4">
-        <div className="relative w-16 h-16">
-          <Shield className="w-16 h-16 text-primary animate-shield-pulse" />
+        <div className="flex items-center gap-2 animate-shield-pulse">
+            <Shield className="h-12 w-12 text-primary" />
+            <span className="font-bold text-4xl">CyberWall</span>
         </div>
         <div className="w-48 h-1.5 bg-border rounded-full overflow-hidden">
           <div className="h-full bg-primary animate-loader-progress rounded-full"></div>
