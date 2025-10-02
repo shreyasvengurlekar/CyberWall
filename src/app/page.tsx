@@ -103,7 +103,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     <Link href="/dashboard">Get Started for Free</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg">
-                    <Link href="/services">Learn More</Link>
+                    <Link href="/#features">Learn More</Link>
                   </Button>
                 </div>
               </div>
