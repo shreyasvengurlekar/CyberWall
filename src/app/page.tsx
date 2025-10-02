@@ -108,10 +108,17 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 </div>
               </div>
               <div className="flex justify-center items-center">
-                <div className="flex flex-col items-center gap-4 text-primary animate-shield-pulse">
-                    <Shield className="h-48 w-48" />
-                    <span className="font-bold text-7xl" data-text="CyberWall">CyberWall</span>
-                </div>
+                {heroImage && (
+                  <Image
+                    src={heroImage.imageUrl}
+                    alt={heroImage.description}
+                    width={600}
+                    height={400}
+                    className="rounded-lg shadow-2xl transition-all duration-300 hover:shadow-primary/20 hover:scale-105"
+                    data-ai-hint={heroImage.imageHint}
+                    priority
+                  />
+                )}
               </div>
             </div>
           </div>
