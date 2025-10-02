@@ -51,6 +51,8 @@ const searchableTerms = [
   { term: 'Dashboard', path: '/dashboard' },
   { term: 'Login', path: '/login' },
   { term: 'Sign Up', path: '/signup' },
+  { term: 'Privacy Policy', path: '/privacy'},
+  { term: 'Terms of Service', path: '/terms'},
 ];
 
 
@@ -63,6 +65,7 @@ type HeaderProps = {
 export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<{term: string, path: string}[]>([]);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = React.useState(-1);
   const searchRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const pathname = usePathname();
@@ -103,8 +106,33 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         item.term.toLowerCase().includes(query.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
+      setActiveSuggestionIndex(-1);
     } else {
       setSuggestions([]);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (suggestions.length === 0) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setActiveSuggestionIndex(prevIndex =>
+        prevIndex === suggestions.length - 1 ? 0 : prevIndex + 1
+      );
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setActiveSuggestionIndex(prevIndex =>
+        prevIndex <= 0 ? suggestions.length - 1 : prevIndex - 1
+      );
+    } else if (e.key === 'Enter') {
+      if (activeSuggestionIndex > -1) {
+        e.preventDefault();
+        handleSuggestionClick(suggestions[activeSuggestionIndex]);
+      }
+    } else if (e.key === 'Escape') {
+      setSuggestions([]);
+      setIsSearchOpen(false);
     }
   };
 
@@ -137,6 +165,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => setIsSearchOpen(true)}
+                  onKeyDown={handleKeyDown}
                 />
                  <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                  {suggestions.length > 0 && (
@@ -145,8 +174,12 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                         {suggestions.map((suggestion, index) => (
                           <li
                             key={index}
-                            className="px-4 py-2 hover:bg-muted cursor-pointer"
+                            className={cn(
+                              "px-4 py-2 hover:bg-muted cursor-pointer",
+                              index === activeSuggestionIndex && "bg-muted"
+                            )}
                             onClick={() => handleSuggestionClick(suggestion)}
+                            onMouseEnter={() => setActiveSuggestionIndex(index)}
                           >
                             {suggestion.term}
                           </li>
@@ -216,6 +249,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                         className="w-full pr-10"
                         value={searchQuery}
                         onChange={handleSearchChange}
+                        onKeyDown={handleKeyDown}
                       />
                       <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
                        {suggestions.length > 0 && (
@@ -224,8 +258,12 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                             {suggestions.map((suggestion, index) => (
                               <SheetClose asChild key={index}>
                               <li
-                                className="px-4 py-2 hover:bg-muted cursor-pointer"
+                                className={cn(
+                                  "px-4 py-2 hover:bg-muted cursor-pointer",
+                                  index === activeSuggestionIndex && "bg-muted"
+                                )}
                                 onClick={() => handleSuggestionClick(suggestion)}
+                                onMouseEnter={() => setActiveSuggestionIndex(index)}
                               >
                                 {suggestion.term}
                               </li>
