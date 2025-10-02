@@ -58,7 +58,8 @@ const searchableTerms = [
 
 
 export function Header() {
-  const { searchQuery, setSearchQuery } = useSearch();
+  const { setSearchQuery } = useSearch();
+  const [localQuery, setLocalQuery] = React.useState('');
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<{term: string, path: string}[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = React.useState(-1);
@@ -69,6 +70,7 @@ export function Header() {
 
   const closeAndClearSearch = React.useCallback(() => {
     setIsSearchOpen(false);
+    setLocalQuery('');
     setSearchQuery('');
     setSuggestions([]);
     setActiveSuggestionIndex(-1);
@@ -102,6 +104,7 @@ export function Header() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
+    setLocalQuery(query);
     setSearchQuery(query);
     if (query.length > 0) {
       const filteredSuggestions = searchableTerms.filter(item =>
@@ -154,7 +157,7 @@ export function Header() {
         type="search"
         placeholder="Search..."
         className="w-full pl-10"
-        value={searchQuery}
+        value={localQuery}
         onChange={handleSearchChange}
         onKeyDown={handleKeyDown}
       />
