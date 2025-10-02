@@ -107,19 +107,18 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                   </Button>
                 </div>
               </div>
-              <div className="relative flex justify-center items-center h-80 lg:h-96">
-                <div className="absolute w-full h-full animate-ring-glitch-1">
-                  <div className="w-full h-full rounded-full border-2 border-primary/20 animate-expand-fade" style={{ animationDelay: '0s' }}></div>
-                </div>
-                <div className="absolute w-full h-full animate-ring-glitch-2">
-                   <div className="w-full h-full rounded-full border-2 border-primary/20 animate-expand-fade" style={{ animationDelay: '1s' }}></div>
-                </div>
-                <div className="absolute w-full h-full animate-ring-glitch-3">
-                   <div className="w-full h-full rounded-full border-2 border-primary/20 animate-expand-fade" style={{ animationDelay: '2s' }}></div>
-                </div>
-                <div className="relative z-10 animate-shield-pulse">
-                  <Shield className="w-32 h-32 md:w-48 md:h-48 text-primary drop-shadow-[0_0_10px_hsl(var(--primary))]" />
-                </div>
+              <div className="flex justify-center items-center">
+                {heroImage && (
+                  <Image
+                    src={heroImage.imageUrl}
+                    alt={heroImage.description}
+                    width={600}
+                    height={400}
+                    className="rounded-xl shadow-2xl"
+                    data-ai-hint={heroImage.imageHint}
+                    priority
+                  />
+                )}
               </div>
             </div>
           </div>
@@ -375,3 +374,5 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
     </div>
   );
 }
+
+    
