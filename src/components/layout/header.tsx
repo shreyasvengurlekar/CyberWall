@@ -99,7 +99,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery?.(query);
-    if (query.length > 1) {
+    if (query.length > 0) {
       const filteredSuggestions = searchableTerms.filter(term =>
         term.toLowerCase().includes(query.toLowerCase())
       );
@@ -112,6 +112,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const handleSuggestionClick = (suggestion: string) => {
     setSearchQuery?.(suggestion);
     setSuggestions([]);
+    setIsSearchOpen(false);
     inputRef.current?.focus();
   };
 
@@ -222,13 +223,14 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                         <Card className="absolute top-full mt-2 w-full max-h-48 overflow-y-auto z-10">
                           <ul>
                             {suggestions.map((suggestion, index) => (
+                              <SheetClose asChild key={index}>
                               <li
-                                key={index}
                                 className="px-4 py-2 hover:bg-muted cursor-pointer"
                                 onClick={() => handleSuggestionClick(suggestion)}
                               >
                                 {suggestion}
                               </li>
+                              </SheetClose>
                             ))}
                           </ul>
                         </Card>
