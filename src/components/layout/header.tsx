@@ -144,13 +144,104 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <div className="flex flex-1 items-center justify-between">
+        <div className="mr-4 hidden md:flex">
           <Link href="/" className="flex items-center gap-2 group">
             <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
             <span className="font-bold text-2xl">CyberWall</span>
           </Link>
+        </div>
+        <div className="flex flex-1 items-center justify-between">
+            <div className="flex items-center md:hidden">
+                <Sheet>
+                    <SheetTrigger asChild>
+                    <Button variant="outline" size="icon" aria-label="Toggle Menu">
+                        <Menu className="h-5 w-5" />
+                    </Button>
+                    </SheetTrigger>
+                    <SheetContent side="left">
+                    <div className="grid gap-4 py-6">
+                        <SheetClose asChild>
+                          <Link href="/" className="flex items-center gap-2 mb-4">
+                            <Shield className="h-8 w-8 text-primary" />
+                            <span className="font-bold text-2xl">CyberWall</span>
+                          </Link>
+                        </SheetClose>
+                        <div className="relative">
+                          <Input 
+                            type="search" 
+                            placeholder="Search..." 
+                            className="w-full pr-10"
+                            value={searchQuery}
+                            onChange={handleSearchChange}
+                            onKeyDown={handleKeyDown}
+                          />
+                          <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                          {suggestions.length > 0 && (
+                            <Card className="absolute top-full mt-2 w-full max-h-48 overflow-y-auto z-10">
+                              <ul>
+                                {suggestions.map((suggestion, index) => (
+                                  <SheetClose asChild key={index}>
+                                  <li
+                                    className={cn(
+                                      "px-4 py-2 hover:bg-muted cursor-pointer",
+                                      index === activeSuggestionIndex && "bg-muted"
+                                    )}
+                                    onClick={() => handleSuggestionClick(suggestion)}
+                                    onMouseEnter={() => setActiveSuggestionIndex(index)}
+                                  >
+                                    {suggestion.term}
+                                  </li>
+                                  </SheetClose>
+                                ))}
+                              </ul>
+                            </Card>
+                          )}
+                        </div>
+                        {navLinks.map((link) => (
+                        <SheetClose asChild key={link.href}>
+                            <Link
+                            href={link.href}
+                            className="flex w-full items-center py-2 text-lg font-semibold"
+                            >
+                            {link.label}
+                            </Link>
+                        </SheetClose>
+                        ))}
+                        <SheetClose asChild>
+                            <Link
+                            href="/#contact"
+                            className="flex w-full items-center py-2 text-lg font-semibold"
+                            >
+                            Contact
+                            </Link>
+                        </SheetClose>
+                        <div className="flex flex-col gap-2 mt-4">
+                          <SheetClose asChild>
+                            <Button asChild>
+                                <Link href="/dashboard">Scan Now</Link>
+                            </Button>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Button asChild variant="outline">
+                                <Link href="/signup">Sign Up</Link>
+                            </Button>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Button asChild variant="outline">
+                                <Link href="/login">Log In</Link>
+                            </Button>
+                          </SheetClose>
+                        </div>
+                    </div>
+                    </SheetContent>
+                </Sheet>
+                 <Link href="/" className="flex items-center gap-2 group ml-4">
+                    <Shield className="h-8 w-8 text-primary" />
+                    <span className="font-bold text-2xl">CyberWall</span>
+                </Link>
+            </div>
 
           <div className="flex items-center gap-2">
             {/* Desktop Search */}
@@ -224,13 +315,13 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
               </div>
             </div>
 
-            {/* Mobile Menu */}
+            {/* Mobile Menu Trigger for search (replaces old menu) */}
             <div className="flex items-center sm:hidden">
               <Sheet>
                   <SheetTrigger asChild>
-                  <Button variant="outline" size="icon" aria-label="Toggle Menu">
-                      <Menu className="h-5 w-5" />
-                  </Button>
+                     <Button variant="ghost" size="icon" className="md:hidden">
+                      <Search className="h-5 w-5" />
+                    </Button>
                   </SheetTrigger>
                   <SheetContent side="right">
                   <div className="grid gap-4 py-6">
@@ -271,38 +362,10 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                           </Card>
                         )}
                       </div>
-                      {navLinks.map((link) => (
-                      <SheetClose asChild key={link.href}>
-                          <Link
-                          href={link.href}
-                          className="flex w-full items-center py-2 text-lg font-semibold"
-                          >
-                          {link.label}
-                          </Link>
-                      </SheetClose>
-                      ))}
-                      <SheetClose asChild>
-                          <Link
-                          href="/#contact"
-                          className="flex w-full items-center py-2 text-lg font-semibold"
-                          >
-                          Contact
-                          </Link>
-                      </SheetClose>
                       <div className="flex flex-col gap-2 mt-4">
                         <SheetClose asChild>
                           <Button asChild>
                               <Link href="/dashboard">Scan Now</Link>
-                          </Button>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Button asChild variant="outline">
-                              <Link href="/signup">Sign Up</Link>
-                          </Button>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Button asChild variant="outline">
-                              <Link href="/login">Log In</Link>
                           </Button>
                         </SheetClose>
                       </div>
@@ -316,3 +379,5 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
     </header>
   );
 }
+
+    
