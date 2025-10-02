@@ -95,6 +95,7 @@ export function Header() {
   }, [isSearchOpen]);
   
   React.useEffect(() => {
+    // When the page changes, close the search
     closeAndClearSearch();
   }, [pathname, closeAndClearSearch]);
   
