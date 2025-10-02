@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Menu, Search, ScanLine, X } from 'lucide-react';
+import { Shield, Menu, Search, X } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -87,9 +87,11 @@ export function Header() {
   }, [isSearchOpen]);
   
   React.useEffect(() => {
-    setIsSearchOpen(false);
-    setSearchQuery('');
-    setSuggestions([]);
+    if (pathname) {
+        setIsSearchOpen(false);
+        setSearchQuery('');
+        setSuggestions([]);
+    }
   }, [pathname, setSearchQuery]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,14 +184,14 @@ export function Header() {
                         <Link href="/dashboard">Scan Now</Link>
                     </Button>
                   </SheetClose>
-                  <SheetClose asChild>
-                    <Button asChild variant="outline">
-                        <Link href="/signup">Sign Up</Link>
+                   <SheetClose asChild>
+                    <Button asChild variant="ghost">
+                        <Link href="/login">Log In</Link>
                     </Button>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Button asChild variant="ghost">
-                        <Link href="/login">Log In</Link>
+                    <Button asChild variant="outline">
+                        <Link href="/signup">Sign Up</Link>
                     </Button>
                   </SheetClose>
                 </div>
@@ -259,17 +261,22 @@ export function Header() {
             </div>
             
             <ThemeToggle />
+
             <div className='hidden md:flex items-center gap-2'>
-              <Button asChild variant="ghost">
-                <Link href="/login">Log In</Link>
-              </Button>
-              <Button asChild>
-                <Link href="/signup">Sign Up</Link>
-              </Button>
+                <Button asChild>
+                    <Link href="/dashboard">Scan Now</Link>
+                </Button>
+                <Button asChild variant="ghost">
+                    <Link href="/login">Log In</Link>
+                </Button>
+                <Button asChild variant="outline">
+                    <Link href="/signup">Sign Up</Link>
+                </Button>
             </div>
-          <Button variant="ghost" size="icon" className="sm:hidden" onClick={() => setIsSearchOpen(true)}>
-            <Search className="h-5 w-5" />
-          </Button>
+
+            <Button variant="ghost" size="icon" className="sm:hidden" onClick={() => setIsSearchOpen(true)}>
+                <Search className="h-5 w-5" />
+            </Button>
         </div>
       </div>
 
