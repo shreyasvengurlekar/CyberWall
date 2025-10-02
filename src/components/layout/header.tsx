@@ -142,7 +142,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 mr-auto">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden" aria-label="Toggle Menu">
@@ -202,21 +202,19 @@ export function Header() {
           </Link>
         </div>
 
-        <div className="flex-1 flex justify-center">
-            <nav className="hidden items-center gap-4 text-sm lg:flex">
-              {navLinks.map((link) => (
-                  <Link
-                  key={link.href}
-                  href={link.href}
-                  className="font-medium text-muted-foreground transition-colors hover:text-primary"
-                  >
-                  {link.label}
-                  </Link>
-              ))}
-          </nav>
-        </div>
+        <nav className="hidden items-center gap-4 text-sm md:flex">
+            {navLinks.map((link) => (
+                <Link
+                key={link.href}
+                href={link.href}
+                className="font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                {link.label}
+                </Link>
+            ))}
+        </nav>
           
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 ml-auto">
             <div className="relative hidden sm:flex items-center gap-2" ref={searchRef}>
                <div className={cn('absolute right-12 transition-all duration-300 w-full max-w-sm', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'opacity-100')}>
                 <Input
@@ -266,7 +264,7 @@ export function Header() {
                 <Link href="/dashboard"><ScanLine className="mr-2 h-4 w-4" /> Scan Now</Link>
               </Button>
             </div>
-             <div className='hidden sm:flex items-center gap-2'>
+             <div className='hidden sm:flex md:hidden lg:hidden items-center gap-2'>
               <Button variant="outline" asChild>
                   <Link href="/signup">Sign Up</Link>
               </Button>
@@ -322,3 +320,4 @@ export function Header() {
     </header>
   );
 }
+    
