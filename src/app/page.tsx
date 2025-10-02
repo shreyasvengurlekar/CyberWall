@@ -257,7 +257,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                 <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Free</h3>
-                    <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">₹0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
@@ -274,7 +274,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 text-sm font-semibold" style={{clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)'}}>Popular</div>
                     <CardHeader className="pt-12">
                     <h3 className="text-2xl font-semibold">Pro</h3>
-                    <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">₹49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
@@ -291,7 +291,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                  <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Business</h3>
-                    <p className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">₹99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
