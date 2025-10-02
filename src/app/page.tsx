@@ -365,7 +365,8 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
               </div>
               <div className="mx-auto mt-8 w-full max-w-sm space-y-2">
                  <Button asChild size="lg" className="w-full">
-                    <Link href="/dashboard">Start Scanning Now</Link>                  </Button>
+                    <Link href="/dashboard">Start Scanning Now</Link>
+                 </Button>
               </div>
             </div>
           </div>
@@ -374,5 +375,3 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
     </div>
   );
 }
-
-    
