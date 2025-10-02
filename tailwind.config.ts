@@ -106,6 +106,28 @@ export default {
           '75%': { clip: 'rect(0, 9999px, 0, 0)' },
           '100%': { clip: 'rect(90px, 9999px, 92px, 0)' },
         },
+        'expand-fade': {
+          '0%': { transform: 'scale(0.5)', opacity: '1' },
+          '100%': { transform: 'scale(1.2)', opacity: '0' },
+        },
+        'ring-glitch-1': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '25%': { transform: 'translate(5px, -5px) scale(0.95)' },
+          '50%': { transform: 'translate(0, 0) scale(1)' },
+          '75%': { transform: 'translate(-5px, 5px) scale(1.05)' },
+        },
+        'ring-glitch-2': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '25%': { transform: 'translate(-5px, 5px) scale(1.05)' },
+          '50%': { transform: 'translate(0, 0) scale(1)' },
+          '75%': { transform: 'translate(5px, -5px) scale(0.95)' },
+        },
+        'ring-glitch-3': {
+          '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+          '25%': { transform: 'translate(3px, 3px) scale(1.02)' },
+          '50%': { transform: 'translate(0, 0) scale(1)' },
+          '75%': { transform: 'translate(-3px, -3px) scale(0.98)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
@@ -113,8 +135,14 @@ export default {
         'fade-in': 'fade-in 0.5s ease-out',
         'fade-in-slide-up': 'fade-in-slide-up 0.6s ease-out forwards',
         'glitch': 'glitch 2.5s infinite',
+        'expand-fade': 'expand-fade 3s infinite linear',
+        'ring-glitch-1': 'ring-glitch-1 4s infinite alternate ease-in-out',
+        'ring-glitch-2': 'ring-glitch-2 3.5s infinite alternate ease-in-out',
+        'ring-glitch-3': 'ring-glitch-3 4.5s infinite alternate ease-in-out',
       },
     },
   },
   plugins: [require('tailwindcss-animate')],
 } satisfies Config;
+
+    
