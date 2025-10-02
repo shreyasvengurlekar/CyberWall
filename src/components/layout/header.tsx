@@ -1,8 +1,9 @@
 'use client';
 
-import { Shield, Menu, Search, ScanLine } from 'lucide-react';
+import { Shield, Menu, Search, ScanLine, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
+import { useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,37 +23,34 @@ const navLinks = [
 ];
 
 const searchableTerms = [
-  // From Homepage
-  'Vulnerability Scanning',
-  'AI-Powered Remediation',
-  'Actionable Reporting',
-  'Get Started',
-  'How It Works',
-  'Testimonials',
-  'Pricing',
-  'Free Plan',
-  'Pro Plan',
-  'Business Plan',
-  'Contact',
-  
-  // From Services pages
-  'SQL Injection',
-  'Cross-Site Scripting (XSS)',
-  'Broken Authentication',
-  'XML External Entity (XXE)',
-  'Broken Access Control',
-  'Security Misconfiguration',
-  'Insecure Deserialization',
-  'Known Vulnerabilities',
-  'Insufficient Logging & Monitoring',
-  'Services',
-
-  // From About page
-  'About',
-  'My Journey',
-  'Project Timeline',
-  'Technologies',
-  'Skills',
+  { term: 'Home', path: '/' },
+  { term: 'Features', path: '/#features' },
+  { term: 'How It Works', path: '/#how-it-works' },
+  { term: 'Testimonials', path: '/#testimonials' },
+  { term: 'Pricing', path: '/#pricing' },
+  { term: 'Free Plan', path: '/#pricing' },
+  { term: 'Pro Plan', path: '/#pricing' },
+  { term: 'Business Plan', path: '/#pricing' },
+  { term: 'Contact', path: '/#contact' },
+  { term: 'Get in Touch', path: '/#contact' },
+  { term: 'Services', path: '/services' },
+  { term: 'SQL Injection', path: '/services/sql-injection' },
+  { term: 'Cross-Site Scripting (XSS)', path: '/services/xss' },
+  { term: 'Broken Authentication', path: '/services/broken-authentication' },
+  { term: 'XML External Entity (XXE)', path: '/services/xxe' },
+  { term: 'Broken Access Control', path: '/services/broken-access-control' },
+  { term: 'Security Misconfiguration', path: '/services/security-misconfiguration' },
+  { term: 'Insecure Deserialization', path: '/services/insecure-deserialization' },
+  { term: 'Known Vulnerabilities', path: '/services/known-vulnerabilities' },
+  { term: 'Insufficient Logging & Monitoring', path: '/services/insufficient-logging' },
+  { term: 'About', path: '/about' },
+  { term: 'My Journey', path: '/about' },
+  { term: 'Project Timeline', path: '/about' },
+  { term: 'Technologies', path: '/about' },
+  { term: 'Skills', path: '/about' },
+  { term: 'Dashboard', path: '/dashboard' },
+  { term: 'Login', path: '/login' },
+  { term: 'Sign Up', path: '/signup' },
 ];
 
 
@@ -64,10 +62,11 @@ type HeaderProps = {
 
 export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-  const [suggestions, setSuggestions] = React.useState<string[]>([]);
+  const [suggestions, setSuggestions] = React.useState<{term: string, path: string}[]>([]);
   const searchRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const pathname = usePathname();
+  const router = useRouter();
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -100,8 +99,8 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
     const query = e.target.value;
     setSearchQuery?.(query);
     if (query.length > 0) {
-      const filteredSuggestions = searchableTerms.filter(term =>
-        term.toLowerCase().includes(query.toLowerCase())
+      const filteredSuggestions = searchableTerms.filter(item =>
+        item.term.toLowerCase().includes(query.toLowerCase())
       );
       setSuggestions(filteredSuggestions);
     } else {
@@ -109,11 +108,11 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
     }
   };
 
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchQuery?.(suggestion);
+  const handleSuggestionClick = (suggestion: {term: string, path: string}) => {
+    router.push(suggestion.path);
+    setSearchQuery?.('');
     setSuggestions([]);
     setIsSearchOpen(false);
-    inputRef.current?.focus();
   };
 
   return (
@@ -149,7 +148,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                             className="px-4 py-2 hover:bg-muted cursor-pointer"
                             onClick={() => handleSuggestionClick(suggestion)}
                           >
-                            {suggestion}
+                            {suggestion.term}
                           </li>
                         ))}
                       </ul>
@@ -228,7 +227,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                                 className="px-4 py-2 hover:bg-muted cursor-pointer"
                                 onClick={() => handleSuggestionClick(suggestion)}
                               >
-                                {suggestion}
+                                {suggestion.term}
                               </li>
                               </SheetClose>
                             ))}
