@@ -22,19 +22,39 @@ const navLinks = [
 ];
 
 const searchableTerms = [
+  // From Homepage
   'Vulnerability Scanning',
   'AI-Powered Remediation',
   'Actionable Reporting',
+  'Get Started',
+  'How It Works',
+  'Testimonials',
+  'Pricing',
+  'Free Plan',
+  'Pro Plan',
+  'Business Plan',
+  'Contact',
+  
+  // From Services pages
   'SQL Injection',
   'Cross-Site Scripting (XSS)',
   'Broken Authentication',
+  'XML External Entity (XXE)',
+  'Broken Access Control',
   'Security Misconfiguration',
-  'Pricing',
-  'Features',
-  'Testimonials',
+  'Insecure Deserialization',
+  'Known Vulnerabilities',
+  'Insufficient Logging & Monitoring',
+  'Services',
+
+  // From About page
   'About',
-  'Services'
+  'My Journey',
+  'Project Timeline',
+  'Technologies',
+  'Skills',
 ];
+
 
 type HeaderProps = {
   searchQuery?: string;
@@ -63,7 +83,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   }, [searchRef]);
 
   React.useEffect(() => {
-    if (isSearchOpen) {
+    if (isSearchOpen && window.innerWidth > 640) { // Only auto-focus on desktop
       inputRef.current?.focus();
     }
   }, [isSearchOpen]);
@@ -108,7 +128,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         <div className="flex flex-1 items-center justify-end gap-2">
           {/* Desktop Search */}
           <div className="relative hidden sm:flex items-center gap-2 justify-end flex-1" ref={searchRef}>
-              <div className={cn('relative transition-all duration-300 w-full max-w-sm', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'w-full max-w-sm opacity-100')}>
+              <div className={cn('relative transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'w-full max-w-sm opacity-100')}>
                 <Input
                   ref={inputRef}
                   type="search"
@@ -138,7 +158,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
+                  onClick={() => setIsSearchOpen(prev => !prev)}
                   aria-label="Toggle Search"
                 >
                   <Search className="h-5 w-5" />
