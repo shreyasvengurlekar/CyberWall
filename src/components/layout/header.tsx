@@ -144,7 +144,9 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <div className="mr-auto flex items-center gap-4">
+        {/* Left section: Mobile Menu and Logo */}
+        <div className="flex items-center gap-4">
+          {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden" aria-label="Toggle Menu">
@@ -198,13 +200,15 @@ export function Header() {
               </div>
             </SheetContent>
           </Sheet>
+          {/* Logo */}
           <Link href="/" className="group flex items-center gap-2">
             <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
             <span className="hidden text-2xl font-bold sm:inline-block">CyberWall</span>
           </Link>
         </div>
 
-        <nav className="hidden items-center gap-4 text-sm md:flex">
+        {/* Center section: Desktop Navigation */}
+        <nav className="hidden md:flex items-center gap-4 text-sm mx-auto">
             {navLinks.map((link) => (
                 <Link
                 key={link.href}
@@ -216,9 +220,11 @@ export function Header() {
             ))}
         </nav>
           
-        <div className="ml-auto flex items-center gap-2">
-            <div className="relative hidden sm:flex items-center gap-2" ref={searchRef}>
-               <div className={cn('absolute right-12 w-full max-w-sm transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'opacity-100')}>
+        {/* Right section: Search, Theme, Auth Buttons */}
+        <div className="flex items-center gap-2">
+            {/* Search */}
+            <div className="relative" ref={searchRef}>
+               <div className={cn('hidden md:block absolute right-12 w-full max-w-sm transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'opacity-100')}>
                 <Input
                   ref={inputRef}
                   type="search"
@@ -262,6 +268,7 @@ export function Header() {
             
             <ThemeToggle />
 
+            {/* Auth Buttons */}
             <div className='hidden md:flex items-center gap-2'>
                 <Button asChild>
                     <Link href="/dashboard">Scan Now</Link>
@@ -273,15 +280,12 @@ export function Header() {
                     <Link href="/signup">Sign Up</Link>
                 </Button>
             </div>
-
-            <Button variant="ghost" size="icon" className="sm:hidden" onClick={() => setIsSearchOpen(true)}>
-                <Search className="h-5 w-5" />
-            </Button>
         </div>
       </div>
 
-       {isSearchOpen && (
-        <div className="sm:hidden absolute top-0 left-0 w-full h-16 bg-background border-b z-50 flex items-center px-4 animate-fade-in-down">
+      {/* Mobile Search Overlay */}
+      {isSearchOpen && (
+        <div className="md:hidden absolute top-0 left-0 w-full h-16 bg-background border-b z-50 flex items-center px-4 animate-fade-in-down">
            <div className="relative w-full" ref={searchRef}>
               <Input
                 ref={inputRef}
