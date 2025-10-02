@@ -148,120 +148,128 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <div className="flex items-center gap-4">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" size="icon" className="md:hidden" aria-label="Toggle Menu">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <div className="grid gap-4 py-6">
-                <SheetClose asChild>
-                  <Link href="/" className="mb-4 flex items-center gap-2">
-                    <Shield className="h-8 w-8 text-primary" />
-                    <span className="text-2xl font-bold">CyberWall</span>
-                  </Link>
-                </SheetClose>
+        {/* Mobile Menu & Logo */}
+        <div className="flex items-center md:hidden">
+            <Sheet>
+                <SheetTrigger asChild>
+                <Button variant="outline" size="icon" className="mr-2" aria-label="Toggle Menu">
+                    <Menu className="h-5 w-5" />
+                </Button>
+                </SheetTrigger>
+                <SheetContent side="left">
+                    <div className="grid gap-4 py-6">
+                        <SheetClose asChild>
+                        <Link href="/" className="mb-4 flex items-center gap-2">
+                            <Shield className="h-8 w-8 text-primary" />
+                            <span className="text-2xl font-bold">CyberWall</span>
+                        </Link>
+                        </SheetClose>
+                        {navLinks.map((link) => (
+                        <SheetClose asChild key={link.href}>
+                            <Link
+                            href={link.href}
+                            className="flex w-full items-center py-2 text-lg font-semibold"
+                            >
+                            {link.label}
+                            </Link>
+                        </SheetClose>
+                        ))}
+                        <SheetClose asChild>
+                        <Link
+                            href="/#contact"
+                            className="flex w-full items-center py-2 text-lg font-semibold"
+                        >
+                            Contact
+                        </Link>
+                        </SheetClose>
+                        <div className="mt-4 flex flex-col gap-2">
+                            <SheetClose asChild>
+                                <Button asChild>
+                                <Link href="/dashboard">Scan Now</Link>
+                                </Button>
+                            </SheetClose>
+                             <SheetClose asChild>
+                                <Button asChild variant="ghost">
+                                <Link href="/login">Log In</Link>
+                                </Button>
+                            </SheetClose>
+                            <SheetClose asChild>
+                                <Button asChild variant="outline">
+                                <Link href="/signup">Sign Up</Link>
+                                </Button>
+                            </SheetClose>
+                        </div>
+                    </div>
+                </SheetContent>
+            </Sheet>
+        </div>
+        
+        {/* Desktop Logo & Nav */}
+        <div className="hidden md:flex items-center gap-6">
+             <Link href="/" className="group flex items-center gap-2">
+                <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
+                <span className="text-2xl font-bold">CyberWall</span>
+            </Link>
+            <nav className="flex items-center gap-4 text-sm">
                 {navLinks.map((link) => (
-                  <SheetClose asChild key={link.href}>
                     <Link
-                      href={link.href}
-                      className="flex w-full items-center py-2 text-lg font-semibold"
+                    key={link.href}
+                    href={link.href}
+                    className="font-medium text-muted-foreground transition-colors hover:text-primary"
                     >
-                      {link.label}
+                    {link.label}
                     </Link>
-                  </SheetClose>
                 ))}
-                <SheetClose asChild>
-                  <Link
-                    href="/#contact"
-                    className="flex w-full items-center py-2 text-lg font-semibold"
-                  >
-                    Contact
-                  </Link>
-                </SheetClose>
-                <div className="mt-4 flex flex-col gap-2">
-                  <SheetClose asChild>
-                    <Button asChild>
-                      <Link href="/dashboard">Scan Now</Link>
-                    </Button>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Button asChild variant="ghost">
-                      <Link href="/login">Log In</Link>
-                    </Button>
-                  </SheetClose>
-                  <SheetClose asChild>
-                    <Button asChild variant="outline">
-                      <Link href="/signup">Sign Up</Link>
-                    </Button>
-                  </SheetClose>
-                </div>
-              </div>
-            </SheetContent>
-          </Sheet>
-          <Link href="/" className="group flex items-center gap-2">
-            <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
-            <span className="hidden text-2xl font-bold sm:inline-block">CyberWall</span>
-          </Link>
+            </nav>
         </div>
 
-        <nav className="hidden md:flex items-center gap-4 text-sm mx-auto">
-          {navLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-medium text-muted-foreground transition-colors hover:text-primary"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-          
-        <div className="flex flex-1 items-center justify-end gap-2">
-          <div className="relative" ref={searchRef}>
-            <div className={cn('hidden md:block absolute right-12 w-full max-w-sm transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'opacity-100')}>
-              <Input
-                ref={inputRef}
-                type="search"
-                placeholder="Search..."
-                className="w-full pl-10"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyDown={handleKeyDown}
-              />
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-              {suggestions.length > 0 && (
-                <Card className="absolute top-full z-10 mt-2 w-full max-h-60 overflow-y-auto">
-                  <ul>
-                    {suggestions.map((suggestion, index) => (
-                      <li
-                        key={index}
-                        className={cn(
-                          "cursor-pointer px-4 py-2 hover:bg-muted",
-                          index === activeSuggestionIndex && "bg-muted"
-                        )}
-                        onClick={() => handleSuggestionClick(suggestion)}
-                        onMouseEnter={() => setActiveSuggestionIndex(index)}
-                      >
-                        {suggestion.term}
-                      </li>
-                    ))}
-                  </ul>
-                </Card>
-              )}
+        {/* Search & Actions */}
+        <div className="flex flex-1 items-center justify-end gap-2" ref={searchRef}>
+            <div className={cn("relative w-full max-w-xs md:w-auto", isSearchOpen ? "block" : "hidden md:block")}>
+                 <div className={cn('md:absolute md:right-12 md:w-full md:max-w-sm md:transition-all md:duration-300', !isSearchOpen ? 'md:w-0 md:opacity-0 md:pointer-events-none' : 'md:opacity-100')}>
+                    <Input
+                        ref={inputRef}
+                        type="search"
+                        placeholder="Search..."
+                        className="w-full pl-10"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onKeyDown={handleKeyDown}
+                        onFocus={() => setIsSearchOpen(true)}
+                    />
+                    <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+                    {suggestions.length > 0 && isSearchOpen && (
+                        <Card className="absolute top-full z-10 mt-2 w-full max-h-60 overflow-y-auto">
+                        <ul>
+                            {suggestions.map((suggestion, index) => (
+                            <li
+                                key={index}
+                                className={cn(
+                                "cursor-pointer px-4 py-2 hover:bg-muted",
+                                index === activeSuggestionIndex && "bg-muted"
+                                )}
+                                onClick={() => handleSuggestionClick(suggestion)}
+                                onMouseEnter={() => setActiveSuggestionIndex(index)}
+                            >
+                                {suggestion.term}
+                            </li>
+                            ))}
+                        </ul>
+                        </Card>
+                    )}
+                </div>
             </div>
+
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setIsSearchOpen(prev => !prev)}
               aria-label="Toggle Search"
             >
-              <Search className="h-5 w-5" />
+              {isSearchOpen && <X className="h-5 w-5" />}
+              {!isSearchOpen && <Search className="h-5 w-5" />}
             </Button>
-          </div>
-            
+
           <ThemeToggle />
 
           <div className='hidden md:flex items-center gap-2'>
@@ -277,46 +285,8 @@ export function Header() {
           </div>
         </div>
       </div>
-
-      {isSearchOpen && (
-        <div className="md:hidden absolute top-0 left-0 w-full h-16 bg-background border-b z-50 flex items-center px-4 animate-fade-in-down">
-           <div className="relative w-full" ref={searchRef}>
-              <Input
-                ref={inputRef}
-                type="search"
-                placeholder="Search..."
-                className="w-full pl-10"
-                value={searchQuery}
-                onChange={handleSearchChange}
-                onKeyDown={handleKeyDown}
-                autoFocus
-              />
-              <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-                {suggestions.length > 0 && (
-                  <Card className="absolute top-full mt-2 w-full max-h-60 overflow-y-auto z-10">
-                    <ul>
-                      {suggestions.map((suggestion, index) => (
-                        <li
-                          key={index}
-                          className={cn(
-                            "px-4 py-2 hover:bg-muted cursor-pointer",
-                            index === activeSuggestionIndex && "bg-muted"
-                          )}
-                          onClick={() => handleSuggestionClick(suggestion)}
-                          onMouseEnter={() => setActiveSuggestionIndex(index)}
-                        >
-                          {suggestion.term}
-                        </li>
-                      ))}
-                    </ul>
-                  </Card>
-                )}
-            </div>
-             <Button variant="ghost" size="icon" onClick={() => setIsSearchOpen(false)}>
-                <X className="h-5 w-5" />
-            </Button>
-        </div>
-      )}
     </header>
   );
 }
+
+    
