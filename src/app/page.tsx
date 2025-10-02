@@ -93,7 +93,7 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 xl:gap-16 items-center">
               <div className="space-y-6">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl lg:text-7xl">
-                  <Highlight query={searchQuery ?? ''}>Fortify Your Web Applications</Highlight>
+                  <Highlight query={searchQuery ?? ''}>Intelligent Security Scanning for Modern Web Apps</Highlight>
                 </h1>
                 <p className="max-w-[600px] text-muted-foreground md:text-xl">
                   <Highlight query={searchQuery ?? ''}>CyberWall Scanner provides powerful, AI-driven security analysis to help you identify and remediate vulnerabilities before they become a threat.</Highlight>
