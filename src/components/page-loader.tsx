@@ -33,7 +33,7 @@ export function PageLoader() {
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm transition-opacity duration-500',
+        'fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 transition-opacity duration-500',
         isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none'
       )}
     >
