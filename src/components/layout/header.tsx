@@ -142,7 +142,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <div className="flex items-center gap-4 mr-auto">
+        <div className="mr-auto flex items-center gap-4">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden" aria-label="Toggle Menu">
@@ -152,9 +152,9 @@ export function Header() {
             <SheetContent side="left">
               <div className="grid gap-4 py-6">
                 <SheetClose asChild>
-                  <Link href="/" className="flex items-center gap-2 mb-4">
+                  <Link href="/" className="mb-4 flex items-center gap-2">
                     <Shield className="h-8 w-8 text-primary" />
-                    <span className="font-bold text-2xl">CyberWall</span>
+                    <span className="text-2xl font-bold">CyberWall</span>
                   </Link>
                 </SheetClose>
                 
@@ -176,7 +176,7 @@ export function Header() {
                     Contact
                     </Link>
                 </SheetClose>
-                <div className="flex flex-col gap-2 mt-4">
+                <div className="mt-4 flex flex-col gap-2">
                   <SheetClose asChild>
                     <Button asChild>
                         <Link href="/dashboard">Scan Now</Link>
@@ -196,9 +196,9 @@ export function Header() {
               </div>
             </SheetContent>
           </Sheet>
-          <Link href="/" className="flex items-center gap-2 group">
+          <Link href="/" className="group flex items-center gap-2">
             <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
-            <span className="font-bold text-2xl hidden sm:inline-block">CyberWall</span>
+            <span className="hidden text-2xl font-bold sm:inline-block">CyberWall</span>
           </Link>
         </div>
 
@@ -214,9 +214,9 @@ export function Header() {
             ))}
         </nav>
           
-        <div className="flex items-center gap-2 ml-auto">
+        <div className="ml-auto flex items-center gap-2">
             <div className="relative hidden sm:flex items-center gap-2" ref={searchRef}>
-               <div className={cn('absolute right-12 transition-all duration-300 w-full max-w-sm', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'opacity-100')}>
+               <div className={cn('absolute right-12 w-full max-w-sm transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'opacity-100')}>
                 <Input
                   ref={inputRef}
                   type="search"
@@ -229,13 +229,13 @@ export function Header() {
                 />
                 <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
                 {suggestions.length > 0 && (
-                    <Card className="absolute top-full mt-2 w-full max-h-60 overflow-y-auto z-10">
+                    <Card className="absolute top-full z-10 mt-2 w-full max-h-60 overflow-y-auto">
                       <ul>
                         {suggestions.map((suggestion, index) => (
                           <li
                             key={index}
                             className={cn(
-                              "px-4 py-2 hover:bg-muted cursor-pointer",
+                              "cursor-pointer px-4 py-2 hover:bg-muted",
                               index === activeSuggestionIndex && "bg-muted"
                             )}
                             onClick={() => handleSuggestionClick(suggestion)}
@@ -259,17 +259,12 @@ export function Header() {
             </div>
             
             <ThemeToggle />
-            <div className='hidden lg:flex items-center gap-2'>
+            <div className='hidden md:flex items-center gap-2'>
+              <Button asChild variant="ghost">
+                <Link href="/login">Log In</Link>
+              </Button>
               <Button asChild>
-                <Link href="/dashboard"><ScanLine className="mr-2 h-4 w-4" /> Scan Now</Link>
-              </Button>
-            </div>
-             <div className='hidden sm:flex md:hidden lg:hidden items-center gap-2'>
-              <Button variant="outline" asChild>
-                  <Link href="/signup">Sign Up</Link>
-              </Button>
-              <Button variant="ghost" asChild>
-                  <Link href="/login">Log In</Link>
+                <Link href="/signup">Sign Up</Link>
               </Button>
             </div>
           <Button variant="ghost" size="icon" className="sm:hidden" onClick={() => setIsSearchOpen(true)}>
