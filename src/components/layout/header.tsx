@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Menu, Search, ScanLine, RefreshCw } from 'lucide-react';
+import { Shield, Menu, Search, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 
@@ -107,14 +107,13 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         
         <div className="flex flex-1 items-center justify-end gap-2">
           {/* Desktop Search */}
-          <div className="relative hidden sm:flex items-center gap-2 justify-end flex-1">
-              <div ref={searchRef} className={cn('relative transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0' : 'w-full max-w-sm')}>
+          <div className="relative hidden sm:flex items-center gap-2 justify-end flex-1" ref={searchRef}>
+              <div className={cn('relative transition-all duration-300 w-full max-w-sm', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'w-full max-w-sm opacity-100')}>
                 <Input
                   ref={inputRef}
                   type="search"
                   placeholder="Search..."
                   className="w-full pl-10"
-                  aria-hidden={!isSearchOpen}
                   value={searchQuery}
                   onChange={handleSearchChange}
                   onFocus={() => setIsSearchOpen(true)}
