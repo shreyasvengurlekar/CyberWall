@@ -6,35 +6,32 @@ import { cn } from '@/lib/utils';
 
 export function PageLoader() {
   const [showLongLoadMessage, setShowLongLoadMessage] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(true); // Assume loading starts immediately
+  const [visible, setVisible] = React.useState(true);
 
   React.useEffect(() => {
-    let timer: NodeJS.Timeout;
-    if (isLoading) {
-      setShowLongLoadMessage(false);
-      timer = setTimeout(() => {
-        setShowLongLoadMessage(true);
-      }, 2000); // Show message after 2 seconds
-    }
+    const longLoadTimer = setTimeout(() => {
+      setShowLongLoadMessage(true);
+    }, 2000); // Show message after 2 seconds
 
+    // This effect should only run once on mount
     return () => {
-      clearTimeout(timer);
+      clearTimeout(longLoadTimer);
     };
-  }, [isLoading]);
+  }, []);
 
-   React.useEffect(() => {
-    // This is a simple way to hide the loader after a delay,
-    // as Suspense will handle the actual content readiness.
-    const timer = setTimeout(() => setIsLoading(false), 4000); // Max wait time
-    return () => clearTimeout(timer);
+  React.useEffect(() => {
+    // In a real app with suspense, the loader would unmount naturally.
+    // We keep a small delay here for visual consistency in development.
+    const visibilityTimer = setTimeout(() => setVisible(false), 3000); // Max wait time before fade out
+    return () => clearTimeout(visibilityTimer);
   }, []);
 
 
   return (
     <div
       className={cn(
-        'fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/80 transition-opacity duration-500',
-        isLoading ? 'opacity-100' : 'opacity-0 pointer-events-none'
+        'fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background transition-opacity duration-500',
+        visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
       )}
     >
       <div className="flex flex-col items-center gap-4">

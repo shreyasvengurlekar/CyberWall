@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
 const formSchema = z
@@ -28,7 +27,6 @@ const formSchema = z
   });
 
 export default function SignupPage() {
-  const { toast } = useToast();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -41,14 +39,10 @@ export default function SignupPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    toast({
-      title: 'Account Created!',
-      description: 'You have successfully signed up. Redirecting to dashboard...',
-    });
+    // You can add your signup logic here
+    alert('Account Created! You have successfully signed up. Redirecting to dashboard...');
     form.reset();
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 2000);
+    router.push('/dashboard');
   }
 
   return (

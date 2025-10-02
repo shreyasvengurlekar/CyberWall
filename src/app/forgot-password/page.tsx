@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
 const formSchema = z.object({
@@ -18,7 +17,6 @@ const formSchema = z.object({
 });
 
 export default function ForgotPasswordPage() {
-  const { toast } = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -28,10 +26,8 @@ export default function ForgotPasswordPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    toast({
-      title: 'Password Reset Requested',
-      description: `If an account exists for ${values.email}, a reset link has been sent.`,
-    });
+    // You can add your password reset logic here
+    alert(`If an account exists for ${values.email}, a reset link has been sent.`);
     form.reset();
   }
 

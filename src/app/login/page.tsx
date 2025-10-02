@@ -9,7 +9,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
 const formSchema = z.object({
@@ -22,7 +21,6 @@ const formSchema = z.object({
 });
 
 export default function LoginPage() {
-  const { toast } = useToast();
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,14 +32,10 @@ export default function LoginPage() {
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
-    toast({
-      title: 'Login Successful',
-      description: 'Welcome back! Redirecting to dashboard...',
-    });
+    // You can add your login logic here
+    alert('Login Successful! Redirecting to dashboard...');
     form.reset();
-    setTimeout(() => {
-      router.push('/dashboard');
-    }, 2000);
+    router.push('/dashboard');
   }
 
   return (

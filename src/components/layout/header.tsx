@@ -1,17 +1,18 @@
 'use client';
 
-import { Shield, Menu, Search, ScanLine } from 'lucide-react';
+import { Shield, Menu, Search, ScanLine, X } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from '@/components/ui/sheet';
 import { ThemeToggle } from '../theme-toggle';
 import { cn } from '@/lib/utils';
-import { usePathname } from 'next/navigation';
 import { Card } from '@/components/ui/card';
+import { useSearch } from '@/context/search-provider';
+
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -56,13 +57,8 @@ const searchableTerms = [
 ];
 
 
-type HeaderProps = {
-  searchQuery?: string;
-  setSearchQuery?: (query: string) => void;
-};
-
-
-export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
+export function Header() {
+  const { searchQuery, setSearchQuery } = useSearch();
   const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const [suggestions, setSuggestions] = React.useState<{term: string, path: string}[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = React.useState(-1);
@@ -85,22 +81,20 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   }, [searchRef]);
 
   React.useEffect(() => {
-    if (isSearchOpen && window.innerWidth > 640) { // Only auto-focus on desktop
-      inputRef.current?.focus();
+    if (isSearchOpen && inputRef.current) {
+      inputRef.current.focus();
     }
   }, [isSearchOpen]);
   
   React.useEffect(() => {
     setIsSearchOpen(false);
-    if(setSearchQuery){
-      setSearchQuery('');
-    }
+    setSearchQuery('');
     setSuggestions([]);
   }, [pathname, setSearchQuery]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
-    setSearchQuery?.(query);
+    setSearchQuery(query);
     if (query.length > 0) {
       const filteredSuggestions = searchableTerms.filter(item =>
         item.term.toLowerCase().includes(query.toLowerCase())
@@ -129,6 +123,8 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
       if (activeSuggestionIndex > -1) {
         e.preventDefault();
         handleSuggestionClick(suggestions[activeSuggestionIndex]);
+      } else if (suggestions.length > 0) {
+        handleSuggestionClick(suggestions[0]);
       }
     } else if (e.key === 'Escape') {
       setSuggestions([]);
@@ -138,7 +134,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
 
   const handleSuggestionClick = (suggestion: {term: string, path: string}) => {
     router.push(suggestion.path);
-    setSearchQuery?.('');
+    setSearchQuery('');
     setSuggestions([]);
     setIsSearchOpen(false);
   };
@@ -146,7 +142,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
-        <div className="flex items-center">
+        <div className="flex items-center gap-4">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden" aria-label="Toggle Menu">
@@ -161,37 +157,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <span className="font-bold text-2xl">CyberWall</span>
                   </Link>
                 </SheetClose>
-                <div className="relative">
-                  <Input 
-                    type="search" 
-                    placeholder="Search..." 
-                    className="w-full pr-10"
-                    value={searchQuery}
-                    onChange={handleSearchChange}
-                    onKeyDown={handleKeyDown}
-                  />
-                  <Search className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-                   {suggestions.length > 0 && (
-                    <Card className="absolute top-full mt-2 w-full max-h-48 overflow-y-auto z-10">
-                      <ul>
-                        {suggestions.map((suggestion, index) => (
-                          <SheetClose asChild key={index}>
-                          <li
-                            className={cn(
-                              "px-4 py-2 hover:bg-muted cursor-pointer",
-                              index === activeSuggestionIndex && "bg-muted"
-                            )}
-                            onClick={() => handleSuggestionClick(suggestion)}
-                            onMouseEnter={() => setActiveSuggestionIndex(index)}
-                          >
-                            {suggestion.term}
-                          </li>
-                          </SheetClose>
-                        ))}
-                      </ul>
-                    </Card>
-                  )}
-                </div>
+                
                 {navLinks.map((link) => (
                 <SheetClose asChild key={link.href}>
                     <Link
@@ -222,7 +188,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     </Button>
                   </SheetClose>
                   <SheetClose asChild>
-                    <Button asChild variant="outline">
+                    <Button asChild variant="ghost">
                         <Link href="/login">Log In</Link>
                     </Button>
                   </SheetClose>
@@ -230,7 +196,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
               </div>
             </SheetContent>
           </Sheet>
-          <Link href="/" className="flex items-center gap-2 group ml-4 md:ml-0">
+          <Link href="/" className="flex items-center gap-2 group">
             <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
             <span className="font-bold text-2xl hidden sm:inline-block">CyberWall</span>
           </Link>
@@ -252,7 +218,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
           
         <div className="flex items-center gap-2">
             <div className="relative hidden sm:flex items-center gap-2" ref={searchRef}>
-              <div className={cn('relative transition-all duration-300', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'w-full max-w-sm opacity-100')}>
+               <div className={cn('absolute right-12 transition-all duration-300 w-full max-w-sm', !isSearchOpen ? 'w-0 opacity-0 pointer-events-none' : 'opacity-100')}>
                 <Input
                   ref={inputRef}
                   type="search"
@@ -295,10 +261,12 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
             </div>
             
             <ThemeToggle />
-            <div className='hidden sm:flex items-center gap-2'>
+            <div className='hidden lg:flex items-center gap-2'>
               <Button asChild>
                 <Link href="/dashboard"><ScanLine className="mr-2 h-4 w-4" /> Scan Now</Link>
               </Button>
+            </div>
+             <div className='hidden sm:flex items-center gap-2'>
               <Button variant="outline" asChild>
                   <Link href="/signup">Sign Up</Link>
               </Button>

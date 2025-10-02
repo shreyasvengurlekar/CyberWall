@@ -8,6 +8,8 @@ import * as React from 'react';
 import { Highlight } from '@/components/highlight';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Autoplay from "embla-carousel-autoplay"
+import { useSearch } from '@/context/search-provider';
+
 
 const features = [
   {
@@ -76,7 +78,8 @@ const testimonials = [
   },
 ];
 
-export default function Home({ searchQuery }: { searchQuery?: string }) {
+export default function Home() {
+  const { searchQuery } = useSearch();
 
   const plugin = React.useRef(
     Autoplay({ delay: 4000, stopOnInteraction: true, stopOnMouseEnter: true })
