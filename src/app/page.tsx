@@ -112,11 +112,6 @@ export default function Home({ searchQuery }: { searchQuery?: string }) {
                     <div className="absolute h-full w-full rounded-full bg-primary/10 animate-expand-fade" style={{ animationDelay: '1s' }} />
                     <div className="absolute h-full w-full rounded-full bg-primary/10 animate-expand-fade" style={{ animationDelay: '2s' }} />
                     
-                    {/* Glitching Rings */}
-                    <div className="absolute h-4/5 w-4/5 rounded-full border-2 border-dashed border-primary/50 animate-ring-glitch-1" />
-                    <div className="absolute h-full w-full rounded-full border-2 border-primary/30 animate-ring-glitch-2" />
-                    <div className="absolute h-2/3 w-2/3 rounded-full border-2 border-dashed border-primary/50 animate-ring-glitch-3" />
-
                     {/* Central Shield */}
                     <Shield className="w-32 h-32 md:w-48 md:h-48 text-primary drop-shadow-[0_0_10px_hsl(var(--primary))]" />
                 </div>
