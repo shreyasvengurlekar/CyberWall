@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, Menu, Search, ScanLine, RefreshCw } from 'lucide-react';
+import { Shield, Menu, Search, ScanLine } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
@@ -149,7 +149,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         <div className={cn("mr-4 hidden items-center md:flex")}>
           <Link href="/" className="flex items-center gap-2 group">
             <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
-            <span className="font-bold text-xl">CyberWall</span>
+            <span className="font-bold text-2xl">CyberWall</span>
           </Link>
         </div>
         
@@ -239,7 +239,7 @@ export function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                     <SheetClose asChild>
                       <Link href="/" className="flex items-center gap-2 mb-4">
                         <Shield className="h-8 w-8 text-primary" />
-                        <span className="font-bold text-xl">CyberWall</span>
+                        <span className="font-bold text-2xl">CyberWall</span>
                       </Link>
                     </SheetClose>
                     <div className="relative">
