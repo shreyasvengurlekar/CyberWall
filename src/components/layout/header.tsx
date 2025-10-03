@@ -59,8 +59,6 @@ const searchableTerms = [
 
 
 export function Header() {
-  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
-
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
@@ -139,7 +137,7 @@ export function Header() {
 
         {/* Actions & Search */}
         <div className="flex flex-1 items-center justify-end gap-2">
-          <SearchFlyout isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
+          <SearchFlyout />
           <ThemeToggle />
 
           <div className='hidden md:flex items-center gap-2'>
@@ -160,12 +158,13 @@ export function Header() {
 }
 
 
-function SearchFlyout({isSearchOpen, setIsSearchOpen}: {isSearchOpen: boolean, setIsSearchOpen: React.Dispatch<React.SetStateAction<boolean>>}) {
+function SearchFlyout() {
+  const [isSearchOpen, setIsSearchOpen] = React.useState(false);
   const { setSearchQuery } = useSearch();
   const [localQuery, setLocalQuery] = React.useState('');
   const [suggestions, setSuggestions] = React.useState<{term: string, path: string}[]>([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = React.useState(-1);
-  const searchRef = React.useRef<HTMLDivElement>(null);
+  const searchContainerRef = React.useRef<HTMLDivElement>(null);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const pathname = usePathname();
   const router = useRouter();
@@ -176,21 +175,37 @@ function SearchFlyout({isSearchOpen, setIsSearchOpen}: {isSearchOpen: boolean, s
     setSearchQuery('');
     setSuggestions([]);
     setActiveSuggestionIndex(-1);
-  }, [setSearchQuery, setIsSearchOpen]);
+  }, [setSearchQuery]);
 
   React.useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+    closeAndClearSearch();
+  }, [pathname, closeAndClearSearch]);
+
+  React.useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
+        event.preventDefault();
+        setIsSearchOpen(true);
+      }
+      if (event.key === 'Escape') {
         closeAndClearSearch();
       }
-    }
-    if (isSearchOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isSearchOpen, searchRef, closeAndClearSearch]);
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isSearchOpen && searchContainerRef.current && !searchContainerRef.current.contains(event.target as Node)) {
+        closeAndClearSearch();
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSearchOpen, closeAndClearSearch]);
 
   React.useEffect(() => {
     if (isSearchOpen && inputRef.current) {
@@ -198,14 +213,6 @@ function SearchFlyout({isSearchOpen, setIsSearchOpen}: {isSearchOpen: boolean, s
     }
   }, [isSearchOpen]);
   
-  React.useEffect(() => {
-    closeAndClearSearch();
-  }, [pathname, closeAndClearSearch]);
-  
-  const handleToggleSearch = () => {
-    setIsSearchOpen(prev => !prev);
-  };
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setLocalQuery(query);
@@ -221,12 +228,7 @@ function SearchFlyout({isSearchOpen, setIsSearchOpen}: {isSearchOpen: boolean, s
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Escape') {
-      closeAndClearSearch();
-      return;
-    }
-    
+  const handleSuggestionKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (suggestions.length === 0) return;
 
     if (e.key === 'ArrowDown') {
@@ -241,10 +243,12 @@ function SearchFlyout({isSearchOpen, setIsSearchOpen}: {isSearchOpen: boolean, s
       );
     } else if (e.key === 'Enter') {
       e.preventDefault();
-      if (activeSuggestionIndex > -1) {
-        handleSuggestionClick(suggestions[activeSuggestionIndex]);
-      } else if (suggestions.length > 0) {
-        handleSuggestionClick(suggestions[0]);
+      const suggestion = activeSuggestionIndex > -1 
+        ? suggestions[activeSuggestionIndex] 
+        : suggestions.length > 0 ? suggestions[0] : null;
+      
+      if(suggestion) {
+        handleSuggestionClick(suggestion);
       }
     }
   };
@@ -254,85 +258,64 @@ function SearchFlyout({isSearchOpen, setIsSearchOpen}: {isSearchOpen: boolean, s
     closeAndClearSearch();
   };
   
-  const SearchComponent = ({isMobile = false}: {isMobile?: boolean}) => (
-     <div className='relative w-full' ref={searchRef}>
-      <Input
-        ref={inputRef}
-        type="search"
-        placeholder="Search the site..."
-        className={cn("w-full pl-10", isMobile ? 'h-12 text-base' : '')}
-        value={localQuery}
-        onChange={handleSearchChange}
-        onKeyDown={handleKeyDown}
-      />
-      <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
-      {suggestions.length > 0 && (
-          <Card className="absolute top-full z-10 mt-2 w-full max-h-60 overflow-y-auto">
-              <ul>
-                  {suggestions.map((suggestion, index) => (
-                  <li
-                      key={index}
-                      className={cn(
-                      "cursor-pointer px-4 py-3 hover:bg-muted text-sm",
-                      index === activeSuggestionIndex && "bg-muted"
-                      )}
-                      onClick={() => handleSuggestionClick(suggestion)}
-                      onMouseEnter={() => setActiveSuggestionIndex(index)}
-                  >
-                      <Highlight query={localQuery}>{suggestion.term}</Highlight>
-                  </li>
-                  ))}
-              </ul>
-          </Card>
-      )}
-    </div>
-  );
-
   return (
     <>
-      {/* Desktop Search */}
-      <div className="hidden md:flex items-center justify-end">
-        <div className={cn(
-          "absolute right-0 top-0 h-full w-full max-w-sm transform-gpu transition-transform duration-300 ease-in-out",
-          isSearchOpen ? "translate-x-0" : "translate-x-full"
-        )}>
-          <div className="flex h-full items-center bg-background p-4 border-l">
-            <SearchComponent />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleToggleSearch}
-              className='ml-2'
-              aria-label="Close Search"
-            >
-              <X className="h-5 w-5" /> 
-            </Button>
-          </div>
-        </div>
-          <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleToggleSearch}
-              aria-label="Open Search"
-          >
-              <Search className="h-5 w-5" />
-          </Button>
-      </div>
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setIsSearchOpen(true)}
+        aria-label="Open Search"
+      >
+        <Search className="h-5 w-5" />
+      </Button>
 
-      {/* Mobile Search */}
-      <div className="flex md:hidden">
-          <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleToggleSearch}
-              aria-label="Open Search"
-          >
-              <Search className="h-5 w-5" />
-          </Button>
-      </div>
       {isSearchOpen && (
-          <div className='md:hidden absolute top-16 left-0 w-full bg-background p-4 border-b animate-fade-in-down' ref={searchRef}>
-          <SearchComponent isMobile />
+        <div 
+          ref={searchContainerRef}
+          className="fixed inset-0 z-50 flex justify-center items-start pt-20 bg-background/80 backdrop-blur-sm animate-fade-in"
+        >
+          <Card className="w-full max-w-lg relative animate-fade-in-down">
+            <div className='relative w-full'>
+              <Input
+                ref={inputRef}
+                type="search"
+                placeholder="Search the site..."
+                className="w-full h-14 pl-12 text-lg"
+                value={localQuery}
+                onChange={handleSearchChange}
+                onKeyDown={handleSuggestionKeyDown}
+              />
+              <Search className="absolute left-4 top-1/2 h-6 w-6 -translate-y-1/2 text-muted-foreground" />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={closeAndClearSearch}
+              >
+                <X className="h-5 w-5" />
+              </Button>
+            </div>
+            {suggestions.length > 0 && (
+                <ul className="max-h-80 overflow-y-auto border-t">
+                    {suggestions.map((suggestion, index) => (
+                    <li
+                        key={index}
+                        className={cn(
+                        "cursor-pointer px-4 py-3 hover:bg-muted text-base",
+                        index === activeSuggestionIndex && "bg-muted"
+                        )}
+                        onClick={() => handleSuggestionClick(suggestion)}
+                        onMouseEnter={() => setActiveSuggestionIndex(index)}
+                    >
+                        <Highlight query={localQuery}>{suggestion.term}</Highlight>
+                    </li>
+                    ))}
+                </ul>
+            )}
+            <div className="p-2 text-center text-xs text-muted-foreground border-t">
+              Press <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">ESC</kbd> to close.
+            </div>
+          </Card>
         </div>
       )}
     </>
