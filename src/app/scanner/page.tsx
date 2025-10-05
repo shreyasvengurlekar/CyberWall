@@ -264,15 +264,15 @@ export default function ScannerPage() {
                                         <FileText className='w-8 h-8 text-primary' />
                                         <div>
                                             <CardTitle>Get the Full Picture</CardTitle>
-                                            <CardDescription>Our Pro scan found {mockVulnerabilities.loggedIn.length - mockVulnerabilities.guest.length} additional issues.</CardDescription>
+                                            <CardDescription>Our full scan found {mockVulnerabilities.loggedIn.length - mockVulnerabilities.guest.length} additional issues.</CardDescription>
                                         </div>
                                     </CardHeader>
                                     <CardContent>
                                         <p className="text-muted-foreground mb-4">
-                                            This includes vulnerabilities like SQL Injection, Broken Access Control, and more.
+                                            This includes vulnerabilities like SQL Injection, Broken Access Control, and more. Sign up to get access to all findings.
                                         </p>
                                         <Button asChild>
-                                            <Link href="/#pricing">Upgrade to Pro <ExternalLink className='w-4 h-4 ml-2'/></Link>
+                                            <Link href="/signup">Sign Up to Explore <ExternalLink className='w-4 h-4 ml-2'/></Link>
                                         </Button>
                                     </CardContent>
                                 </Card>
