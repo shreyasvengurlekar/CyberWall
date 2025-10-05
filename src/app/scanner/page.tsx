@@ -63,13 +63,13 @@ const mockVulnerabilities = {
             title: 'Cross-Site Scripting (XSS)',
             severity: 'High',
             description: 'A potential reflected XSS vulnerability was found in a search parameter. Malicious scripts could be injected.',
-            remediation: 'Upgrade to the Pro plan to see detailed remediation advice.'
+            remediation: 'Sanitize user input to prevent script execution. A Pro plan provides AI-generated code snippets for your specific framework.'
         },
         {
             title: 'Insecure Security Headers',
             severity: 'Medium',
             description: 'The Content-Security-Policy (CSP) header is missing.',
-            remediation: 'Upgrade to the Pro plan to see detailed remediation advice.'
+            remediation: 'Implement a strict CSP to mitigate various attacks. Upgrade to see a recommended policy.'
         },
     ],
     loggedIn: [
@@ -244,21 +244,12 @@ export default function ScannerPage() {
                                             <p>{vuln.description}</p>
                                             <h4 className='font-bold mt-2'>Remediation</h4>
                                             <p>{vuln.remediation}</p>
-                                             {!user?.isLoggedIn && (
-                                                <Alert variant="default" className='mt-4 bg-primary/10 border-primary/20'>
-                                                    <AlertTriangle className="h-4 w-4 text-primary" />
-                                                    <AlertTitle>Upgrade for Details</AlertTitle>
-                                                    <AlertDescription>
-                                                        <Link href="/#pricing" className="text-primary font-bold hover:underline">Sign up for a Pro plan</Link> to get detailed, AI-powered remediation advice for every vulnerability.
-                                                    </AlertDescription>
-                                                </Alert>
-                                            )}
                                         </AccordionContent>
                                     </AccordionItem>
                                 ))}
                             </Accordion>
 
-                             {!user?.isLoggedIn && mockVulnerabilities.loggedIn.length > mockVulnerabilities.guest.length && (
+                             {!user?.isLoggedIn && (
                                 <Card className='mt-6 bg-muted'>
                                     <CardHeader className='flex-row items-center gap-4 space-y-0'>
                                         <FileText className='w-8 h-8 text-primary' />
@@ -278,13 +269,17 @@ export default function ScannerPage() {
                                 </Card>
                              )}
                               {user?.isLoggedIn && (
-                                 <Alert variant="default" className='mt-6 bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-400'>
-                                    <CheckCircle className="h-4 w-4 text-green-500" />
-                                    <AlertTitle>You're a Pro!</AlertTitle>
-                                    <AlertDescription>
-                                        You have access to all vulnerability details and remediation advice.
-                                    </AlertDescription>
-                                </Alert>
+                                 <Alert variant="default" className='mt-4 bg-primary/10 border-primary/20'>
+                                     <AlertTriangle className="h-4 w-4 text-primary" />
+                                     <AlertTitle>Unlock AI-Powered Remediation</AlertTitle>
+                                     <AlertDescription>
+                                         Upgrade to a Pro plan to get detailed, AI-generated code fixes for every vulnerability, saving you time and ensuring your code is secure.
+                                         <br/>
+                                         <Link href="/#pricing" className="text-primary font-bold hover:underline mt-2 inline-block">
+                                             View Pricing Plans &rarr;
+                                         </Link>
+                                     </AlertDescription>
+                                 </Alert>
                               )}
                         </CardContent>
                         <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
