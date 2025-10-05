@@ -1,3 +1,4 @@
+
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -277,7 +278,7 @@ export default function Home() {
                     </ul>
                     </CardContent>
                     <div className="p-6 pt-0">
-                    <Button asChild className="w-full"><Link href="/scanner">Get Started</Link></Button>
+                    <Button asChild className="w-full"><Link href="/scanner">Purchase</Link></Button>
                     </div>
                 </Card>
                  <Card className="flex flex-col transition-transform hover:scale-[1.03]">
