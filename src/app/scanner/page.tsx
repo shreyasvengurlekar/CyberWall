@@ -294,9 +294,11 @@ function ScannerResults() {
                                         {user ? 'You have unlimited scans.' : `You have ${scansRemaining} scans remaining.`}
                                     </p>
                                     <div className="flex gap-2">
-                                        <Button onClick={() => router.back()} variant="outline">
-                                            <ArrowLeft className='w-4 h-4 mr-2'/> Back
-                                        </Button>
+                                        {vulnerabilityType && (
+                                             <Button onClick={() => router.push('/services')} variant="outline">
+                                                <ArrowLeft className='w-4 h-4 mr-2'/> Back to Services
+                                            </Button>
+                                        )}
                                         <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
                                     </div>
                                 </>
