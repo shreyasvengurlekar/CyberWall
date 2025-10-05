@@ -167,7 +167,7 @@ export default function AboutPage() {
                         <CardTitle>AI & Backend</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">Genkit, Firebase, Zod, Node.js</p>
+                        <p className="text-muted-foreground">Genkit, Firebase, Node.js</p>
                     </CardContent>
                 </Card>
                  <Card className="text-center hover:shadow-primary/10 hover:-translate-y-1 transition-all">
