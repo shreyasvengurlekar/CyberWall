@@ -271,32 +271,29 @@ function ScannerResults() {
                                  </Alert>
                             )}
                             
-                            {plan === 'guest' && !canScan && (
-                                 <Alert variant="default" className='mt-6 bg-blue-500/10 border-blue-500/20'>
-                                     <Info className="h-4 w-4 text-blue-500" />
-                                     <AlertTitle>Get Unlimited Scans</AlertTitle>
-                                     <AlertDescription>
-                                         You have reached your scan limit as a guest.
-                                         <br/>
-                                         <Link href="/signup" className="text-primary font-bold hover:underline mt-2 inline-block">
-                                             Sign Up for Unlimited Scans &rarr;
-                                         </Link>
-                                     </AlertDescription>
-                                 </Alert>
-                            )}
                         </CardContent>
                         <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
-                            <p className='text-sm text-muted-foreground'>
-                                {user ? 'You have unlimited scans.' : `You have ${scansRemaining} scans remaining today.`}
-                            </p>
-                            <div className="flex gap-2">
-                                {vulnerabilityType && (
-                                <Button asChild variant="outline">
-                                    <Link href="/services"><ArrowLeft className='w-4 h-4 mr-2'/> Back to Services</Link>
-                                </Button>
-                                )}
-                                <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
-                            </div>
+                            {!user && !canScan ? (
+                                <div className="w-full flex justify-center">
+                                    <Button asChild className='w-full max-w-xs'>
+                                        <Link href="/signup">Sign Up for Unlimited Scans</Link>
+                                    </Button>
+                                </div>
+                            ) : (
+                                <>
+                                    <p className='text-sm text-muted-foreground'>
+                                        {user ? 'You have unlimited scans.' : `You have ${scansRemaining} scans remaining.`}
+                                    </p>
+                                    <div className="flex gap-2">
+                                        {vulnerabilityType && (
+                                        <Button asChild variant="outline">
+                                            <Link href="/services"><ArrowLeft className='w-4 h-4 mr-2'/> Back to Services</Link>
+                                        </Button>
+                                        )}
+                                        <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
+                                    </div>
+                                </>
+                            )}
                         </CardFooter>
                     </Card>
                 </div>
@@ -315,3 +312,5 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
+
+    
