@@ -14,7 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/firebase/auth/use-user';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 
 const formSchema = z.object({
@@ -73,6 +73,7 @@ const mockVulnerabilities = [
 function ScannerResults() {
   const { user, profile, recordScan } = useUser();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const vulnerabilityType = searchParams.get('vulnerability');
   const vulnerabilityName = vulnerabilityType
     ? vulnerabilityType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
@@ -204,7 +205,10 @@ function ScannerResults() {
                                     </Button>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <Button onClick={() => router.back()} className="w-full text-lg" size="lg" variant="outline">
+                                        <ArrowLeft className='mr-2 w-4 h-4'/> Back
+                                    </Button>
                                     <Button onClick={() => handleScan('quick')} className="w-full text-lg" size="lg" disabled={!canScan}>
                                         {canScan ? 'Quick Scan' : 'Limit Reached'}
                                     </Button>
