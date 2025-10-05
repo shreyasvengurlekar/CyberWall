@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Shield, Menu, Search, X } from 'lucide-react';
+import { Shield, Menu, Search, X, LayoutDashboard, User, Settings, LogOut } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -14,6 +14,44 @@ import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
 import { useSearch } from '@/context/search-provider';
 import { Highlight } from '../highlight';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+
+
+// Mock user state - in a real app, this would come from an auth context
+const useUser = () => {
+    const [user, setUser] = React.useState<{isLoggedIn: boolean, name: string, email: string} | null>(null);
+
+    // Simulate login state change for demo purposes
+    const login = () => {
+        setUser({ isLoggedIn: true, name: 'Shreyas V', email: 'shreyas@example.com' });
+    }
+    const logout = () => {
+        setUser(null);
+    }
+    
+    // Allow components to manually trigger login for simulation
+    React.useEffect(() => {
+        const handleLogin = () => login();
+        const handleLogout = () => logout();
+        window.addEventListener('login', handleLogin);
+        window.addEventListener('logout', handleLogout);
+
+        return () => {
+            window.removeEventListener('login', handleLogin);
+            window.removeEventListener('logout', handleLogout);
+        }
+    }, [])
+
+    return { user, login, logout };
+}
 
 
 const navLinks = [
@@ -61,6 +99,14 @@ const searchableTerms = [
 
 
 export function Header() {
+  const { user, logout } = useUser();
+
+  const handleLogout = () => {
+    logout();
+    // In a real app, you'd also redirect or clear tokens
+    window.dispatchEvent(new CustomEvent('logout'));
+  }
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
@@ -90,21 +136,38 @@ export function Header() {
                     </SheetClose>
                     ))}
                     <div className="mt-4 flex flex-col gap-2">
-                        <SheetClose asChild>
+                      {user?.isLoggedIn ? (
+                        <>
+                           <SheetClose asChild>
                             <Button asChild>
-                            <Link href="/scanner">Scan Now</Link>
+                              <Link href="/dashboard">Dashboard</Link>
                             </Button>
-                        </SheetClose>
-                         <SheetClose asChild>
-                            <Button asChild variant="ghost">
-                            <Link href="/login">Log In</Link>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Button asChild variant="outline" onClick={handleLogout}>
+                              <Link href="/">Log Out</Link>
                             </Button>
-                        </SheetClose>
-                        <SheetClose asChild>
-                            <Button asChild variant="outline">
-                            <Link href="/signup">Sign Up</Link>
-                            </Button>
-                        </SheetClose>
+                          </SheetClose>
+                        </>
+                      ) : (
+                        <>
+                          <SheetClose asChild>
+                              <Button asChild>
+                              <Link href="/scanner">Scan Now</Link>
+                              </Button>
+                          </SheetClose>
+                          <SheetClose asChild>
+                              <Button asChild variant="ghost">
+                              <Link href="/login">Log In</Link>
+                              </Button>
+                          </SheetClose>
+                          <SheetClose asChild>
+                              <Button asChild variant="outline">
+                              <Link href="/signup">Sign Up</Link>
+                              </Button>
+                          </SheetClose>
+                        </>
+                      )}
                     </div>
                 </div>
             </SheetContent>
@@ -143,17 +206,52 @@ export function Header() {
         <div className="flex items-center justify-end gap-2 md:w-auto">
           <SearchFlyout />
           <ThemeToggle />
-
           <div className='hidden md:flex items-center gap-2'>
               <Button asChild>
               <Link href="/scanner">Scan Now</Link>
               </Button>
-              <Button asChild variant="ghost">
-              <Link href="/login">Log In</Link>
-              </Button>
-              <Button asChild variant="outline">
-              <Link href="/signup">Sign Up</Link>
-              </Button>
+            {user?.isLoggedIn ? (
+                 <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                       <Avatar>
+                        <AvatarImage src="https://github.com/shreyasvengurlekar.png" alt={user.name} />
+                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <p className="text-sm font-medium leading-none">{user.name}</p>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/dashboard"><LayoutDashboard className="mr-2" /> Dashboard</Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Settings className="mr-2" /> Settings
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout}>
+                      <LogOut className="mr-2" /> Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <>
+                <Button asChild variant="ghost">
+                    <Link href="/login">Log In</Link>
+                </Button>
+                <Button asChild variant="outline">
+                    <Link href="/signup">Sign Up</Link>
+                </Button>
+                </>
+            )}
           </div>
         </div>
       </div>
@@ -325,3 +423,5 @@ function SearchFlyout() {
     </>
   );
 }
+
+    
