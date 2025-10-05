@@ -57,7 +57,7 @@ export default function LoginPage() {
         errorMessage = 'This account has been disabled.';
       } else if (error.code === 'auth/too-many-requests') {
         errorMessage = 'Too many login attempts. Please try again later.';
-      } else if (error.code === 'auth/email-not-verified') {
+      } else if (error.code === 'auth/email-not-verified' || error.message === 'auth/email-not-verified') {
         errorMessage = 'Please verify your email before logging in. Check your inbox for a verification link.';
       }
       toast.error(errorMessage);
