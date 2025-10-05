@@ -260,7 +260,6 @@ export default function Home() {
                     </ul>
                     </CardContent>
                     <div className="p-6 pt-0">
-                    <Button asChild className="w-full" variant="outline"><Link href="/signup">Sign Up</Link></Button>
                     </div>
                 </Card>
                 <Card className="flex flex-col border-primary ring-2 ring-primary shadow-lg transition-transform hover:scale-[1.03] relative overflow-hidden">
