@@ -22,7 +22,7 @@ const formSchema = z.object({
 });
 
 type ScanStatus = 'idle' | 'scanning' | 'complete' | 'error';
-type ScanType = 'quick' | 'full';
+type ScanType = 'quick' | 'full' | 'targeted';
 
 const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low') => {
   switch (severity) {
@@ -74,13 +74,16 @@ function ScannerResults() {
   const { user, profile, recordScan } = useUser();
   const searchParams = useSearchParams();
   const vulnerabilityType = searchParams.get('vulnerability');
+  const vulnerabilityName = vulnerabilityType
+    ? vulnerabilityType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
+    : '';
 
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
   const [scanType, setScanType] = React.useState<ScanType>('quick');
   const [progress, setProgress] = React.useState(0);
   const [scannedUrl, setScannedUrl] = React.useState('');
   
-  const plan = user ? 'free' : 'guest'; // All logged in users are on a free plan with unlimited scans
+  const plan = user ? 'free' : 'guest';
   const scansToday = profile?.scansToday || 0;
 
   const scanLimit = plan === 'guest' ? 2 : Infinity;
@@ -141,17 +144,11 @@ function ScannerResults() {
     if (!vulnerabilityType) {
       return mockVulnerabilities;
     }
-    const results = mockVulnerabilities.filter(v => v.type === vulnerabilityType);
-    if(results.length === 0) {
-        // If no specific vulnerability found, show a generic "not found" message, but still show other results
-        // In a real app, you might have a specific state for this.
-        return mockVulnerabilities;
-    }
-    return results;
+    return mockVulnerabilities.filter(v => v.type === vulnerabilityType);
   }, [vulnerabilityType]);
 
   const pageTitle = vulnerabilityType 
-    ? `Scan for ${vulnerabilityType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}` 
+    ? `Scan for ${vulnerabilityName}` 
     : 'Website Security Scanner';
 
 
@@ -197,18 +194,26 @@ function ScannerResults() {
                                 </FormItem>
                             )}
                             />
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Button onClick={() => handleScan('quick')} className="w-full text-lg" size="lg" disabled={!canScan}>
-                                    {canScan ? 'Quick Scan' : 'Limit Reached'}
+                            {vulnerabilityType ? (
+                                <Button onClick={() => handleScan('targeted')} className="w-full text-lg" size="lg" disabled={!canScan}>
+                                    {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
                                 </Button>
-                                <Button onClick={() => handleScan('full')} className="w-full text-lg" size="lg" variant="outline" disabled={!canScan}>
-                                    {canScan ? 'Full Scan' : 'Limit Reached'}
-                                </Button>
-                            </div>
-                            <p className='text-center text-sm text-muted-foreground flex items-center justify-center gap-2'>
-                                <Clock className='w-4 h-4' />
-                                Full scan is more comprehensive and will take longer.
-                            </p>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Button onClick={() => handleScan('quick')} className="w-full text-lg" size="lg" disabled={!canScan}>
+                                        {canScan ? 'Quick Scan' : 'Limit Reached'}
+                                    </Button>
+                                    <Button onClick={() => handleScan('full')} className="w-full text-lg" size="lg" variant="outline" disabled={!canScan}>
+                                        {canScan ? 'Full Scan' : 'Limit Reached'}
+                                    </Button>
+                                </div>
+                            )}
+                            {!vulnerabilityType && (
+                                <p className='text-center text-sm text-muted-foreground flex items-center justify-center gap-2'>
+                                    <Clock className='w-4 h-4' />
+                                    Full scan is more comprehensive and will take longer.
+                                </p>
+                            )}
                         </form>
                     </Form>
                 </div>
@@ -238,35 +243,35 @@ function ScannerResults() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                             <Accordion type="single" collapsible className="w-full" defaultValue='item-0'>
-                                {filteredVulnerabilities.map((vuln, index) => (
-                                    <AccordionItem value={`item-${index}`} key={index}>
-                                        <AccordionTrigger>
-                                            <div className="flex items-center gap-4">
-                                                <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadge(vuln.severity as any)}`}>{vuln.severity}</span>
-                                                <span className="font-semibold">{vuln.title}</span>
-                                            </div>
-                                        </AccordionTrigger>
-                                        <AccordionContent className='prose prose-sm max-w-none'>
-                                            <p>{vuln.description}</p>
-                                            <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
-                                            <p>{vuln.remediation}</p>
-                                        </AccordionContent>
-                                    </AccordionItem>
-                                ))}
-                            </Accordion>
-                            
-                            {vulnerabilityType && filteredVulnerabilities.length === 0 && (
+                             {filteredVulnerabilities.length > 0 ? (
+                                <Accordion type="single" collapsible className="w-full" defaultValue='item-0'>
+                                    {filteredVulnerabilities.map((vuln, index) => (
+                                        <AccordionItem value={`item-${index}`} key={index}>
+                                            <AccordionTrigger>
+                                                <div className="flex items-center gap-4">
+                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadge(vuln.severity as any)}`}>{vuln.severity}</span>
+                                                    <span className="font-semibold">{vuln.title}</span>
+                                                </div>
+                                            </AccordionTrigger>
+                                            <AccordionContent className='prose prose-sm max-w-none'>
+                                                <p>{vuln.description}</p>
+                                                <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
+                                                <p>{vuln.remediation}</p>
+                                            </AccordionContent>
+                                        </AccordionItem>
+                                    ))}
+                                </Accordion>
+                            ) : (
                                  <Alert variant="default" className='mt-6 bg-green-500/10 border-green-500/20'>
                                      <CheckCircle className="h-4 w-4 text-green-500" />
-                                     <AlertTitle>No specific vulnerabilities found!</AlertTitle>
+                                     <AlertTitle>No {vulnerabilityName} Vulnerabilities Found!</AlertTitle>
                                      <AlertDescription>
-                                        Our scan did not find any issues related to {vulnerabilityType.replace('-', ' ')} on this URL. We're still showing other potential issues below.
+                                        Our scan did not find any issues related to {vulnerabilityName.toLowerCase()} on this URL. You can start a new, general scan to check for other issues.
                                      </AlertDescription>
                                  </Alert>
                             )}
-
-                            {plan === 'guest' && (
+                            
+                            {plan === 'guest' && !canScan && (
                                  <Alert variant="default" className='mt-6 bg-blue-500/10 border-blue-500/20'>
                                      <Info className="h-4 w-4 text-blue-500" />
                                      <AlertTitle>Get Unlimited Scans</AlertTitle>
