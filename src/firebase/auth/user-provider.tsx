@@ -154,19 +154,19 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   const recordScan = async (): Promise<void> => {
-    if (!user) throw new Error("User not authenticated");
+    if (!user) return; // Only record scans for logged-in users. Guests are handled client-side.
     const userRef = doc(firestore, 'users', user.uid);
     const today = new Date().toISOString().split('T')[0];
     
-    let newScanCount = 1;
-    if (profile && profile.lastScanDate === today) {
-        newScanCount = (profile.scansToday || 0) + 1;
-    }
+    // For logged-in users, scans are unlimited, but we can still track them if needed.
+    // For simplicity with the new requirement, we can just not update the count for logged-in users,
+    // or just track guest scans on the client.
+    // If we were to track logged-in user scans (even if unlimited), the logic would be here.
+    // For now, this function can be a no-op for logged-in users based on the new requirements.
 
-    await setDoc(userRef, { 
-        scansToday: newScanCount,
-        lastScanDate: today,
-    }, { merge: true });
+    // If guest scan tracking is needed in Firestore (which is not, based on prompt)
+    // it would be more complex as they don't have a user record.
+    // The current implementation on the scanner page handles guest limits on the client.
   };
 
 

@@ -72,10 +72,6 @@ export default function DashboardPage() {
         );
     }
 
-    const scanLimit = profile.plan === 'pro' || profile.plan === 'business' ? Infinity : 10;
-    const scanPercentage = scanLimit === Infinity ? 100 : ((profile.scansToday || 0) / scanLimit) * 100;
-    const planName = profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1);
-
   return (
     <div className="container mx-auto py-10 px-4 md:px-6">
         <div className="grid gap-8">
@@ -120,20 +116,14 @@ export default function DashboardPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle className='flex items-center gap-2'><Shield /> Plan Details</CardTitle>
-                            <CardDescription>You are currently on the <span className='font-semibold text-primary'>{planName}</span> plan.</CardDescription>
+                            <CardDescription>You are on the <span className='font-semibold text-primary'>Free</span> plan with unlimited scans.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className='space-y-2'>
-                                <p className='text-sm font-medium'>Daily Scans Used</p>
-                                <Progress value={scanPercentage} />
-                                <p className='text-sm text-muted-foreground'>{profile.scansToday || 0} of {scanLimit === Infinity ? 'Unlimited' : scanLimit} scans used</p>
+                                <p className='text-sm font-medium'>Daily Scans: Unlimited</p>
+                                <p className='text-sm text-muted-foreground'>You have full access to our scanning features.</p>
                             </div>
                         </CardContent>
-                        <CardFooter>
-                            <Button asChild className='w-full' variant='outline'>
-                                <Link href="/#pricing"><Zap className='mr-2 w-4 h-4'/> Upgrade Plan</Link>
-                            </Button>
-                        </CardFooter>
                     </Card>
                 </div>
                 

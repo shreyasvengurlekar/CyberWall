@@ -71,7 +71,7 @@ const mockVulnerabilities = [
 ];
 
 function ScannerResults() {
-  const { user, profile } = useUser();
+  const { user, profile, recordScan } = useUser();
   const searchParams = useSearchParams();
   const vulnerabilityType = searchParams.get('vulnerability');
 
@@ -80,11 +80,12 @@ function ScannerResults() {
   const [progress, setProgress] = React.useState(0);
   const [scannedUrl, setScannedUrl] = React.useState('');
   
-  const plan = profile?.plan || 'guest';
+  const plan = user ? 'free' : 'guest'; // All logged in users are on a free plan with unlimited scans
   const scansToday = profile?.scansToday || 0;
 
-  const scanLimit = plan === 'guest' ? 2 : (plan === 'pro' || plan === 'business' ? Infinity : 10);
-  const canScan = plan === 'pro' || plan === 'business' || scansToday < scanLimit;
+  const scanLimit = plan === 'guest' ? 2 : Infinity;
+  const canScan = plan === 'guest' ? scansToday < scanLimit : true;
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -94,7 +95,7 @@ function ScannerResults() {
   const handleScan = (scanType: ScanType) => {
     form.handleSubmit((values) => {
         if (!canScan) {
-          alert('You have reached your daily scan limit.');
+          alert('You have reached your daily scan limit. Please sign up for unlimited scans.');
           return;
         }
         
@@ -102,7 +103,7 @@ function ScannerResults() {
         setScanStatus('scanning');
         setScanType(scanType);
         if(user) {
-          (window as any).recordScan?.();
+          recordScan?.();
         }
         
         const scanTime = scanType === 'quick' ? 2000 : 4000;
@@ -173,8 +174,11 @@ function ScannerResults() {
                         <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
                         <AlertTitle>{user ? `Welcome, ${user.displayName || 'User'}!` : 'Welcome, Guest!'}</AlertTitle>
                         <AlertDescription>
-                            <b>You have {scansRemaining} scans remaining today.</b>
-                            {!user && ' Login or Sign Up for more scans and detailed results.'}
+                            {user ? (
+                                <b>You have unlimited scans.</b>
+                            ) : (
+                                <b>You have {scansRemaining} scans remaining today. Sign up for unlimited scans.</b>
+                            )}
                         </AlertDescription>
                     </Alert>
 
@@ -235,7 +239,7 @@ function ScannerResults() {
                         </CardHeader>
                         <CardContent>
                              <Accordion type="single" collapsible className="w-full" defaultValue='item-0'>
-                                {filteredVulnerabilities.slice(0, (plan === 'free' || plan === 'guest') ? 2 : mockVulnerabilities.length).map((vuln, index) => (
+                                {filteredVulnerabilities.map((vuln, index) => (
                                     <AccordionItem value={`item-${index}`} key={index}>
                                         <AccordionTrigger>
                                             <div className="flex items-center gap-4">
@@ -245,7 +249,7 @@ function ScannerResults() {
                                         </AccordionTrigger>
                                         <AccordionContent className='prose prose-sm max-w-none'>
                                             <p>{vuln.description}</p>
-                                            <h4 className='font-bold mt-2'>Remediation</h4>
+                                            <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
                                             <p>{vuln.remediation}</p>
                                         </AccordionContent>
                                     </AccordionItem>
@@ -265,43 +269,21 @@ function ScannerResults() {
                             {plan === 'guest' && (
                                  <Alert variant="default" className='mt-6 bg-blue-500/10 border-blue-500/20'>
                                      <Info className="h-4 w-4 text-blue-500" />
-                                     <AlertTitle>Get the Full Picture</AlertTitle>
+                                     <AlertTitle>Get Unlimited Scans</AlertTitle>
                                      <AlertDescription>
-                                         You're seeing limited results as a guest. This includes {filteredVulnerabilities.slice(0,2).length} of {mockVulnerabilities.length} potential findings.
+                                         You have reached your scan limit as a guest.
                                          <br/>
                                          <Link href="/signup" className="text-primary font-bold hover:underline mt-2 inline-block">
-                                             Sign Up to Explore More &rarr;
+                                             Sign Up for Unlimited Scans &rarr;
                                          </Link>
                                      </AlertDescription>
                                  </Alert>
-                            )}
-
-                             {plan === 'free' && (
-                                 <Alert variant="default" className='mt-4 bg-primary/10 border-primary/20'>
-                                     <AlertTriangle className="h-4 w-4 text-primary" />
-                                     <AlertTitle>Unlock AI-Powered Remediation</AlertTitle>
-                                     <AlertDescription>
-                                         Upgrade to a Pro plan to get detailed, AI-generated code fixes for every vulnerability, saving you time and ensuring your code is secure.
-                                         <br/>
-                                         <Link href="/#pricing" className="text-primary font-bold hover:underline mt-2 inline-block">
-                                             View Pricing Plans &rarr;
-                                         </Link>
-                                     </AlertDescription>
-                                 </Alert>
-                             )}
-
-                            { (plan === 'pro' || plan === 'business') && (
-                                <Alert variant="default" className="mt-6 bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-400">
-                                    <CheckCircle className="h-4 w-4" />
-                                    <AlertTitle>You're a Pro!</AlertTitle>
-                                    <AlertDescription>
-                                        You have access to all vulnerability details and remediation advice.
-                                    </AlertDescription>
-                                </Alert>
                             )}
                         </CardContent>
                         <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
-                             <p className='text-sm text-muted-foreground'>You have {scansRemaining} scans remaining today.</p>
+                            <p className='text-sm text-muted-foreground'>
+                                {user ? 'You have unlimited scans.' : `You have ${scansRemaining} scans remaining today.`}
+                            </p>
                              <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
                         </CardFooter>
                     </Card>
@@ -321,5 +303,3 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
-
-    
