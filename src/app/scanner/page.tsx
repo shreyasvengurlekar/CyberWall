@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock } from 'lucide-react';
+import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/firebase/auth/use-user';
 import { useSearchParams } from 'next/navigation';
@@ -289,7 +289,14 @@ function ScannerResults() {
                             <p className='text-sm text-muted-foreground'>
                                 {user ? 'You have unlimited scans.' : `You have ${scansRemaining} scans remaining today.`}
                             </p>
-                             <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
+                            <div className="flex gap-2">
+                                {vulnerabilityType && (
+                                <Button asChild variant="outline">
+                                    <Link href="/services"><ArrowLeft className='w-4 h-4 mr-2'/> Back to Services</Link>
+                                </Button>
+                                )}
+                                <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
+                            </div>
                         </CardFooter>
                     </Card>
                 </div>
