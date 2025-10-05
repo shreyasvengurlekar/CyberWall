@@ -70,7 +70,7 @@ export default function AboutPage() {
             </p>
             <div className="mt-6 flex justify-center md:justify-start gap-4">
               <Button asChild>
-                <a href="/resume.pdf" download="resume.pdf">
+                <a href="/SHREYAS_VENGURLEKAR_Resume_linkedin.pdf" download="SHREYAS_VENGURLEKAR_Resume_linkedin.pdf">
                   <Download className="mr-2" /> Download Resume
                 </a>
               </Button>
@@ -212,5 +212,7 @@ export default function AboutPage() {
     </div>
   );
 }
+
+    
 
     
