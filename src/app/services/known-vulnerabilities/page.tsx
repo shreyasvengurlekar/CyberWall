@@ -36,7 +36,7 @@ export default function KnownVulnerabilitiesPage() {
             <div className='flex gap-4'>
               {user ? (
                 <Button asChild>
-                    <Link href="/scanner">Scan Now</Link>
+                    <Link href="/scanner?vulnerability=known-vulnerabilities">Scan Now</Link>
                 </Button>
               ) : (
                 <Button asChild>
@@ -52,3 +52,5 @@ export default function KnownVulnerabilitiesPage() {
     </div>
   );
 }
+
+    

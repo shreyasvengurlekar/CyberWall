@@ -14,6 +14,7 @@ import { Progress } from '@/components/ui/progress';
 import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useUser } from '@/firebase/auth/use-user';
+import { useSearchParams } from 'next/navigation';
 
 
 const formSchema = z.object({
@@ -41,33 +42,39 @@ const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low') => {
 const mockVulnerabilities = [
     {
         title: 'Cross-Site Scripting (XSS)',
+        type: 'xss',
         severity: 'High',
         description: 'A potential reflected XSS vulnerability was found in a search parameter. Malicious scripts could be injected.',
         remediation: 'Sanitize all user-provided input on the server-side before rendering it back to the page. Use libraries like DOMPurify on the client-side.'
     },
     {
         title: 'Insecure Security Headers',
+        type: 'security-misconfiguration',
         severity: 'Medium',
         description: 'The Content-Security-Policy (CSP) header is missing, which can increase the risk of XSS attacks.',
         remediation: 'Implement a strict Content-Security-Policy header to control which resources can be loaded by the browser.'
     },
     {
         title: 'SQL Injection',
+        type: 'sql-injection',
         severity: 'Critical',
         description: 'A login form parameter appears to be vulnerable to SQL Injection, potentially allowing attackers to bypass authentication.',
         remediation: 'Use parameterized queries (prepared statements) for all database interactions. Never concatenate user input directly into SQL queries.'
     },
     {
         title: 'Outdated Component: jQuery 3.1.0',
+        type: 'known-vulnerabilities',
         severity: 'Low',
         description: 'The application uses an outdated version of jQuery which has known vulnerabilities.',
         remediation: 'Update jQuery to the latest stable version to patch known security issues.'
     }
 ];
 
+function ScannerResults() {
+  const { user, profile } = useUser();
+  const searchParams = useSearchParams();
+  const vulnerabilityType = searchParams.get('vulnerability');
 
-export default function ScannerPage() {
-  const { user, profile, recordScan } = useUser();
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
   const [scanType, setScanType] = React.useState<ScanType>('quick');
   const [progress, setProgress] = React.useState(0);
@@ -95,10 +102,9 @@ export default function ScannerPage() {
         setScanStatus('scanning');
         setScanType(scanType);
         if(user) {
-          recordScan();
+          (window as any).recordScan?.();
         }
         
-        // Simulate scan progress
         const scanTime = scanType === 'quick' ? 2000 : 4000;
         const intervalTime = scanTime / 20;
 
@@ -130,16 +136,34 @@ export default function ScannerPage() {
   
   const scansRemaining = scanLimit === Infinity ? 'unlimited' : scanLimit - scansToday;
 
+  const filteredVulnerabilities = React.useMemo(() => {
+    if (!vulnerabilityType) {
+      return mockVulnerabilities;
+    }
+    const results = mockVulnerabilities.filter(v => v.type === vulnerabilityType);
+    if(results.length === 0) {
+        // If no specific vulnerability found, show a generic "not found" message, but still show other results
+        // In a real app, you might have a specific state for this.
+        return mockVulnerabilities;
+    }
+    return results;
+  }, [vulnerabilityType]);
+
+  const pageTitle = vulnerabilityType 
+    ? `Scan for ${vulnerabilityType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}` 
+    : 'Website Security Scanner';
+
+
   return (
     <div className="container mx-auto max-w-4xl py-12 px-4">
       <Card className="shadow-lg">
         <CardHeader className="text-center">
             <div className='flex justify-center items-center gap-3'>
                 <ScanLine className="w-10 h-10 text-primary" />
-                <CardTitle className="text-4xl font-bold tracking-tight">Website Security Scanner</CardTitle>
+                <CardTitle className="text-4xl font-bold tracking-tight">{pageTitle}</CardTitle>
             </div>
           <CardDescription className="text-lg">
-            Enter a URL to scan for common web vulnerabilities. Educational use only.
+            Enter a URL to scan for web vulnerabilities. Educational use only.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -210,8 +234,8 @@ export default function ScannerPage() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                             <Accordion type="single" collapsible className="w-full">
-                                { mockVulnerabilities.slice(0, (plan === 'free' || plan === 'guest') ? 2 : mockVulnerabilities.length).map((vuln, index) => (
+                             <Accordion type="single" collapsible className="w-full" defaultValue='item-0'>
+                                {filteredVulnerabilities.slice(0, (plan === 'free' || plan === 'guest') ? 2 : mockVulnerabilities.length).map((vuln, index) => (
                                     <AccordionItem value={`item-${index}`} key={index}>
                                         <AccordionTrigger>
                                             <div className="flex items-center gap-4">
@@ -228,12 +252,22 @@ export default function ScannerPage() {
                                 ))}
                             </Accordion>
                             
+                            {vulnerabilityType && filteredVulnerabilities.length === 0 && (
+                                 <Alert variant="default" className='mt-6 bg-green-500/10 border-green-500/20'>
+                                     <CheckCircle className="h-4 w-4 text-green-500" />
+                                     <AlertTitle>No specific vulnerabilities found!</AlertTitle>
+                                     <AlertDescription>
+                                        Our scan did not find any issues related to {vulnerabilityType.replace('-', ' ')} on this URL. We're still showing other potential issues below.
+                                     </AlertDescription>
+                                 </Alert>
+                            )}
+
                             {plan === 'guest' && (
                                  <Alert variant="default" className='mt-6 bg-blue-500/10 border-blue-500/20'>
                                      <Info className="h-4 w-4 text-blue-500" />
                                      <AlertTitle>Get the Full Picture</AlertTitle>
                                      <AlertDescription>
-                                         You're seeing limited results as a guest. This includes {mockVulnerabilities.slice(0,2).length} of {mockVulnerabilities.length} potential findings.
+                                         You're seeing limited results as a guest. This includes {filteredVulnerabilities.slice(0,2).length} of {mockVulnerabilities.length} potential findings.
                                          <br/>
                                          <Link href="/signup" className="text-primary font-bold hover:underline mt-2 inline-block">
                                              Sign Up to Explore More &rarr;
@@ -279,3 +313,13 @@ export default function ScannerPage() {
     </div>
   );
 }
+
+export default function ScannerPage() {
+    return (
+        <React.Suspense fallback={<div>Loading...</div>}>
+            <ScannerResults />
+        </React.Suspense>
+    )
+}
+
+    

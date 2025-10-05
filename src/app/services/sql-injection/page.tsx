@@ -37,7 +37,7 @@ export default function SqlInjectionPage() {
             <div className='flex gap-4'>
               {user ? (
                 <Button asChild>
-                    <Link href="/scanner">Scan Now</Link>
+                    <Link href="/scanner?vulnerability=sql-injection">Scan Now</Link>
                 </Button>
               ) : (
                 <Button asChild>
@@ -53,3 +53,5 @@ export default function SqlInjectionPage() {
     </div>
   );
 }
+
+    

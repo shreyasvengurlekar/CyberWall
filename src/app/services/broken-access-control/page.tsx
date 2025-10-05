@@ -36,7 +36,7 @@ export default function BrokenAccessControlPage() {
              <div className='flex gap-4'>
               {user ? (
                 <Button asChild>
-                    <Link href="/scanner">Scan Now</Link>
+                    <Link href="/scanner?vulnerability=broken-access-control">Scan Now</Link>
                 </Button>
               ) : (
                 <Button asChild>
@@ -52,3 +52,5 @@ export default function BrokenAccessControlPage() {
     </div>
   );
 }
+
+    
