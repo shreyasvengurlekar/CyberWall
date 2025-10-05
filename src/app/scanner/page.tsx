@@ -197,8 +197,8 @@ function ScannerResults() {
                             />
                             {vulnerabilityType ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Button asChild variant="outline" className="w-full text-lg" size="lg">
-                                        <Link href="/services"><ArrowLeft className='mr-2 w-4 h-4'/> Back to Services</Link>
+                                    <Button onClick={() => router.push('/services')} variant="outline" className="w-full text-lg" size="lg">
+                                        <ArrowLeft className='mr-2 w-4 h-4'/> Back to Services
                                     </Button>
                                     <Button onClick={() => handleScan('targeted')} className="w-full text-lg" size="lg" disabled={!canScan}>
                                         {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
@@ -294,11 +294,9 @@ function ScannerResults() {
                                         {user ? 'You have unlimited scans.' : `You have ${scansRemaining} scans remaining.`}
                                     </p>
                                     <div className="flex gap-2">
-                                        {vulnerabilityType && (
-                                             <Button onClick={() => router.push('/services')} variant="outline">
-                                                <ArrowLeft className='w-4 h-4 mr-2'/> Back to Services
-                                            </Button>
-                                        )}
+                                        <Button onClick={handleNewScan} variant="outline">
+                                            <ArrowLeft className='w-4 h-4 mr-2'/> Back
+                                        </Button>
                                         <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
                                     </div>
                                 </>
