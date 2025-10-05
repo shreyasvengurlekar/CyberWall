@@ -46,6 +46,18 @@ export function Footer() {
             <p className="text-sm text-muted-foreground">
               &copy; {new Date().getFullYear()} CyberWall. All rights reserved.
             </p>
+             <p className="text-sm text-muted-foreground">
+              Designed & Built by{' '}
+              <a
+                href="https://github.com/shreyasvengurlekar"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-foreground hover:text-primary transition-colors"
+              >
+                Shreyas Vengurlekar
+              </a>
+              .
+            </p>
           </div>
 
           <div className="flex flex-col items-center gap-4">
