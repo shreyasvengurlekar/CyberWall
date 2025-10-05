@@ -30,7 +30,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Features' },
   { href: '/services', label: 'Services' },
-  { href: '/scanner', label: 'Scanner' },
+  { href: '/scanner', label: 'Scan Now' },
   { href: '/#pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
 ];
