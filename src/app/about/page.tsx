@@ -75,7 +75,7 @@ export default function AboutPage() {
                 </a>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/#contact">Get in Touch</Link>
+                <Link href="#connect">Get in Touch</Link>
               </Button>
             </div>
           </div>
@@ -185,7 +185,7 @@ export default function AboutPage() {
         </section>
 
         {/* --- Connect Section --- */}
-        <section className="text-center bg-muted rounded-lg p-12">
+        <section id="connect" className="text-center bg-muted rounded-lg p-12 scroll-mt-20">
           <h2 className="text-3xl font-bold mb-4">Let's Connect</h2>
           <p className="text-muted-foreground mb-8 max-w-2xl mx-auto">
             I'm always open to discussing new projects, creative ideas, or opportunities to be part of an amazing team.
