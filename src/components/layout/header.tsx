@@ -56,6 +56,7 @@ const searchableTerms = [
   { term: 'Sign Up', path: '/signup' },
   { term: 'Privacy Policy', path: '/privacy'},
   { term: 'Terms of Service', path: '/terms'},
+  { term: 'Scanner', path: '/scanner' },
 ];
 
 
@@ -91,7 +92,7 @@ export function Header() {
                     <div className="mt-4 flex flex-col gap-2">
                         <SheetClose asChild>
                             <Button asChild>
-                            <Link href="/dashboard">Scan Now</Link>
+                            <Link href="/scanner">Scan Now</Link>
                             </Button>
                         </SheetClose>
                          <SheetClose asChild>
@@ -145,7 +146,7 @@ export function Header() {
 
           <div className='hidden md:flex items-center gap-2'>
               <Button asChild>
-              <Link href="/dashboard">Scan Now</Link>
+              <Link href="/scanner">Scan Now</Link>
               </Button>
               <Button asChild variant="ghost">
               <Link href="/login">Log In</Link>

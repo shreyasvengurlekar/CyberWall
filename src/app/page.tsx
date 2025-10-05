@@ -96,7 +96,7 @@ export default function Home() {
                 </p>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button asChild size="lg">
-                    <Link href="/dashboard">Get Started for Free</Link>
+                    <Link href="/scanner">Get Started for Free</Link>
                   </Button>
                   <Button asChild variant="outline" size="lg">
                     <Link href="/#features">Learn More</Link>
@@ -278,7 +278,7 @@ export default function Home() {
                     </ul>
                     </CardContent>
                     <div className="p-6 pt-0">
-                    <Button asChild className="w-full"><Link href="/dashboard">Get Started</Link></Button>
+                    <Button asChild className="w-full"><Link href="/scanner">Get Started</Link></Button>
                     </div>
                 </Card>
                  <Card className="flex flex-col transition-transform hover:scale-[1.03]">
@@ -358,7 +358,7 @@ export default function Home() {
               </div>
               <div className="mx-auto mt-8 w-full max-w-sm space-y-2">
                  <Button asChild size="lg" className="w-full">
-                    <Link href="/dashboard">Start Scanning Now</Link>
+                    <Link href="/scanner">Start Scanning Now</Link>
                  </Button>
               </div>
             </div>
