@@ -1,3 +1,4 @@
+
 'use client';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
@@ -165,11 +166,11 @@ export default function ScannerPage() {
         <CardContent>
             {scanStatus === 'idle' && (
                 <div className='animate-fade-in'>
-                    <Alert>
-                        <Info className="h-4 w-4" />
+                    <Alert className="bg-yellow-50 border-yellow-300 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300">
+                        <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
                         <AlertTitle>{user?.isLoggedIn ? `Welcome, ${user.name}!` : 'You are scanning as a guest.'}</AlertTitle>
                         <AlertDescription>
-                            You have used {scansToday} of your {scanLimit} scans for today. 
+                            <b>You have used {scansToday} of your {scanLimit} scans for today.</b> 
                             {!user?.isLoggedIn && ' Login or Sign Up for more scans and detailed results.'}
                         </AlertDescription>
                     </Alert>
