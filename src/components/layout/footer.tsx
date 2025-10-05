@@ -49,7 +49,7 @@ export function Footer() {
              <p className="text-sm text-muted-foreground">
               Designed & Built by{' '}
               <a
-                href="https://github.com/shreyasvengurlekar"
+                href="https://linkedin.com/in/shreyasvengurlekar"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-foreground hover:text-primary transition-colors"

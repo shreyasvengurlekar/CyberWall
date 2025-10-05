@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Shield, Menu, Search, X } from 'lucide-react';
@@ -108,23 +109,12 @@ export function Header() {
             </SheetContent>
         </Sheet>
 
-        {/* Desktop Logo & Nav */}
-        <div className="hidden md:flex items-center gap-6">
+        {/* Desktop Logo */}
+        <div className="hidden md:flex items-center gap-2">
              <Link href="/" className="group flex items-center gap-2">
                 <Shield className="h-8 w-8 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
                 <span className="text-2xl font-bold">CyberWall</span>
             </Link>
-            <nav className="flex items-center gap-4 text-sm">
-                {navLinks.map((link) => (
-                    <Link
-                    key={link.href}
-                    href={link.href}
-                    className="font-medium text-muted-foreground transition-colors hover:text-primary"
-                    >
-                    {link.label}
-                    </Link>
-                ))}
-            </nav>
         </div>
         
         {/* Mobile Logo (centered) */}
@@ -135,8 +125,21 @@ export function Header() {
             </Link>
         </div>
 
+        {/* Desktop Nav (centered) */}
+        <nav className="hidden md:flex flex-1 items-center justify-center gap-4 text-sm">
+            {navLinks.map((link) => (
+                <Link
+                key={link.href}
+                href={link.href}
+                className="font-medium text-muted-foreground transition-colors hover:text-primary"
+                >
+                {link.label}
+                </Link>
+            ))}
+        </nav>
+
         {/* Actions & Search */}
-        <div className="flex flex-1 items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-2 md:w-auto">
           <SearchFlyout />
           <ThemeToggle />
 
