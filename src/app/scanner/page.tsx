@@ -14,26 +14,22 @@ import { Progress } from '@/components/ui/progress';
 import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
 
-// Mock user state - in a real app, this would come from an auth provider
+// Mock user state - assuming user is always logged in for this version
 const useUser = () => {
-    const [user, setUser] = React.useState<{isLoggedIn: boolean, name: string} | null>(null);
     const [scansToday, setScansToday] = React.useState(0);
-
-    // Simulate login state change
-    const login = () => {
-        setUser({ isLoggedIn: true, name: 'Demo User' });
-        setScansToday(0); // Reset scans on login for demo
-    }
-    const logout = () => {
-        setUser(null);
-        setScansToday(0); // Reset scans on logout for demo
-    }
 
     const recordScan = () => {
         setScansToday(prev => prev + 1);
     }
     
-    return { user, login, logout, scansToday, recordScan };
+    return { 
+        user: { isLoggedIn: true, name: 'Demo User' }, 
+        scansToday, 
+        recordScan,
+        // login and logout are no longer needed
+        login: () => {}, 
+        logout: () => {}
+    };
 }
 
 const formSchema = z.object({
@@ -58,58 +54,42 @@ const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low') => {
   }
 };
 
-const mockVulnerabilities = {
-    guest: [
-        {
-            title: 'Cross-Site Scripting (XSS)',
-            severity: 'High',
-            description: 'A potential reflected XSS vulnerability was found in a search parameter. Malicious scripts could be injected.',
-            remediation: 'Sanitize user input to prevent script execution. A Pro plan provides AI-generated code snippets for your specific framework.'
-        },
-        {
-            title: 'Insecure Security Headers',
-            severity: 'Medium',
-            description: 'The Content-Security-Policy (CSP) header is missing.',
-            remediation: 'Implement a strict CSP to mitigate various attacks. Upgrade to see a recommended policy.'
-        },
-    ],
-    loggedIn: [
-        {
-            title: 'Cross-Site Scripting (XSS)',
-            severity: 'High',
-            description: 'A potential reflected XSS vulnerability was found in a search parameter. Malicious scripts could be injected.',
-            remediation: 'Sanitize all user-provided input on the server-side before rendering it back to the page. Use libraries like DOMPurify on the client-side.'
-        },
-        {
-            title: 'Insecure Security Headers',
-            severity: 'Medium',
-            description: 'The Content-Security-Policy (CSP) header is missing, which can increase the risk of XSS attacks.',
-            remediation: 'Implement a strict Content-Security-Policy header to control which resources can be loaded by the browser.'
-        },
-        {
-            title: 'SQL Injection',
-            severity: 'Critical',
-            description: 'A login form parameter appears to be vulnerable to SQL Injection, potentially allowing attackers to bypass authentication.',
-            remediation: 'Use parameterized queries (prepared statements) for all database interactions. Never concatenate user input directly into SQL queries.'
-        },
-        {
-            title: 'Outdated Component: jQuery 3.1.0',
-            severity: 'Low',
-            description: 'The application uses an outdated version of jQuery which has known vulnerabilities.',
-            remediation: 'Update jQuery to the latest stable version to patch known security issues.'
-        }
-    ]
-}
+const mockVulnerabilities = [
+    {
+        title: 'Cross-Site Scripting (XSS)',
+        severity: 'High',
+        description: 'A potential reflected XSS vulnerability was found in a search parameter. Malicious scripts could be injected.',
+        remediation: 'Sanitize all user-provided input on the server-side before rendering it back to the page. Use libraries like DOMPurify on the client-side.'
+    },
+    {
+        title: 'Insecure Security Headers',
+        severity: 'Medium',
+        description: 'The Content-Security-Policy (CSP) header is missing, which can increase the risk of XSS attacks.',
+        remediation: 'Implement a strict Content-Security-Policy header to control which resources can be loaded by the browser.'
+    },
+    {
+        title: 'SQL Injection',
+        severity: 'Critical',
+        description: 'A login form parameter appears to be vulnerable to SQL Injection, potentially allowing attackers to bypass authentication.',
+        remediation: 'Use parameterized queries (prepared statements) for all database interactions. Never concatenate user input directly into SQL queries.'
+    },
+    {
+        title: 'Outdated Component: jQuery 3.1.0',
+        severity: 'Low',
+        description: 'The application uses an outdated version of jQuery which has known vulnerabilities.',
+        remediation: 'Update jQuery to the latest stable version to patch known security issues.'
+    }
+];
 
 
 export default function ScannerPage() {
-  const { user, login, logout, scansToday, recordScan } = useUser();
+  const { user, scansToday, recordScan } = useUser();
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
   const [scanType, setScanType] = React.useState<ScanType>('quick');
   const [progress, setProgress] = React.useState(0);
   const [scannedUrl, setScannedUrl] = React.useState('');
   
-  const scanLimit = user?.isLoggedIn ? 10 : 2;
+  const scanLimit = 10; // Always logged in user limit
   const canScan = scansToday < scanLimit;
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -176,10 +156,9 @@ export default function ScannerPage() {
                 <div className='animate-fade-in'>
                     <Alert className="bg-yellow-50 border-yellow-300 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300">
                         <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
-                        <AlertTitle>{user?.isLoggedIn ? `Welcome, ${user.name}!` : 'You are scanning as a guest.'}</AlertTitle>
+                        <AlertTitle>Welcome, {user.name}!</AlertTitle>
                         <AlertDescription>
                             <b>You have used {scansToday} of your {scanLimit} scans for today.</b> 
-                            {!user?.isLoggedIn && ' Login or Sign Up for more scans and detailed results.'}
                         </AlertDescription>
                     </Alert>
 
@@ -212,15 +191,6 @@ export default function ScannerPage() {
                             </p>
                         </form>
                     </Form>
-
-                    {/* Simulate Login/Logout for demo */}
-                    <div className='text-center mt-6'>
-                        {user?.isLoggedIn ? (
-                             <Button variant="link" onClick={logout}>Log out to scan as a guest.</Button>
-                        ): (
-                            <Button variant="link" onClick={login}>Simulate Login</Button>
-                        )}
-                    </div>
                 </div>
             )}
 
@@ -249,7 +219,7 @@ export default function ScannerPage() {
                         </CardHeader>
                         <CardContent>
                              <Accordion type="single" collapsible className="w-full">
-                                { (user?.isLoggedIn ? mockVulnerabilities.loggedIn : mockVulnerabilities.guest).map((vuln, index) => (
+                                { mockVulnerabilities.map((vuln, index) => (
                                     <AccordionItem value={`item-${index}`} key={index}>
                                         <AccordionTrigger>
                                             <div className="flex items-center gap-4">
@@ -266,38 +236,17 @@ export default function ScannerPage() {
                                 ))}
                             </Accordion>
 
-                             {!user?.isLoggedIn && (
-                                <Card className='mt-6 bg-muted'>
-                                    <CardHeader className='flex-row items-center gap-4 space-y-0'>
-                                        <FileText className='w-8 h-8 text-primary' />
-                                        <div>
-                                            <CardTitle>Get the Full Picture</CardTitle>
-                                            <CardDescription>Our full scan found {mockVulnerabilities.loggedIn.length - mockVulnerabilities.guest.length} additional issues.</CardDescription>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <p className="text-muted-foreground mb-4">
-                                            This includes vulnerabilities like SQL Injection, Broken Access Control, and more. Sign up to get access to all findings.
-                                        </p>
-                                        <Button asChild>
-                                            <Link href="/signup">Sign Up to Explore <ExternalLink className='w-4 h-4 ml-2'/></Link>
-                                        </Button>
-                                    </CardContent>
-                                </Card>
-                             )}
-                              {user?.isLoggedIn && (
-                                 <Alert variant="default" className='mt-4 bg-primary/10 border-primary/20'>
-                                     <AlertTriangle className="h-4 w-4 text-primary" />
-                                     <AlertTitle>Unlock AI-Powered Remediation</AlertTitle>
-                                     <AlertDescription>
-                                         Upgrade to a Pro plan to get detailed, AI-generated code fixes for every vulnerability, saving you time and ensuring your code is secure.
-                                         <br/>
-                                         <Link href="/#pricing" className="text-primary font-bold hover:underline mt-2 inline-block">
-                                             View Pricing Plans &rarr;
-                                         </Link>
-                                     </AlertDescription>
-                                 </Alert>
-                              )}
+                            <Alert variant="default" className='mt-4 bg-primary/10 border-primary/20'>
+                                 <AlertTriangle className="h-4 w-4 text-primary" />
+                                 <AlertTitle>Unlock AI-Powered Remediation</AlertTitle>
+                                 <AlertDescription>
+                                     Upgrade to a Pro plan to get detailed, AI-generated code fixes for every vulnerability, saving you time and ensuring your code is secure.
+                                     <br/>
+                                     <Link href="/#pricing" className="text-primary font-bold hover:underline mt-2 inline-block">
+                                         View Pricing Plans &rarr;
+                                     </Link>
+                                 </AlertDescription>
+                             </Alert>
                         </CardContent>
                         <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
                              <p className='text-sm text-muted-foreground'>You have {scanLimit - scansToday} scans remaining today.</p>
