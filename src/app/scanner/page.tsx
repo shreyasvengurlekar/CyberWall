@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink } from 'lucide-react';
+import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
 
 // Mock user state - in a real app, this would come from an auth provider
@@ -41,6 +41,7 @@ const formSchema = z.object({
 });
 
 type ScanStatus = 'idle' | 'scanning' | 'complete' | 'error';
+type ScanType = 'quick' | 'full';
 
 const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low') => {
   switch (severity) {
@@ -104,6 +105,7 @@ const mockVulnerabilities = {
 export default function ScannerPage() {
   const { user, login, logout, scansToday, recordScan } = useUser();
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
+  const [scanType, setScanType] = React.useState<ScanType>('quick');
   const [progress, setProgress] = React.useState(0);
   const [scannedUrl, setScannedUrl] = React.useState('');
   
@@ -115,33 +117,39 @@ export default function ScannerPage() {
     defaultValues: { url: '' },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    if (!canScan) {
-      alert('You have reached your daily scan limit.');
-      return;
-    }
-    
-    setScannedUrl(values.url);
-    setScanStatus('scanning');
-    recordScan();
-    
-    // Simulate scan progress
-    setProgress(0);
-    const interval = setInterval(() => {
-        setProgress(prev => {
-            if (prev >= 95) {
-                clearInterval(interval);
-                return prev;
-            }
-            return prev + 5;
-        });
-    }, 200);
+  const handleScan = (scanType: ScanType) => {
+    form.handleSubmit((values) => {
+        if (!canScan) {
+          alert('You have reached your daily scan limit.');
+          return;
+        }
+        
+        setScannedUrl(values.url);
+        setScanStatus('scanning');
+        setScanType(scanType);
+        recordScan();
+        
+        // Simulate scan progress
+        const scanTime = scanType === 'quick' ? 2000 : 4000;
+        const intervalTime = scanTime / 20;
 
-    setTimeout(() => {
-      setProgress(100);
-      setScanStatus('complete');
-      clearInterval(interval);
-    }, 4000);
+        setProgress(0);
+        const interval = setInterval(() => {
+            setProgress(prev => {
+                if (prev >= 95) {
+                    clearInterval(interval);
+                    return prev;
+                }
+                return prev + 5;
+            });
+        }, intervalTime);
+
+        setTimeout(() => {
+          setProgress(100);
+          setScanStatus('complete');
+          clearInterval(interval);
+        }, scanTime);
+    })();
   };
 
   const handleNewScan = () => {
@@ -176,7 +184,7 @@ export default function ScannerPage() {
                     </Alert>
 
                     <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 mt-6">
+                        <form onSubmit={(e) => e.preventDefault()} className="space-y-6 mt-6">
                             <FormField
                             control={form.control}
                             name="url"
@@ -190,9 +198,18 @@ export default function ScannerPage() {
                                 </FormItem>
                             )}
                             />
-                            <Button type="submit" className="w-full text-lg" size="lg" disabled={!canScan}>
-                                {canScan ? 'Start Scan' : 'Scan Limit Reached'}
-                            </Button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <Button onClick={() => handleScan('quick')} className="w-full text-lg" size="lg" disabled={!canScan}>
+                                    {canScan ? 'Quick Scan' : 'Limit Reached'}
+                                </Button>
+                                <Button onClick={() => handleScan('full')} className="w-full text-lg" size="lg" variant="outline" disabled={!canScan}>
+                                    {canScan ? 'Full Scan' : 'Limit Reached'}
+                                </Button>
+                            </div>
+                            <p className='text-center text-sm text-muted-foreground flex items-center justify-center gap-2'>
+                                <Clock className='w-4 h-4' />
+                                Full scan is more comprehensive and will take longer.
+                            </p>
                         </form>
                     </Form>
 
@@ -209,7 +226,7 @@ export default function ScannerPage() {
 
             {scanStatus === 'scanning' && (
                 <div className="text-center animate-fade-in space-y-4">
-                    <p className="text-lg text-muted-foreground">Scanning <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
+                    <p className="text-lg text-muted-foreground">Performing {scanType} scan on <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
                     <Progress value={progress} className="w-full" />
                     <p className="text-sm text-muted-foreground">This may take a moment. Please don't close this page.</p>
                      <div className="flex justify-center items-center text-primary pt-4">
@@ -295,3 +312,5 @@ export default function ScannerPage() {
     </div>
   );
 }
+
+    
