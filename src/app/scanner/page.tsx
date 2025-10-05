@@ -13,24 +13,8 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Progress } from '@/components/ui/progress';
 import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
+import { useUser } from '@/hooks/use-user';
 
-// Mock user state - assuming user is always logged in for this version
-const useUser = () => {
-    const [scansToday, setScansToday] = React.useState(0);
-
-    const recordScan = () => {
-        setScansToday(prev => prev + 1);
-    }
-    
-    return { 
-        user: { isLoggedIn: true, name: 'Demo User' }, 
-        scansToday, 
-        recordScan,
-        // login and logout are no longer needed
-        login: () => {}, 
-        logout: () => {}
-    };
-}
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL (e.g., https://example.com)' }),
@@ -83,14 +67,14 @@ const mockVulnerabilities = [
 
 
 export default function ScannerPage() {
-  const { user, scansToday, recordScan } = useUser();
+  const { user, scansToday, recordScan, plan } = useUser();
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
   const [scanType, setScanType] = React.useState<ScanType>('quick');
   const [progress, setProgress] = React.useState(0);
   const [scannedUrl, setScannedUrl] = React.useState('');
   
-  const scanLimit = 10; // Always logged in user limit
-  const canScan = scansToday < scanLimit;
+  const scanLimit = plan === 'guest' ? 2 : (plan === 'pro' || plan === 'business' ? Infinity : 10);
+  const canScan = plan === 'pro' || plan === 'business' || scansToday < scanLimit;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -138,6 +122,8 @@ export default function ScannerPage() {
     setScannedUrl('');
     form.reset();
   }
+  
+  const scansRemaining = scanLimit === Infinity ? 'unlimited' : scanLimit - scansToday;
 
   return (
     <div className="container mx-auto max-w-4xl py-12 px-4">
@@ -156,9 +142,10 @@ export default function ScannerPage() {
                 <div className='animate-fade-in'>
                     <Alert className="bg-yellow-50 border-yellow-300 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300">
                         <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
-                        <AlertTitle>Welcome, {user.name}!</AlertTitle>
+                        <AlertTitle>{user ? `Welcome, ${user.name}!` : 'Welcome, Guest!'}</AlertTitle>
                         <AlertDescription>
-                            <b>You have used {scansToday} of your {scanLimit} scans for today.</b> 
+                            <b>You have {scansRemaining} scans remaining today.</b>
+                            {!user && ' Login or Sign Up for more scans and detailed results.'}
                         </AlertDescription>
                     </Alert>
 
@@ -219,7 +206,7 @@ export default function ScannerPage() {
                         </CardHeader>
                         <CardContent>
                              <Accordion type="single" collapsible className="w-full">
-                                { mockVulnerabilities.map((vuln, index) => (
+                                { mockVulnerabilities.slice(0, (plan === 'free' || plan === 'guest') ? 2 : mockVulnerabilities.length).map((vuln, index) => (
                                     <AccordionItem value={`item-${index}`} key={index}>
                                         <AccordionTrigger>
                                             <div className="flex items-center gap-4">
@@ -235,21 +222,47 @@ export default function ScannerPage() {
                                     </AccordionItem>
                                 ))}
                             </Accordion>
+                            
+                            {plan === 'guest' && (
+                                 <Alert variant="default" className='mt-6 bg-blue-500/10 border-blue-500/20'>
+                                     <Info className="h-4 w-4 text-blue-500" />
+                                     <AlertTitle>Get the Full Picture</AlertTitle>
+                                     <AlertDescription>
+                                         You're seeing limited results as a guest. This includes {mockVulnerabilities.slice(0,2).length} of {mockVulnerabilities.length} potential findings.
+                                         <br/>
+                                         <Link href="/signup" className="text-primary font-bold hover:underline mt-2 inline-block">
+                                             Sign Up to Explore More &rarr;
+                                         </Link>
+                                     </AlertDescription>
+                                 </Alert>
+                            )}
 
-                            <Alert variant="default" className='mt-4 bg-primary/10 border-primary/20'>
-                                 <AlertTriangle className="h-4 w-4 text-primary" />
-                                 <AlertTitle>Unlock AI-Powered Remediation</AlertTitle>
-                                 <AlertDescription>
-                                     Upgrade to a Pro plan to get detailed, AI-generated code fixes for every vulnerability, saving you time and ensuring your code is secure.
-                                     <br/>
-                                     <Link href="/#pricing" className="text-primary font-bold hover:underline mt-2 inline-block">
-                                         View Pricing Plans &rarr;
-                                     </Link>
-                                 </AlertDescription>
-                             </Alert>
+                             {plan === 'free' && (
+                                 <Alert variant="default" className='mt-4 bg-primary/10 border-primary/20'>
+                                     <AlertTriangle className="h-4 w-4 text-primary" />
+                                     <AlertTitle>Unlock AI-Powered Remediation</AlertTitle>
+                                     <AlertDescription>
+                                         Upgrade to a Pro plan to get detailed, AI-generated code fixes for every vulnerability, saving you time and ensuring your code is secure.
+                                         <br/>
+                                         <Link href="/#pricing" className="text-primary font-bold hover:underline mt-2 inline-block">
+                                             View Pricing Plans &rarr;
+                                         </Link>
+                                     </AlertDescription>
+                                 </Alert>
+                             )}
+
+                            { (plan === 'pro' || plan === 'business') && (
+                                <Alert variant="default" className="mt-6 bg-green-500/10 border-green-500/20 text-green-700 dark:text-green-400">
+                                    <CheckCircle className="h-4 w-4" />
+                                    <AlertTitle>You're a Pro!</AlertTitle>
+                                    <AlertDescription>
+                                        You have access to all vulnerability details and remediation advice.
+                                    </AlertDescription>
+                                </Alert>
+                            )}
                         </CardContent>
                         <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
-                             <p className='text-sm text-muted-foreground'>You have {scanLimit - scansToday} scans remaining today.</p>
+                             <p className='text-sm text-muted-foreground'>You have {scansRemaining} scans remaining today.</p>
                              <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
                         </CardFooter>
                     </Card>

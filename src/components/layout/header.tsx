@@ -23,23 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-
-
-// Mock user state - assuming user is always logged in for this version
-const useUser = () => {
-    // Simulate a logged-in user
-    const user = { isLoggedIn: true, name: 'Shreyas V', email: 'shreyas@example.com' };
-
-    const logout = () => {
-        // In a real app, this would clear tokens and redirect.
-        // For this simulation, we can just log a message.
-        console.log("User logged out.");
-        // The UI will not change since we're hardcoding the logged-in state.
-        window.dispatchEvent(new CustomEvent('logout'));
-    }
-
-    return { user, logout };
-}
+import { useUser } from '@/hooks/use-user';
 
 
 const navLinks = [
@@ -91,7 +75,7 @@ export function Header() {
 
   const handleLogout = () => {
     logout();
-    window.dispatchEvent(new CustomEvent('logout'));
+    // No need to dispatch event if useUser hook handles state
   }
 
   return (
@@ -123,16 +107,33 @@ export function Header() {
                     </SheetClose>
                     ))}
                     <div className="mt-4 flex flex-col gap-2">
-                      <SheetClose asChild>
-                        <Button asChild>
-                          <Link href="/dashboard">Dashboard</Link>
-                        </Button>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Button asChild variant="outline" onClick={handleLogout}>
-                          <Link href="/">Log Out</Link>
-                        </Button>
-                      </SheetClose>
+                      {user ? (
+                        <>
+                          <SheetClose asChild>
+                            <Button asChild>
+                              <Link href="/dashboard">Dashboard</Link>
+                            </Button>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Button asChild variant="outline" onClick={handleLogout}>
+                              <Link href="/">Log Out</Link>
+                            </Button>
+                          </SheetClose>
+                        </>
+                      ) : (
+                        <>
+                          <SheetClose asChild>
+                            <Button asChild>
+                              <Link href="/login">Log In</Link>
+                            </Button>
+                          </SheetClose>
+                          <SheetClose asChild>
+                            <Button asChild variant="outline">
+                              <Link href="/signup">Sign Up</Link>
+                            </Button>
+                          </SheetClose>
+                        </>
+                      )}
                     </div>
                 </div>
             </SheetContent>
@@ -172,40 +173,48 @@ export function Header() {
           <SearchFlyout />
           <ThemeToggle />
           <div className='hidden md:flex items-center gap-2'>
-            <Button asChild>
-            <Link href="/scanner">Scan Now</Link>
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                   <Avatar>
-                    <AvatarImage src="https://github.com/shreyasvengurlekar.png" alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
-                <DropdownMenuLabel className="font-normal">
-                  <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">{user.name}</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      {user.email}
-                    </p>
-                  </div>
-                </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href="/dashboard"><LayoutDashboard className="mr-2" /> Dashboard</Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Settings className="mr-2" /> Settings
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={handleLogout}>
-                  <LogOut className="mr-2" /> Log out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {user ? (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                        <Avatar>
+                            <AvatarImage src={user.avatarUrl} alt={user.name} />
+                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        </Avatar>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56" align="end" forceMount>
+                        <DropdownMenuLabel className="font-normal">
+                        <div className="flex flex-col space-y-1">
+                            <p className="text-sm font-medium leading-none">{user.name}</p>
+                            <p className="text-xs leading-none text-muted-foreground">
+                            {user.email}
+                            </p>
+                        </div>
+                        </DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                        <Link href="/dashboard"><LayoutDashboard className="mr-2" /> Dashboard</Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                        <Settings className="mr-2" /> Settings
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2" /> Log out
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            ) : (
+                <>
+                    <Button asChild variant='ghost'>
+                        <Link href="/login">Log In</Link>
+                    </Button>
+                    <Button asChild>
+                        <Link href="/signup">Sign Up</Link>
+                    </Button>
+                </>
+            )}
           </div>
         </div>
       </div>

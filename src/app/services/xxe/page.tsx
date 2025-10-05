@@ -4,8 +4,10 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Server } from 'lucide-react';
 import * as React from 'react';
+import { useUser } from '@/hooks/use-user';
 
 export default function XxePage() {
+  const { user } = useUser();
   return (
     <div className="container max-w-4xl mx-auto py-12 md:py-20 px-4 md:px-6">
       <div className="space-y-6">
@@ -32,10 +34,16 @@ export default function XxePage() {
             <h3 className='text-xl font-semibold'>Ready to find XXE vulnerabilities?</h3>
             <p className='text-muted-foreground'>Scan your application now to check for this specific issue.</p>
             <div className='flex gap-4'>
+              {user ? (
                 <Button asChild>
                     <Link href="/scanner">Scan Now</Link>
                 </Button>
-                <Button asChild variant='outline'>
+              ) : (
+                <Button asChild>
+                    <Link href="/login">Log In to Scan</Link>
+                </Button>
+              )}
+                 <Button asChild variant='outline'>
                      <Link href="/#pricing">Upgrade to Pro for AI Fixes</Link>
                 </Button>
             </div>

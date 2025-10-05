@@ -1,3 +1,4 @@
+
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -10,6 +11,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
+import { useUser } from '@/hooks/use-user';
+import * as React from 'react';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -22,6 +25,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
+  const { login, user } = useUser();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -30,10 +34,21 @@ export default function LoginPage() {
     },
   });
 
+  React.useEffect(() => {
+    if (user) {
+      router.push('/dashboard');
+    }
+  }, [user, router]);
+
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     console.log(values);
     // You can add your login logic here
     alert('Login Successful! Redirecting to dashboard...');
+    
+    // Simulate login. In a real app, you'd get the plan from your backend.
+    const plan = values.email.includes('+pro') ? 'pro' : 'free';
+    login(plan);
     form.reset();
     router.push('/dashboard');
   }

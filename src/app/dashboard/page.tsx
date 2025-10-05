@@ -9,17 +9,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { FileText, ScanLine, Settings, Shield, User, Zap } from 'lucide-react';
 import * as React from 'react';
-
-// Mock data, in a real app this would come from an API
-const user = {
-    name: 'Shreyas Vengurlekar',
-    email: 'shreyas@example.com',
-    avatarUrl: 'https://github.com/shreyasvengurlekar.png',
-    plan: 'Pro',
-    scansUsed: 4,
-    scanLimit: 10,
-    memberSince: 'July 2024'
-}
+import { useUser } from '@/hooks/use-user';
+import { useRouter } from 'next/navigation';
 
 const recentScans = [
     { id: 1, url: 'https://my-e-commerce-site.com', date: '2024-07-28', findings: 3, severity: 'High' },
@@ -43,12 +34,22 @@ const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'None') => 
 
 
 export default function DashboardPage() {
-    const scanPercentage = (user.scansUsed / user.scanLimit) * 100;
-    
-    // Simulate login for demo purposes
+    const { user, plan, scansToday } = useUser();
+    const router = useRouter();
+
     React.useEffect(() => {
-        window.dispatchEvent(new CustomEvent('login'));
-    }, [])
+        if (!user) {
+            router.push('/login');
+        }
+    }, [user, router]);
+    
+    if (!user) {
+        return null; // or a loading spinner
+    }
+
+    const scanLimit = plan === 'pro' || plan === 'business' ? Infinity : 10;
+    const scanPercentage = scanLimit === Infinity ? 100 : (scansToday / scanLimit) * 100;
+    const planName = plan.charAt(0).toUpperCase() + plan.slice(1);
 
   return (
     <div className="container mx-auto py-10 px-4 md:px-6">
@@ -84,7 +85,7 @@ export default function DashboardPage() {
                             </div>
                         </CardHeader>
                         <CardFooter>
-                            <p className='text-sm text-muted-foreground'>Member since {user.memberSince}</p>
+                            <p className='text-sm text-muted-foreground'>Logged in</p>
                         </CardFooter>
                     </Card>
 
@@ -92,13 +93,13 @@ export default function DashboardPage() {
                     <Card>
                         <CardHeader>
                             <CardTitle className='flex items-center gap-2'><Shield /> Plan Details</CardTitle>
-                            <CardDescription>You are currently on the <span className='font-semibold text-primary'>{user.plan}</span> plan.</CardDescription>
+                            <CardDescription>You are currently on the <span className='font-semibold text-primary'>{planName}</span> plan.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className='space-y-2'>
                                 <p className='text-sm font-medium'>Monthly Scans</p>
                                 <Progress value={scanPercentage} />
-                                <p className='text-sm text-muted-foreground'>{user.scansUsed} of {user.scanLimit} scans used</p>
+                                <p className='text-sm text-muted-foreground'>{scansToday} of {scanLimit === Infinity ? 'Unlimited' : scanLimit} scans used</p>
                             </div>
                         </CardContent>
                         <CardFooter>
