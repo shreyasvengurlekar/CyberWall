@@ -388,4 +388,3 @@ function SearchFlyout() {
     </>
   );
 }
-
