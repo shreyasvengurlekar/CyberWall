@@ -11,8 +11,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/firebase/auth/use-user';
 import * as React from 'react';
+import { toast } from 'sonner';
 
 const formSchema = z
   .object({
@@ -31,7 +32,7 @@ const formSchema = z
 
 export default function SignupPage() {
   const router = useRouter();
-  const { login, user } = useUser();
+  const { user, signUp } = useUser();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -47,13 +48,23 @@ export default function SignupPage() {
     }
   }, [user, router]);
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // You can add your signup logic here
-    alert('Account Created! You have successfully signed up. Redirecting to dashboard...');
-    login('free'); // Log user in on free plan after signup
-    form.reset();
-    router.push('/dashboard');
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await signUp(values.email, values.password);
+      toast.success('Account Created! Please check your email to verify your account.');
+      form.reset();
+      // Don't redirect immediately, let them know to check their email.
+      // router.push('/dashboard');
+    } catch (error: any) {
+      console.error(error.code, error.message);
+      let errorMessage = 'An unexpected error occurred. Please try again.';
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = 'This email is already in use. Please try another email or log in.';
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = 'The password is too weak. Please choose a stronger password.';
+      }
+      toast.error(errorMessage);
+    }
   }
 
   return (
@@ -106,8 +117,8 @@ export default function SignupPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Create Account
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? 'Creating Account...' : 'Create Account'}
                 </Button>
               </form>
             </Form>

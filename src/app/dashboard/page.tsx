@@ -9,8 +9,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { FileText, ScanLine, Settings, Shield, User, Zap } from 'lucide-react';
 import * as React from 'react';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/firebase/auth/use-user';
 import { useRouter } from 'next/navigation';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const recentScans = [
     { id: 1, url: 'https://my-e-commerce-site.com', date: '2024-07-28', findings: 3, severity: 'High' },
@@ -34,22 +35,46 @@ const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'None') => 
 
 
 export default function DashboardPage() {
-    const { user, plan, scansToday } = useUser();
+    const { user, profile, isUserLoading } = useUser();
     const router = useRouter();
 
     React.useEffect(() => {
-        if (!user) {
+        if (!isUserLoading && !user) {
             router.push('/login');
         }
-    }, [user, router]);
+    }, [user, isUserLoading, router]);
     
-    if (!user) {
-        return null; // or a loading spinner
+    if (isUserLoading || !user || !profile) {
+        return (
+            <div className="container mx-auto py-10 px-4 md:px-6">
+                <div className="grid gap-8">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                        <div>
+                            <Skeleton className="h-9 w-48" />
+                            <Skeleton className="h-5 w-64 mt-2" />
+                        </div>
+                        <div className='flex gap-2'>
+                           <Skeleton className="h-10 w-36" />
+                           <Skeleton className="h-10 w-36" />
+                        </div>
+                    </div>
+                     <div className="grid md:grid-cols-3 gap-8">
+                        <div className="md:col-span-1 space-y-8">
+                            <Skeleton className="h-36 w-full" />
+                            <Skeleton className="h-48 w-full" />
+                        </div>
+                        <div className="md:col-span-2">
+                            <Skeleton className="h-80 w-full" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
-    const scanLimit = plan === 'pro' || plan === 'business' ? Infinity : 10;
-    const scanPercentage = scanLimit === Infinity ? 100 : (scansToday / scanLimit) * 100;
-    const planName = plan.charAt(0).toUpperCase() + plan.slice(1);
+    const scanLimit = profile.plan === 'pro' || profile.plan === 'business' ? Infinity : 10;
+    const scanPercentage = scanLimit === Infinity ? 100 : ((profile.scansToday || 0) / scanLimit) * 100;
+    const planName = profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1);
 
   return (
     <div className="container mx-auto py-10 px-4 md:px-6">
@@ -58,7 +83,7 @@ export default function DashboardPage() {
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                    <p className="text-muted-foreground">Welcome back, {user.name}!</p>
+                    <p className="text-muted-foreground">Welcome back, {user.displayName || 'User'}!</p>
                 </div>
                 <div className='flex gap-2'>
                     <Button asChild>
@@ -76,16 +101,18 @@ export default function DashboardPage() {
                     <Card>
                         <CardHeader className='flex-row items-center gap-4'>
                             <Avatar className="h-16 w-16">
-                                <AvatarImage src={user.avatarUrl} alt={user.name} />
-                                <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                                <AvatarImage src={user.photoURL || undefined} alt={user.displayName || ''} />
+                                <AvatarFallback>{user.displayName ? user.displayName.charAt(0) : 'U'}</AvatarFallback>
                             </Avatar>
                             <div>
-                                <CardTitle>{user.name}</CardTitle>
+                                <CardTitle>{user.displayName || 'User'}</CardTitle>
                                 <CardDescription>{user.email}</CardDescription>
                             </div>
                         </CardHeader>
-                        <CardFooter>
-                            <p className='text-sm text-muted-foreground'>Logged in</p>
+                         <CardFooter>
+                            <p className={`text-sm ${user.emailVerified ? 'text-green-500' : 'text-yellow-500'}`}>
+                                {user.emailVerified ? 'Email Verified' : 'Email Not Verified'}
+                            </p>
                         </CardFooter>
                     </Card>
 
@@ -97,9 +124,9 @@ export default function DashboardPage() {
                         </CardHeader>
                         <CardContent>
                             <div className='space-y-2'>
-                                <p className='text-sm font-medium'>Monthly Scans</p>
+                                <p className='text-sm font-medium'>Daily Scans Used</p>
                                 <Progress value={scanPercentage} />
-                                <p className='text-sm text-muted-foreground'>{scansToday} of {scanLimit === Infinity ? 'Unlimited' : scanLimit} scans used</p>
+                                <p className='text-sm text-muted-foreground'>{profile.scansToday || 0} of {scanLimit === Infinity ? 'Unlimited' : scanLimit} scans used</p>
                             </div>
                         </CardContent>
                         <CardFooter>

@@ -6,6 +6,7 @@ import { Inter } from 'next/font/google';
 import * as React from 'react';
 import { PageLoader } from '@/components/page-loader';
 import { Providers } from '@/components/providers';
+import { Toaster } from '@/components/ui/sonner';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
@@ -33,6 +34,7 @@ export default function RootLayout({
             </main>
             <Footer />
             </div>
+            <Toaster />
         </Providers>
       </body>
     </html>

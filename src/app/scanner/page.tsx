@@ -13,7 +13,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { Progress } from '@/components/ui/progress';
 import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock } from 'lucide-react';
 import Link from 'next/link';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/firebase/auth/use-user';
 
 
 const formSchema = z.object({
@@ -67,12 +67,15 @@ const mockVulnerabilities = [
 
 
 export default function ScannerPage() {
-  const { user, scansToday, recordScan, plan } = useUser();
+  const { user, profile, recordScan } = useUser();
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
   const [scanType, setScanType] = React.useState<ScanType>('quick');
   const [progress, setProgress] = React.useState(0);
   const [scannedUrl, setScannedUrl] = React.useState('');
   
+  const plan = profile?.plan || 'guest';
+  const scansToday = profile?.scansToday || 0;
+
   const scanLimit = plan === 'guest' ? 2 : (plan === 'pro' || plan === 'business' ? Infinity : 10);
   const canScan = plan === 'pro' || plan === 'business' || scansToday < scanLimit;
 
@@ -91,7 +94,9 @@ export default function ScannerPage() {
         setScannedUrl(values.url);
         setScanStatus('scanning');
         setScanType(scanType);
-        recordScan();
+        if(user) {
+          recordScan();
+        }
         
         // Simulate scan progress
         const scanTime = scanType === 'quick' ? 2000 : 4000;
@@ -142,7 +147,7 @@ export default function ScannerPage() {
                 <div className='animate-fade-in'>
                     <Alert className="bg-yellow-50 border-yellow-300 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300">
                         <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
-                        <AlertTitle>{user ? `Welcome, ${user.name}!` : 'Welcome, Guest!'}</AlertTitle>
+                        <AlertTitle>{user ? `Welcome, ${user.displayName || 'User'}!` : 'Welcome, Guest!'}</AlertTitle>
                         <AlertDescription>
                             <b>You have {scansRemaining} scans remaining today.</b>
                             {!user && ' Login or Sign Up for more scans and detailed results.'}

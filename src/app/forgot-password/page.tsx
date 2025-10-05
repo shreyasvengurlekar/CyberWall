@@ -3,6 +3,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { useUser } from '@/firebase/auth/use-user';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -17,6 +19,8 @@ const formSchema = z.object({
 });
 
 export default function ForgotPasswordPage() {
+  const { sendPasswordReset } = useUser();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -24,11 +28,15 @@ export default function ForgotPasswordPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    // You can add your password reset logic here
-    alert(`If an account exists for ${values.email}, a reset link has been sent.`);
-    form.reset();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    try {
+      await sendPasswordReset(values.email);
+      toast.success(`If an account exists for ${values.email}, a password reset link has been sent.`);
+      form.reset();
+    } catch (error: any) {
+      console.error(error);
+      toast.error('Failed to send reset email. Please try again.');
+    }
   }
 
   return (
@@ -57,8 +65,8 @@ export default function ForgotPasswordPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full">
-                  Send Reset Link
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                  {form.formState.isSubmitting ? 'Sending...' : 'Send Reset Link'}
                 </Button>
               </form>
             </Form>
