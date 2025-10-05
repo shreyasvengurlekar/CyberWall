@@ -195,9 +195,14 @@ function ScannerResults() {
                             )}
                             />
                             {vulnerabilityType ? (
-                                <Button onClick={() => handleScan('targeted')} className="w-full text-lg" size="lg" disabled={!canScan}>
-                                    {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
-                                </Button>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <Button asChild variant="outline" className="w-full text-lg" size="lg">
+                                        <Link href="/services"><ArrowLeft className='mr-2 w-4 h-4'/> Back to Services</Link>
+                                    </Button>
+                                    <Button onClick={() => handleScan('targeted')} className="w-full text-lg" size="lg" disabled={!canScan}>
+                                        {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
+                                    </Button>
+                                </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <Button onClick={() => handleScan('quick')} className="w-full text-lg" size="lg" disabled={!canScan}>
