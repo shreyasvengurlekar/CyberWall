@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { KeyRound } from 'lucide-react';
 import * as React from 'react';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from '@/firebase/auth/use-user';
 
 export default function BrokenAuthenticationPage() {
   const { user } = useUser();
