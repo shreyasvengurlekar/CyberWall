@@ -70,7 +70,7 @@ export default function AboutPage() {
             </p>
             <div className="mt-6 flex justify-center md:justify-start gap-4">
               <Button asChild>
-                <a href="/SHREYAS_VENGURLEKAR_Resume.pdf" download="SHREYAS_VENGURLEKAR_Resume.pdf">
+                <a href="/SHREYAS_VENGURLEKAR_Resume_linkedin.pdf" download="SHREYAS_VENGURLEKAR_Resume.pdf">
                   <Download className="mr-2" /> Download Resume
                 </a>
               </Button>
@@ -111,17 +111,17 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-center mb-16 tracking-tight">Project Timeline</h2>
             <div className="relative">
                 {/* The vertical line */}
-                <div className="absolute left-1/2 -ml-[2px] h-full w-1 bg-border" aria-hidden="true"></div>
+                <div className="absolute left-4 md:left-1/2 -ml-[2px] h-full w-1 bg-border" aria-hidden="true"></div>
                 
                 <div className="space-y-16">
                     {timelineSteps.map((step, index) => (
-                        <div key={index} className="relative flex justify-center">
-                             <div className="flex items-center justify-center absolute left-1/2 -translate-x-1/2 bg-background w-20 h-20 rounded-full">
+                        <div key={index} className="relative flex items-start">
+                             <div className="flex items-center justify-center absolute left-4 md:left-1/2 -translate-x-1/2 bg-background w-20 h-20 rounded-full">
                                <div className="flex items-center justify-center bg-primary/10 rounded-full w-16 h-16 ring-8 ring-background transition-all group-hover:ring-primary/10 group-hover:scale-110">
                                    {step.icon}
                                </div>
                             </div>
-                            <div className={`w-[calc(50%-2.5rem)] ${index % 2 === 0 ? 'mr-auto text-right' : 'ml-auto text-left'}`}>
+                            <div className={`w-full md:w-[calc(50%-2.5rem)] pl-24 md:pl-0 ${index % 2 === 0 ? 'md:mr-auto md:text-right' : 'md:ml-auto md:text-left'}`}>
                                 <Card className="p-6 transition-all hover:shadow-primary/10 hover:-translate-y-1" >
                                   <h3 className="text-xl font-bold mb-2">{step.title}</h3>
                                   <p className="text-muted-foreground">{step.description}</p>
@@ -212,7 +212,3 @@ export default function AboutPage() {
     </div>
   );
 }
-
-    
-
-    
