@@ -67,6 +67,7 @@ const searchableTerms = [
   { term: 'Privacy Policy', path: '/privacy'},
   { term: 'Terms of Service', path: '/terms'},
   { term: 'Scanner', path: '/scanner' },
+  { term: 'Scan Now', path: '/scanner' },
 ];
 
 
