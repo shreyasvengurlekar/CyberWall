@@ -29,8 +29,8 @@ import { useUser } from '@/firebase/auth/use-user';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Features' },
-  { href: '/#how-it-works', label: 'How It Works' },
   { href: '/services', label: 'Services' },
+  { href: '/scanner', label: 'Scanner' },
   { href: '/#pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
 ];
@@ -387,3 +387,5 @@ function SearchFlyout() {
     </>
   );
 }
+
+    
