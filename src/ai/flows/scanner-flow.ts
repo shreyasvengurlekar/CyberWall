@@ -55,7 +55,11 @@ const scannerPrompt = ai.definePrompt({
         
         Your task is to:
         1.  Create a list of 2 to 4 plausible vulnerabilities that a site like this might have, relevant to the requested scan type. If the scan type is 'general', include a mix of common vulnerabilities (XSS, SQLi, Security Misconfiguration, etc.). If a specific scan type is requested (e.g., 'xss'), focus primarily on that. If no vulnerabilities are found for a specific scan type, the array should be empty.
-        2.  For each vulnerability, provide a clear title, an appropriate severity, a detailed description of the risk, and actionable remediation advice with code snippets if applicable.
+        2.  For each vulnerability, provide:
+            - A clear title.
+            - An appropriate severity.
+            - A detailed description of the risk, written in an easy-to-understand manner.
+            - Actionable remediation advice that is **VERY USER-FRIENDLY**. The advice should be broken down into simple, step-by-step instructions. Where possible, provide clear "before" and "after" code examples to illustrate the fix. Assume the user is a student or new developer.
         3.  Provide a concise, one-sentence summary of the site's security health based on your findings.
         4.  Calculate an overall security score from 0 to 100. A score of 100 means no issues found. Deduct points based on the severity and number of vulnerabilities (e.g., Critical: -40, High: -25, Medium: -15, Low: -5).
         
@@ -79,3 +83,4 @@ const scannerFlow = ai.defineFlow(
     return output;
   }
 );
+
