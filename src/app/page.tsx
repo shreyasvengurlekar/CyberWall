@@ -54,7 +54,7 @@ const testimonials = [
     aiHint: 'female developer',
   },
   {
-    name: 'Atrarv Walavalkar',
+    name: 'Atharv Walavalkar',
     role: <>Founder of <a href="https://recircleprofront-3547939-15cbf.web.app/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Recircle</a></>,
     testimonial: 'As a startup, security is critical. This tool provided us with enterprise-level scanning at a fraction of the cost. The reports are incredibly detailed yet easy to understand.',
     avatar: 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=50&h=50&fit=crop',
