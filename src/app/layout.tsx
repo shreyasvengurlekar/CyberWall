@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/layout/header';
@@ -26,13 +27,13 @@ export default function RootLayout({
       <body className={`${inter.variable} font-body antialiased`}>
         <Providers>
             <div className="flex flex-col min-h-screen">
-            <Header />
-            <main className="flex-1">
-                <React.Suspense fallback={<PageLoader />}>
-                {children}
-                </React.Suspense>
-            </main>
-            <Footer />
+              <Header />
+              <main className="flex-1">
+                  <React.Suspense fallback={<PageLoader />}>
+                  {children}
+                  </React.Suspense>
+              </main>
+              <Footer />
             </div>
             <Toaster />
         </Providers>
