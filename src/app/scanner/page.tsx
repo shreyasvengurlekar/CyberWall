@@ -322,7 +322,7 @@ function ScannerResults() {
                                     <Button type="submit" className="w-full text-lg" size="lg" disabled={!canScan}>
                                         <ScanLine className='mr-2 w-5 h-5'/> {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
                                     </Button>
-                                    <Button onClick={() => router.push('/services')} variant="ghost" className="w-full text-md hover:bg-transparent hover:text-muted-foreground hover:scale-100" size="lg">
+                                    <Button onClick={() => router.push('/services')} variant="ghost" className="w-full text-md hover:bg-transparent hover:text-muted-foreground" size="lg">
                                         <ArrowLeft className='mr-2 w-4 h-4'/> Back to Services
                                     </Button>
                                 </div>
@@ -437,3 +437,5 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
+
+    
