@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUser } from '@/firebase/auth/use-user';
+import { toast } from 'sonner';
 
 
 const navLinks = [
@@ -77,8 +78,14 @@ export function Header() {
   const router = useRouter();
 
   const handleLogout = async () => {
-    await signOut();
-    router.push('/');
+    toast.promise(signOut(), {
+        loading: 'Logging out...',
+        success: () => {
+            router.push('/');
+            return 'You have been logged out.';
+        },
+        error: 'Failed to log out. Please try again.',
+    });
   }
 
   return (
@@ -190,7 +197,7 @@ export function Header() {
                         <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                         <Avatar>
                             <AvatarImage src={user.photoURL || undefined} alt={user.displayName || ''} />
-                            <AvatarFallback>{user.displayName ? user.displayName.charAt(0) : 'U'}</AvatarFallback>
+                            <AvatarFallback>{user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
                         </Avatar>
                         </Button>
                     </DropdownMenuTrigger>

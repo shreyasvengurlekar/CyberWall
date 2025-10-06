@@ -24,7 +24,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { User, Shield, KeyRound, Trash2 } from 'lucide-react';
+import { User, KeyRound, Trash2 } from 'lucide-react';
 
 const profileSchema = z.object({
   displayName: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
@@ -63,41 +63,51 @@ export default function SettingsPage() {
     if (!isUserLoading && !user) {
       router.push('/login');
     }
-    if (profile) {
-      profileForm.setValue('displayName', profile.displayName || '');
+    if (user && profile) {
+      profileForm.setValue('displayName', user.displayName || '');
     }
   }, [user, profile, isUserLoading, router, profileForm]);
 
   const handleProfileUpdate = async (values: z.infer<typeof profileSchema>) => {
-    try {
-      await updateDisplayName(values.displayName);
-      toast.success('Profile updated successfully!');
-    } catch (error: any) {
-      toast.error('Failed to update profile:', error.message);
-    }
+    const promise = updateDisplayName(values.displayName);
+    toast.promise(promise, {
+      loading: 'Updating profile...',
+      success: 'Profile updated successfully!',
+      error: (err) => `Failed to update profile: ${err.message}`,
+    });
   };
 
   const handlePasswordUpdate = async (values: z.infer<typeof passwordSchema>) => {
+    const promise = updateUserPassword(values.newPassword);
+    toast.promise(promise, {
+      loading: 'Updating password...',
+      success: 'Password updated successfully!',
+      error: (err) => `Failed to update password: ${err.message}`,
+    });
     try {
-      await updateUserPassword(values.newPassword);
-      toast.success('Password updated successfully!');
-      passwordForm.reset();
-    } catch (error: any) {
-      toast.error(`Failed to update password: ${error.message}`);
+        await promise;
+        passwordForm.reset();
+    } catch (error) {
+        // handled by toast
     }
   };
 
   const handleDeleteAccount = async () => {
+    const promise = deleteUserAccount();
+    toast.promise(promise, {
+        loading: 'Deleting account...',
+        success: 'Account deleted successfully. Redirecting...',
+        error: (err) => `Failed to delete account: ${err.message}`,
+    });
     try {
-      await deleteUserAccount();
-      toast.success('Account deleted successfully.');
-      router.push('/');
-    } catch (error: any) {
-      toast.error(`Failed to delete account: ${error.message}`);
+        await promise;
+        router.push('/');
+    } catch (error) {
+        // handled by toast
     }
   };
 
-  if (isUserLoading || !profile) {
+  if (isUserLoading || !user || !profile) {
     return (
       <div className="container mx-auto max-w-4xl py-12 px-4 space-y-8">
         <Skeleton className="h-10 w-64" />

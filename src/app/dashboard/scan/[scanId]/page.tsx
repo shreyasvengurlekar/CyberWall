@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { ArrowLeft, ShieldCheck, Download, AlertTriangle, ScanLine } from 'lucide-react';
 import type { ScanResult } from '@/ai/flows/scanner-flow';
 import { generatePdf } from '@/lib/pdf-generator';
+import { Badge } from '@/components/ui/badge';
 
 interface ScanDoc {
     id: string;
@@ -26,18 +27,18 @@ interface ScanDoc {
     scanType: string;
 }
 
-const getSeverityBadgeClass = (severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational') => {
+const getSeverityBadgeVariant = (severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational') => {
   switch (severity) {
     case 'Critical':
-      return 'bg-destructive text-destructive-foreground';
+      return 'destructive';
     case 'High':
-      return 'bg-orange-500 text-white';
+      return 'secondary';
     case 'Medium':
-      return 'bg-yellow-500 text-black';
+      return 'default';
     case 'Low':
-      return 'bg-blue-500 text-white';
+      return 'outline';
     default:
-      return 'bg-gray-500 text-white';
+      return 'outline';
   }
 };
 
@@ -147,7 +148,7 @@ export default function ScanDetailPage() {
                                 <AccordionItem value={`item-${index}`} key={index}>
                                     <AccordionTrigger>
                                         <div className="flex items-center gap-4 text-left">
-                                            <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadgeClass(vuln.severity)}`}>{vuln.severity}</span>
+                                            <Badge variant={getSeverityBadgeVariant(vuln.severity)}>{vuln.severity}</Badge>
                                             <span className="font-semibold">{vuln.title}</span>
                                         </div>
                                     </AccordionTrigger>
@@ -183,5 +184,3 @@ export default function ScanDetailPage() {
     );
 }
 
-
-    

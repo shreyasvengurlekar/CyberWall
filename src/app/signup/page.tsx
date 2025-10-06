@@ -49,22 +49,24 @@ export default function SignupPage() {
   }, [user, router]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      await signUp(values.email, values.password);
-      toast.success('Account Created! Please check your email to verify your account.');
-      form.reset();
-      // Don't redirect immediately, let them know to check their email.
-      // router.push('/dashboard');
-    } catch (error: any) {
-      console.error(error.code, error.message);
-      let errorMessage = 'An unexpected error occurred. Please try again.';
-      if (error.code === 'auth/email-already-in-use') {
-        errorMessage = 'This email is already in use. Please try another email or log in.';
-      } else if (error.code === 'auth/weak-password') {
-        errorMessage = 'The password is too weak. Please choose a stronger password.';
-      }
-      toast.error(errorMessage);
-    }
+    const promise = signUp(values.email, values.password);
+
+    toast.promise(promise, {
+        loading: 'Creating account...',
+        success: () => {
+            form.reset();
+            return 'Account Created! Please check your email to verify your account.';
+        },
+        error: (error) => {
+             console.error(error.code, error.message);
+            if (error.code === 'auth/email-already-in-use') {
+                return 'This email is already in use. Please try another email or log in.';
+            } else if (error.code === 'auth/weak-password') {
+                return 'The password is too weak. Please choose a stronger password.';
+            }
+            return 'An unexpected error occurred. Please try again.';
+        }
+    });
   }
 
   return (
@@ -73,7 +75,7 @@ export default function SignupPage() {
         <Card className="shadow-2xl transition-all hover:shadow-primary/20">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-bold">Create an Account</CardTitle>
-            <CardDescription>Sign up to start your free trial.</CardDescription>
+            <CardDescription>Sign up for unlimited scans and full reports.</CardDescription>
           </CardHeader>
           <CardContent>
             <Form {...form}>

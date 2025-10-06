@@ -30,13 +30,18 @@ export default function ForgotPasswordPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    const promise = sendPasswordReset(values.email);
+    toast.promise(promise, {
+      loading: 'Sending reset link...',
+      success: `If an account exists for ${values.email}, a password reset link has been sent.`,
+      error: 'Failed to send reset email. Please try again.',
+    });
+
     try {
-      await sendPasswordReset(values.email);
-      toast.success(`If an account exists for ${values.email}, a password reset link has been sent.`);
-      form.reset();
-    } catch (error: any) {
-      console.error(error);
-      toast.error('Failed to send reset email. Please try again.');
+        await promise;
+        form.reset();
+    } catch (error) {
+        console.error(error);
     }
   }
 

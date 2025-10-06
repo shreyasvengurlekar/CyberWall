@@ -1,51 +1,25 @@
 
 'use client';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
-import { z } from 'zod';
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, CreditCard, DollarSign } from 'lucide-react';
-import { useRouter } from 'next/navigation';
-
-const formSchema = z.object({
-  name: z.string().min(1, 'Name on card is required'),
-  cardNumber: z.string().refine((value) => /^\d{16}$/.test(value), 'Card number must be 16 digits'),
-  expiry: z.string().refine((value) => /^(0[1-9]|1[0-2])\/\d{2}$/.test(value), 'Expiry must be in MM/YY format'),
-  cvc: z.string().refine((value) => /^\d{3}$/.test(value), 'CVC must be 3 digits'),
-});
+import { CheckCircle, Info, Star, Briefcase } from 'lucide-react';
+import { toast } from 'sonner';
 
 type Plan = 'pro' | 'business';
 
 export default function PurchasePage() {
-    const router = useRouter();
-    const [selectedPlan, setSelectedPlan] = React.useState<Plan | null>(null);
-    const [isPaid, setIsPaid] = React.useState(false);
+    const [isConfirmed, setIsConfirmed] = React.useState(false);
+    const [confirmedPlan, setConfirmedPlan] = React.useState<Plan | null>(null);
 
-    const form = useForm<z.infer<typeof formSchema>>({
-        resolver: zodResolver(formSchema),
-        defaultValues: {
-            name: '',
-            cardNumber: '',
-            expiry: '',
-            cvc: '',
-        },
-    });
-
-    const onSubmit = (values: z.infer<typeof formSchema>) => {
-        console.log('Payment details:', values);
-        setIsPaid(true);
-
-        setTimeout(() => {
-            router.push('/dashboard');
-        }, 3000);
+    const handleSelectPlan = (plan: Plan) => {
+        setConfirmedPlan(plan);
+        setIsConfirmed(true);
+        toast.success(`Congratulations! You've upgraded to the ${plan === 'pro' ? 'Pro' : 'Business'} plan.`);
     };
 
-    if (isPaid) {
+    if (isConfirmed) {
         return (
             <div className="container mx-auto max-w-2xl py-20 md:py-32 px-4 text-center animate-fade-in">
                  <Card className="shadow-lg">
@@ -53,19 +27,18 @@ export default function PurchasePage() {
                         <div className="mx-auto bg-green-100 dark:bg-green-900 rounded-full p-4 w-fit mb-4">
                             <CheckCircle className="w-16 h-16 text-green-600 dark:text-green-400" />
                         </div>
-                        <CardTitle className="text-3xl font-bold">Payment Successful!</CardTitle>
+                        <CardTitle className="text-3xl font-bold">Upgrade Successful!</CardTitle>
                         <CardDescription className='text-lg'>
-                            Congratulations on upgrading to the {selectedPlan === 'pro' ? 'Pro' : 'Business'} plan.
+                            You now have access to all features of the {confirmedPlan === 'pro' ? 'Pro' : 'Business'} plan.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">You now have full access to all features. You will be redirected to your dashboard shortly.</p>
+                        <p className="text-muted-foreground">Thank you for trying out our demo. Explore your new features on the dashboard!</p>
                     </CardContent>
                  </Card>
             </div>
         );
     }
-
 
   return (
     <div className="container mx-auto max-w-5xl py-20 md:py-32 px-4">
@@ -74,81 +47,53 @@ export default function PurchasePage() {
         <p className="text-lg text-muted-foreground mt-2">Unlock advanced features and take control of your security.</p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-8 items-start">
+       <Alert variant="default" className="mb-8 bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
+        <Info className="h-4 w-4" />
+        <AlertTitle>This is a Project Demo</AlertTitle>
+        <AlertDescription>
+          The payment gateway is not implemented. No payment will be processed and no card details are required. Selecting a plan will simulate a successful upgrade.
+        </AlertDescription>
+      </Alert>
+
+      <div className="grid md:grid-cols-2 gap-8 items-start max-w-4xl mx-auto">
         {/* Pro Plan */}
-        <Card className={`transition-all ${selectedPlan === 'pro' ? 'ring-2 ring-primary' : ''}`}>
+        <Card className="transition-all hover:ring-2 hover:ring-primary hover:-translate-y-1">
           <CardHeader>
-            <CardTitle className="text-2xl">Pro Plan</CardTitle>
+             <div className="flex items-center gap-4 mb-2">
+                <Star className="w-8 h-8 text-primary" />
+                <CardTitle className="text-2xl">Pro Plan</CardTitle>
+             </div>
             <CardDescription className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
           </CardHeader>
-          <CardContent>
-            {selectedPlan === 'pro' ? (
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField control={form.control} name="name" render={({ field }) => (
-                    <FormItem><FormLabel>Name on Card</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                  )} />
-                   <FormField control={form.control} name="cardNumber" render={({ field }) => (
-                    <FormItem><FormLabel>Card Number</FormLabel><FormControl><Input {...field} placeholder="•••• •••• •••• ••••" /></FormControl><FormMessage /></FormItem>
-                  )} />
-                  <div className="flex gap-4">
-                     <FormField control={form.control} name="expiry" render={({ field }) => (
-                        <FormItem className="w-1/2"><FormLabel>Expiry</FormLabel><FormControl><Input {...field} placeholder="MM/YY" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                     <FormField control={form.control} name="cvc" render={({ field }) => (
-                        <FormItem className="w-1/2"><FormLabel>CVC</FormLabel><FormControl><Input {...field} placeholder="•••" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                  </div>
-                  <Button type="submit" className="w-full"><CreditCard className='mr-2 w-4 h-4' /> Pay $49</Button>
-                </form>
-              </Form>
-            ) : (
-              <Button onClick={() => setSelectedPlan('pro')} className="w-full" size="lg">Select Pro</Button>
-            )}
+          <CardContent className='space-y-4'>
+            <ul className="space-y-2 text-muted-foreground">
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Advanced Scanning</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> AI Remediation</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Detailed PDF Reports</li>
+            </ul>
+             <Button onClick={() => handleSelectPlan('pro')} className="w-full" size="lg">Select Pro</Button>
           </CardContent>
         </Card>
 
         {/* Business Plan */}
-         <Card className={`transition-all ${selectedPlan === 'business' ? 'ring-2 ring-primary' : ''}`}>
+         <Card className="transition-all hover:ring-2 hover:ring-primary hover:-translate-y-1">
           <CardHeader>
-            <CardTitle className="text-2xl">Business Plan</CardTitle>
+            <div className="flex items-center gap-4 mb-2">
+                <Briefcase className="w-8 h-8 text-primary" />
+                <CardTitle className="text-2xl">Business Plan</CardTitle>
+            </div>
             <CardDescription className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
           </CardHeader>
-          <CardContent>
-            {selectedPlan === 'business' ? (
-                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField control={form.control} name="name" render={({ field }) => (
-                        <FormItem><FormLabel>Name on Card</FormLabel><FormControl><Input {...field} /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <FormField control={form.control} name="cardNumber" render={({ field }) => (
-                        <FormItem><FormLabel>Card Number</FormLabel><FormControl><Input {...field} placeholder="•••• •••• •••• ••••" /></FormControl><FormMessage /></FormItem>
-                    )} />
-                    <div className="flex gap-4">
-                        <FormField control={form.control} name="expiry" render={({ field }) => (
-                            <FormItem className="w-1/2"><FormLabel>Expiry</FormLabel><FormControl><Input {...field} placeholder="MM/YY" /></FormControl><FormMessage /></FormItem>
-                        )} />
-                        <FormField control={form.control} name="cvc" render={({ field }) => (
-                            <FormItem className="w-1/2"><FormLabel>CVC</FormLabel><FormControl><Input {...field} placeholder="•••" /></FormControl><FormMessage /></FormItem>
-                        )} />
-                    </div>
-                    <Button type="submit" className="w-full"><CreditCard className='mr-2 w-4 h-4' /> Pay $99</Button>
-                    </form>
-              </Form>
-            ) : (
-              <Button onClick={() => setSelectedPlan('business')} className="w-full" size="lg">Select Business</Button>
-            )}
+          <CardContent className='space-y-4'>
+             <ul className="space-y-2 text-muted-foreground">
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> All Pro Features</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Team Collaboration</li>
+                <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-primary" /> Priority Support</li>
+            </ul>
+            <Button onClick={() => handleSelectPlan('business')} className="w-full" size="lg">Select Business</Button>
           </CardContent>
         </Card>
       </div>
-
-       <Alert variant="default" className="mt-8 bg-muted">
-        <DollarSign className="h-4 w-4" />
-        <AlertTitle>Secure Payments</AlertTitle>
-        <AlertDescription>
-          All transactions are securely processed. This is a demo and no real payment will be made.
-        </AlertDescription>
-      </Alert>
     </div>
   );
 }
