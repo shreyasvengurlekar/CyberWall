@@ -89,7 +89,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95">
       <div className="container flex h-16 items-center">
         {/* Mobile Nav Trigger */}
         <Sheet>
