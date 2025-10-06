@@ -54,7 +54,7 @@ const scannerPrompt = ai.definePrompt({
         Scan focus: {{{scanType}}}
         
         Your task is to:
-        1.  Create a list of 2 to 4 plausible vulnerabilities that a site like this might have, relevant to the requested scan type. If the scan type is 'general', include a mix of common vulnerabilities (XSS, SQLi, Security Misconfiguration, etc.). If a specific scan type is requested (e.g., 'xss'), focus primarily on that. If no vulnerabilities are found for a specific scan type, the array should be empty.
+        1.  Create a list of 2 to 4 plausible vulnerabilities that a site like this might have, relevant to the requested scan type. If the scan type is 'general', include a mix of common vulnerabilities (XSS, SQLi, Security Misconfiguration, etc.). If no vulnerabilities are found for a specific scan type, the array should be empty.
         2.  For each vulnerability, provide:
             - A clear title.
             - An appropriate severity.
@@ -63,7 +63,7 @@ const scannerPrompt = ai.definePrompt({
         3.  Provide a concise, one-sentence summary of the site's security health based on your findings.
         4.  Calculate an overall security score from 0 to 100. A score of 100 means no issues found. Deduct points based on the severity and number of vulnerabilities (e.g., Critical: -40, High: -25, Medium: -15, Low: -5).
         
-        Produce the output in the required JSON format.
+        Produce the output in the required JSON format. If no vulnerabilities are found, the 'vulnerabilities' array should be empty.
     `,
 });
 
@@ -83,4 +83,5 @@ const scannerFlow = ai.defineFlow(
     return output;
   }
 );
+
 
