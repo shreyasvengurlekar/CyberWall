@@ -57,7 +57,7 @@ const testimonials = [
     name: 'Atrarv Walavalkar',
     role: 'Founder of Recircle',
     testimonial: 'As a startup, security is critical. This tool provided us with enterprise-level scanning at a fraction of the cost. The reports are incredibly detailed yet easy to understand.',
-    avatar: 'https://picsum.photos/seed/testimonial2/100/100',
+    avatar: 'https://source.unsplash.com/rpF3p_RrE9g/100x100',
     aiHint: 'male executive',
   },
   {
@@ -71,7 +71,7 @@ const testimonials = [
     name: 'Sakharam Sarmalkar',
     role: 'Freelance Web Developer',
     testimonial: 'The best part is how educational it is. It doesn\'t just find flaws, it teaches you how to fix them securely. An invaluable tool for any developer.',
-    avatar: 'https://images.unsplash.com/photo-1577975872533-57373f44558e?q=80&w=400&auto=format&fit=crop',
+    avatar: 'https://source.unsplash.com/n4KewLKFOZw/100x100',
     aiHint: 'male face',
   },
 ];
