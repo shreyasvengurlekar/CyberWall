@@ -101,6 +101,7 @@ export default function AboutPage() {
                         height={350}
                         className="rounded-lg shadow-xl"
                         data-ai-hint="technology journey"
+                        priority
                     />
                 </div>
             </div>
