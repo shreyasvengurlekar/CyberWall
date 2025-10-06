@@ -11,11 +11,12 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { ScanLine, ShieldCheck, AlertTriangle, Bot, CheckCircle, ArrowLeft, Download, Shield } from 'lucide-react';
+import { ScanLine, ShieldCheck, AlertTriangle, Bot, CheckCircle, ArrowLeft, Download, Shield, LogIn } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { performScan, type ScanResult } from '@/ai/flows/scanner-flow';
 import jsPDF from 'jspdf';
+import Link from 'next/link';
 
 
 const formSchema = z.object({
@@ -53,7 +54,7 @@ const scanningMessages = [
 
 
 function ScannerResults() {
-  const { user, profile } = useUser();
+  const { user } = useUser();
   const searchParams = useSearchParams();
   const router = useRouter();
   const vulnerabilityType = searchParams.get('vulnerability');
@@ -67,13 +68,30 @@ function ScannerResults() {
   const [scannedUrl, setScannedUrl] = React.useState('');
   const [scanResults, setScanResults] = React.useState<ScanResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
-  
-  const plan = user ? 'free' : 'guest';
-  const scansToday = profile?.scansToday || 0;
+  const [guestScans, setGuestScans] = React.useState(0);
 
-  const scanLimit = plan === 'guest' ? 2 : Infinity;
-  const canScan = plan === 'guest' ? scansToday < scanLimit : true;
+  const GUEST_SCAN_LIMIT = 2;
 
+  // Effect to load guest scan count from localStorage on mount
+  React.useEffect(() => {
+    if (!user) {
+        const storedScans = localStorage.getItem('guestScans');
+        const storedDate = localStorage.getItem('guestScansDate');
+        const today = new Date().toISOString().split('T')[0];
+        
+        if (storedDate === today && storedScans) {
+            setGuestScans(parseInt(storedScans, 10));
+        } else {
+            // Reset if it's a new day
+            localStorage.setItem('guestScans', '0');
+            localStorage.setItem('guestScansDate', today);
+            setGuestScans(0);
+        }
+    }
+  }, [user]);
+
+  const scansRemaining = user ? Infinity : GUEST_SCAN_LIMIT - guestScans;
+  const canScan = user ? true : guestScans < GUEST_SCAN_LIMIT;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -84,6 +102,12 @@ function ScannerResults() {
     if (!canScan) {
       alert('You have reached your daily scan limit. Please sign up for unlimited scans.');
       return;
+    }
+
+    if (!user) {
+        const newScanCount = guestScans + 1;
+        setGuestScans(newScanCount);
+        localStorage.setItem('guestScans', newScanCount.toString());
     }
 
     setScannedUrl(values.url);
@@ -266,10 +290,7 @@ function ScannerResults() {
 
     doc.save(`CyberWall-Report-${new URL(scannedUrl).hostname}.pdf`);
   };
-
   
-  const scansRemaining = scanLimit === Infinity ? 'unlimited' : scanLimit - scansToday;
-
   const pageTitle = vulnerabilityType 
     ? `Scan for ${vulnerabilityName}` 
     : 'Website Security Scanner';
@@ -297,7 +318,7 @@ function ScannerResults() {
                             {user ? (
                                 <b>You have unlimited scans.</b>
                             ) : (
-                                <b>You have {scansRemaining} scans remaining today. Sign up for unlimited scans.</b>
+                                <b>You have {scansRemaining} scans remaining today. <Link href="/signup" className="underline font-bold">Sign up</Link> for unlimited scans.</b>
                             )}
                         </AlertDescription>
                     </Alert>
@@ -322,7 +343,7 @@ function ScannerResults() {
                                     <Button type="submit" className="w-full text-lg" size="lg" disabled={!canScan}>
                                         <ScanLine className='mr-2 w-5 h-5'/> {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
                                     </Button>
-                                    <Button onClick={() => router.push('/services')} variant="ghost" className="w-full text-md hover:bg-transparent hover:text-muted-foreground" size="lg">
+                                    <Button onClick={() => router.push('/services')} variant="ghost" className="w-full text-md hover:bg-transparent hover:text-muted-foreground">
                                         <ArrowLeft className='mr-2 w-4 h-4'/> Back to Services
                                     </Button>
                                 </div>
@@ -346,7 +367,7 @@ function ScannerResults() {
                     <div className="relative w-24 h-24 mx-auto">
                         <Bot className="w-full h-full text-primary animate-pulse" />
                     </div>
-                    <p className="text-xl font-bold text-foreground">
+                    <p className="text-2xl font-bold text-foreground">
                         {Math.round(progress)}%
                     </p>
                     <p className="text-lg text-muted-foreground">Scanning <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
@@ -379,9 +400,31 @@ function ScannerResults() {
                                                 </div>
                                             </AccordionTrigger>
                                             <AccordionContent className='prose prose-sm max-w-none'>
-                                                <p>{vuln.description}</p>
-                                                <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
-                                                <p>{vuln.remediation}</p>
+                                                {user ? (
+                                                    <>
+                                                        <p>{vuln.description}</p>
+                                                        <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
+                                                        <p>{vuln.remediation}</p>
+                                                    </>
+                                                ) : (
+                                                    <Card className="my-4 bg-muted/50 p-6 text-center">
+                                                        <div className="flex justify-center items-center mb-4">
+                                                          <LogIn className="w-8 h-8 text-primary" />
+                                                        </div>
+                                                        <h3 className="text-lg font-bold">Log In for Full Details</h3>
+                                                        <p className="text-muted-foreground mb-4">
+                                                          Create a free account or log in to see the full vulnerability description and AI-powered remediation steps.
+                                                        </p>
+                                                        <div className="flex gap-4 justify-center">
+                                                            <Button asChild>
+                                                                <Link href={`/login?redirect=/scanner`}>Log In</Link>
+                                                            </Button>
+                                                            <Button asChild variant="outline">
+                                                                <Link href="/signup">Sign Up</Link>
+                                                            </Button>
+                                                        </div>
+                                                    </Card>
+                                                )}
                                             </AccordionContent>
                                         </AccordionItem>
                                     ))}
@@ -398,9 +441,11 @@ function ScannerResults() {
                             
                         </CardContent>
                         <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
-                           <Button onClick={downloadReport} variant="secondary">
-                                <Download className='w-4 h-4 mr-2'/> Download Report
-                            </Button>
+                           {user && (
+                                <Button onClick={downloadReport} variant="secondary">
+                                    <Download className='w-4 h-4 mr-2'/> Download Report
+                                </Button>
+                           )}
                             <div className="flex gap-2">
                                 <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
                             </div>
@@ -437,3 +482,5 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
+
+    
