@@ -105,7 +105,8 @@ export const generatePdf = (scannedUrl: string, scanResults: ScanResult) => {
             
             doc.setFontSize(11);
             doc.setFont('helvetica', 'normal');
-            const remLines = doc.splitTextToSize(vuln.remediation, usableWidth);
+            // Treat remediation as markdown list
+            const remLines = doc.splitTextToSize(vuln.remediation.replace(/(\d\.)/g, '\n  • $1'), usableWidth);
             checkAndAddPage(remLines.length * 5);
             doc.text(remLines, margin, y);
             y += remLines.length * 5 + 10;
