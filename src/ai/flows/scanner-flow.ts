@@ -12,7 +12,7 @@ import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
 
 // Define input schema
-export const ScanInputSchema = z.object({
+const ScanInputSchema = z.object({
   url: z.string().url().describe('The URL of the website to scan.'),
   scanType: z.string().describe('The type of scan to perform (e.g., general, xss, sql-injection).'),
 });
@@ -27,7 +27,7 @@ const VulnerabilitySchema = z.object({
 });
 
 // Define the overall output schema for the scan result
-export const ScanResultSchema = z.object({
+const ScanResultSchema = z.object({
     overallScore: z.number().int().min(0).max(100).describe('An overall security score from 0 to 100, where 100 is perfectly secure.'),
     summary: z.string().describe('A one or two-sentence summary of the security posture of the scanned URL.'),
     vulnerabilities: z.array(VulnerabilitySchema).describe('An array of all vulnerabilities found.'),
@@ -79,5 +79,3 @@ const scannerFlow = ai.defineFlow(
     return output;
   }
 );
-
-    
