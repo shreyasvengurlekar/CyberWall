@@ -54,14 +54,11 @@ export default function AboutPage() {
         <section className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
           <div className="relative">
             <Image
-              // 1. Right-click your LinkedIn profile picture and "Copy Image Address".
-              // 2. Paste the URL here to replace the placeholder.
-              src="https://picsum.photos/seed/portrait/200/200"
+              src="https://media.licdn.com/dms/image/v2/D5603AQGdJSecUkT31A/profile-displayphoto-scale_400_400/B56ZlvdjtsKAAg-/0/1758511645378?e=1762387200&v=beta&t=Lw7GquCyd_lkw2oPIFwNAD-u5PHHrE5_BmVc8uLNR30"
               alt="Shreyas Vengurlekar portrait"
               width={200}
               height={200}
               className="rounded-full shadow-2xl border-4 border-primary/50 transition-all duration-300 hover:shadow-primary/20 hover:scale-105"
-              data-ai-hint="male portrait"
             />
           </div>
           <div className="text-center md:text-left">
