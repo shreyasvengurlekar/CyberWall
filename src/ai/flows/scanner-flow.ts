@@ -23,7 +23,7 @@ const VulnerabilitySchema = z.object({
     title: z.string().describe('A brief, descriptive title for the vulnerability (e.g., "Cross-Site Scripting (XSS) in search bar").'),
     severity: z.enum(['Critical', 'High', 'Medium', 'Low', 'Informational']).describe('The severity level of the vulnerability.'),
     description: z.string().describe('A detailed but easy-to-understand explanation of the vulnerability, including the potential impact.'),
-    remediation: z.string().describe('Clear, actionable steps the developer should take to fix the vulnerability. Provide code examples where possible. MUST be a step-by-step markdown list.'),
+    remediation: z.string().describe('Clear, actionable steps the developer should take to fix the vulnerability. Provide code examples where possible. MUST be a step-by-step markdown numbered list.'),
 });
 
 // Define the overall output schema for the scan result
@@ -84,5 +84,4 @@ const scannerFlow = ai.defineFlow(
   }
 );
 
-
-
+    

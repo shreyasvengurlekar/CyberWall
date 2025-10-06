@@ -109,72 +109,60 @@ function ScannerResults() {
       return;
     }
 
-    if (!user) {
-        const newScanCount = guestScans + 1;
-        setGuestScans(newScanCount);
-        localStorage.setItem('guestScans', newScanCount.toString());
-    }
-
     setScannedUrl(values.url);
     setScanStatus('scanning');
     setError(null);
     setScanResults(null);
-    
-    // Simulate progress
     setProgress(0);
     setLoadingMessage(scanningMessages[0]);
-    
+
     const progressInterval = setInterval(() => {
-        setProgress(prev => {
-            if (prev >= 95) {
-                clearInterval(progressInterval);
-                return prev;
-            }
-            const increment = Math.random() * 10;
-            return Math.min(prev + increment, 95);
-        });
+        setProgress(prev => Math.min(prev + Math.random() * 10, 95));
     }, 400);
 
     const messageInterval = setInterval(() => {
-        setLoadingMessage(prevMessage => {
-            const currentIndex = scanningMessages.indexOf(prevMessage);
-            const nextIndex = (currentIndex + 1) % scanningMessages.length;
-            return scanningMessages[nextIndex];
-        });
+        setLoadingMessage(prev => scanningMessages[(scanningMessages.indexOf(prev) + 1) % scanningMessages.length]);
     }, 1500);
 
     try {
-        const results = await performScan({ 
-            url: values.url, 
-            scanType: vulnerabilityType || 'general' 
+        const results = await performScan({
+            url: values.url,
+            scanType: vulnerabilityType || 'general'
         });
+
+        if (!results) {
+            throw new Error("AI model did not return a valid result.");
+        }
+
         setScanResults(results);
-        setProgress(100);
         setScanStatus('complete');
-        
-        // If user is logged in, save scan to Firestore
+        setProgress(100);
+
         if (user && firestore) {
             const scansCollectionRef = collection(firestore, `users/${user.uid}/scans`);
             const scanData = {
                 url: values.url,
                 scanType: vulnerabilityType || 'general',
-                results: results,
+                results,
                 createdAt: serverTimestamp(),
             };
-            
-            // Non-blocking write with contextual error handling
+
             addDoc(scansCollectionRef, scanData).catch(async (err) => {
                 const contextualError = new FirestorePermissionError({
                     path: scansCollectionRef.path,
                     operation: 'create',
                     requestResourceData: scanData,
                 });
-                // Emit the error globally for the dev overlay
                 errorEmitter.emit('permission-error', contextualError);
-                // Also update local state to show a user-friendly message
                 setError('Failed to save scan results due to a permission issue.');
                 setScanStatus('error');
             });
+        }
+
+        if (!user) {
+            const newScanCount = guestScans + 1;
+            setGuestScans(newScanCount);
+            localStorage.setItem('guestScans', newScanCount.toString());
         }
 
     } catch (err) {
@@ -316,7 +304,7 @@ function ScannerResults() {
                                                     <>
                                                         <p>{vuln.description}</p>
                                                         <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
-                                                        <p>{vuln.remediation}</p>
+                                                        <div dangerouslySetInnerHTML={{ __html: vuln.remediation.replace(/\n/g, '<br />') }} />
                                                     </>
                                                 ) : (
                                                     <>
