@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { FileText, ScanLine, Settings, Shield } from 'lucide-react';
+import { FileText, ScanLine, Settings, Shield, Download, BarChart2 } from 'lucide-react';
 import * as React from 'react';
 import { useUser } from '@/firebase/auth/use-user';
 import { useRouter } from 'next/navigation';
@@ -14,7 +14,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useCollection } from '@/firebase/firestore/use-collection';
 import { useFirebase, useMemoFirebase } from '@/firebase/provider';
 import { collection, query, orderBy, limit } from 'firebase/firestore';
-import { ScanResult } from '@/ai/flows/scanner-flow';
+import type { ScanResult } from '@/ai/flows/scanner-flow';
+import { generatePdf } from '@/lib/pdf-generator';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 interface ScanDoc {
     id: string;
@@ -27,7 +30,7 @@ interface ScanDoc {
     scanType: string;
 }
 
-const getSeverityBadge = (score: number) => {
+const getSeverityBadgeVariant = (score: number) => {
   if (score < 40) return 'destructive';
   if (score < 70) return 'secondary';
   return 'default';
@@ -38,6 +41,13 @@ const getSeverityText = (score: number) => {
     if (score < 70) return 'High';
     if (score < 90) return 'Medium';
     return 'Low';
+}
+
+const chartConfig = {
+  score: {
+    label: "Score",
+    color: "hsl(var(--primary))",
+  },
 }
 
 export default function DashboardPage() {
@@ -52,12 +62,25 @@ export default function DashboardPage() {
     }, [user, firestore]);
 
     const { data: recentScans, isLoading: areScansLoading } = useCollection<ScanDoc>(scansQuery);
+    
+    const chartData = React.useMemo(() => {
+        if (!recentScans) return [];
+        return recentScans.slice().reverse().map(scan => ({
+            name: new Date(scan.createdAt.seconds * 1000).toLocaleDateString(),
+            score: scan.results.overallScore,
+            url: new URL(scan.url).hostname,
+        }));
+    }, [recentScans]);
 
     React.useEffect(() => {
         if (!isUserLoading && !user) {
             router.push('/login');
         }
     }, [user, isUserLoading, router]);
+
+    const handleDownloadReport = (scan: ScanDoc) => {
+        generatePdf(scan.url, scan.results);
+    };
     
     if (isUserLoading || !user || !profile) {
         return (
@@ -73,12 +96,13 @@ export default function DashboardPage() {
                            <Skeleton className="h-10 w-36" />
                         </div>
                     </div>
-                     <div className="grid md:grid-cols-3 gap-8">
-                        <div className="md:col-span-1 space-y-8">
+                     <div className="grid lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-1 space-y-8">
                             <Skeleton className="h-36 w-full" />
                             <Skeleton className="h-48 w-full" />
                         </div>
-                        <div className="md:col-span-2">
+                        <div className="lg:col-span-2 space-y-8">
+                            <Skeleton className="h-64 w-full" />
                             <Skeleton className="h-80 w-full" />
                         </div>
                     </div>
@@ -107,15 +131,15 @@ export default function DashboardPage() {
             </div>
 
             {/* Grid for cards */}
-            <div className="grid md:grid-cols-3 gap-8">
-                {/* Profile & Plan Section */}
-                <div className="md:col-span-1 space-y-8">
+            <div className="grid lg:grid-cols-3 gap-8">
+                {/* Left Column: Profile & Plan */}
+                <div className="lg:col-span-1 space-y-8">
                     {/* User Card */}
                     <Card>
                         <CardHeader className='flex-row items-center gap-4'>
                             <Avatar className="h-16 w-16">
                                 <AvatarImage src={user.photoURL || undefined} alt={user.displayName || ''} />
-                                <AvatarFallback>{user.displayName ? user.displayName.charAt(0) : 'U'}</AvatarFallback>
+                                <AvatarFallback>{user.displayName ? user.displayName.charAt(0).toUpperCase() : 'U'}</AvatarFallback>
                             </Avatar>
                             <div>
                                 <CardTitle>{user.displayName || 'User'}</CardTitle>
@@ -132,20 +156,41 @@ export default function DashboardPage() {
                     {/* Plan Details Card */}
                     <Card>
                         <CardHeader>
-                            <CardTitle className='flex items-center gap-2'><Shield /> Plan Details</CardTitle>
-                            <CardDescription>You are on the <span className='font-semibold text-primary'>Free</span> plan with unlimited scans.</CardDescription>
+                            <CardTitle className='flex items-center gap-2'><Shield /> Current Plan</CardTitle>
+                            <CardDescription>You are on the <span className='font-semibold text-primary'>Free</span> plan.</CardDescription>
                         </CardHeader>
                         <CardContent>
                             <div className='space-y-2'>
-                                <p className='text-sm font-medium'>Daily Scans: Unlimited</p>
+                                <p className='text-sm font-medium'>Unlimited Scans</p>
                                 <p className='text-sm text-muted-foreground'>You have full access to our scanning features.</p>
                             </div>
                         </CardContent>
                     </Card>
                 </div>
                 
-                {/* Recent Scans Section */}
-                <div className="md:col-span-2">
+                {/* Right Column: Chart & Scans */}
+                <div className="lg:col-span-2 space-y-8">
+                    {/* Analytics Chart */}
+                     {recentScans && recentScans.length > 0 && (
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-2"><BarChart2 /> Security Score Trend</CardTitle>
+                                <CardDescription>Overall security scores of your last 10 scans.</CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <ChartContainer config={chartConfig} className="w-full h-[250px]">
+                                    <BarChart accessibilityLayer data={chartData}>
+                                        <CartesianGrid vertical={false} />
+                                        <XAxis dataKey="name" tickLine={false} axisLine={false} tickMargin={8} tickFormatter={(value) => value.slice(0, 3)} />
+                                        <ChartTooltip content={<ChartTooltipContent />} />
+                                        <Bar dataKey="score" fill="var(--color-score)" radius={4} />
+                                    </BarChart>
+                                </ChartContainer>
+                            </CardContent>
+                        </Card>
+                     )}
+
+                     {/* Recent Scans Table */}
                      <Card>
                         <CardHeader>
                             <CardTitle className='flex items-center gap-2'><FileText /> Recent Scans</CardTitle>
@@ -154,29 +199,38 @@ export default function DashboardPage() {
                         <CardContent>
                             {areScansLoading && (
                                 <div className="space-y-4">
-                                    <Skeleton className="h-10 w-full" />
-                                    <Skeleton className="h-10 w-full" />
-                                    <Skeleton className="h-10 w-full" />
+                                    {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-12 w-full" />)}
                                 </div>
                             )}
                             {!areScansLoading && recentScans && recentScans.length > 0 ? (
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                        <TableHead>URL</TableHead>
-                                        <TableHead>Date</TableHead>
-                                        <TableHead className="text-center">Findings</TableHead>
-                                        <TableHead className="text-right">Risk Level</TableHead>
+                                            <TableHead className='w-2/5'>URL</TableHead>
+                                            <TableHead>Date</TableHead>
+                                            <TableHead className="text-center">Findings</TableHead>
+                                            <TableHead className="text-center">Risk</TableHead>
+                                            <TableHead className="text-right">Action</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                         {recentScans.map((scan) => (
-                                        <TableRow key={scan.id} className="cursor-pointer hover:bg-muted/50">
+                                        <TableRow key={scan.id} onClick={() => router.push(`/dashboard/scan/${scan.id}`)} className="cursor-pointer hover:bg-muted/50">
                                             <TableCell className="font-medium truncate max-w-xs">{scan.url}</TableCell>
                                             <TableCell>{new Date(scan.createdAt.seconds * 1000).toLocaleDateString()}</TableCell>
                                             <TableCell className="text-center">{scan.results.vulnerabilities.length}</TableCell>
+                                            <TableCell className="text-center">
+                                                <Badge variant={getSeverityBadgeVariant(scan.results.overallScore)}>{getSeverityText(scan.results.overallScore)}</Badge>
+                                            </TableCell>
                                             <TableCell className="text-right">
-                                                <Badge variant={getSeverityBadge(scan.results.overallScore)}>{getSeverityText(scan.results.overallScore)}</Badge>
+                                                <Button 
+                                                    variant="ghost" 
+                                                    size="icon" 
+                                                    onClick={(e) => { e.stopPropagation(); handleDownloadReport(scan); }}
+                                                    aria-label="Download report"
+                                                >
+                                                    <Download className="h-4 w-4" />
+                                                </Button>
                                             </TableCell>
                                         </TableRow>
                                         ))}
@@ -200,3 +254,5 @@ export default function DashboardPage() {
     </div>
   )
 }
+
+    
