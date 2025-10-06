@@ -55,7 +55,7 @@ const testimonials = [
   },
   {
     name: 'Atrarv Walavalkar',
-    role: 'Founder of Recircle',
+    role: <>Founder of <a href="https://recircleprofront-3547939-15cbf.web.app/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Recircle</a></>,
     testimonial: 'As a startup, security is critical. This tool provided us with enterprise-level scanning at a fraction of the cost. The reports are incredibly detailed yet easy to understand.',
     avatar: 'https://source.unsplash.com/rpF3p_RrE9g/100x100',
     aiHint: 'male executive',
@@ -369,5 +369,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
