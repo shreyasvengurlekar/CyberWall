@@ -196,31 +196,28 @@ function ScannerResults() {
                             )}
                             />
                             {vulnerabilityType ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Button onClick={() => router.push('/services')} variant="outline" className="w-full text-lg" size="lg">
-                                        <ArrowLeft className='mr-2 w-4 h-4'/> Back to Services
-                                    </Button>
+                                <div className="flex flex-col gap-4">
                                     <Button onClick={() => handleScan('targeted')} className="w-full text-lg" size="lg" disabled={!canScan}>
-                                        {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
+                                        <ScanLine className='mr-2 w-5 h-5'/> {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
+                                    </Button>
+                                    <Button onClick={() => router.push('/services')} variant="ghost" className="w-full text-md" size="lg">
+                                        <ArrowLeft className='mr-2 w-4 h-4'/> Back to Services
                                     </Button>
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <Button onClick={() => router.back()} className="w-full text-lg" size="lg" variant="outline">
                                         <ArrowLeft className='mr-2 w-4 h-4'/> Back
                                     </Button>
                                     <Button onClick={() => handleScan('quick')} className="w-full text-lg" size="lg" disabled={!canScan}>
                                         {canScan ? 'Quick Scan' : 'Limit Reached'}
                                     </Button>
-                                    <Button onClick={() => handleScan('full')} className="w-full text-lg" size="lg" variant="outline" disabled={!canScan}>
-                                        {canScan ? 'Full Scan' : 'Limit Reached'}
-                                    </Button>
                                 </div>
                             )}
                             {!vulnerabilityType && (
                                 <p className='text-center text-sm text-muted-foreground flex items-center justify-center gap-2'>
                                     <Clock className='w-4 h-4' />
-                                    Full scan is more comprehensive and will take longer.
+                                    The "Full Scan" option has been removed for a streamlined experience.
                                 </p>
                             )}
                         </form>
@@ -319,5 +316,3 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
-
-    
