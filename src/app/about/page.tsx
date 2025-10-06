@@ -157,7 +157,7 @@ export default function AboutPage() {
                         <CardTitle>Frontend</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">React, Next.js, TypeScript, Tailwind CSS, ShadCN/UI</p>
+                        <p className="text-muted-foreground">React, Next.js, TypeScript, Tailwind CSS</p>
                     </CardContent>
                 </Card>
                  <Card className="text-center hover:shadow-primary/10 hover:-translate-y-1 transition-all">
