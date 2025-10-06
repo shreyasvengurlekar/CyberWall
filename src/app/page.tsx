@@ -68,7 +68,7 @@ const testimonials = [
     aiHint: 'female analyst',
   },
    {
-    name: 'Sakharam Sarmalkar',
+    name: 'Shreyas Sarmalkar',
     role: 'Freelance Web Developer',
     testimonial: 'The best part is how educational it is. It doesn\'t just find flaws, it teaches you how to fix them securely. An invaluable tool for any developer.',
     avatar: 'https://images.unsplash.com/photo-1548544149-4835e62ee5b3?w=50&h=50&fit=crop',
