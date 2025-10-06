@@ -11,10 +11,10 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { ScanLine, ShieldCheck, ShieldAlert, AlertTriangle, Info, Bot, FileText, CheckCircle, ExternalLink, Clock, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
+import { ScanLine, ShieldCheck, AlertTriangle, Bot, CheckCircle, ArrowLeft, Download } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { performScan, type ScanResult } from '@/ai/flows/scanner-flow';
 
 
 const formSchema = z.object({
@@ -22,9 +22,8 @@ const formSchema = z.object({
 });
 
 type ScanStatus = 'idle' | 'scanning' | 'complete' | 'error';
-type ScanType = 'quick' | 'full' | 'targeted';
 
-const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low') => {
+const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational') => {
   switch (severity) {
     case 'Critical':
       return 'bg-red-500 text-white';
@@ -39,39 +38,9 @@ const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low') => {
   }
 };
 
-const mockVulnerabilities = [
-    {
-        title: 'Cross-Site Scripting (XSS)',
-        type: 'xss',
-        severity: 'High',
-        description: 'A potential reflected XSS vulnerability was found in a search parameter. Malicious scripts could be injected.',
-        remediation: 'Sanitize all user-provided input on the server-side before rendering it back to the page. Use libraries like DOMPurify on the client-side.'
-    },
-    {
-        title: 'Insecure Security Headers',
-        type: 'security-misconfiguration',
-        severity: 'Medium',
-        description: 'The Content-Security-Policy (CSP) header is missing, which can increase the risk of XSS attacks.',
-        remediation: 'Implement a strict Content-Security-Policy header to control which resources can be loaded by the browser.'
-    },
-    {
-        title: 'SQL Injection',
-        type: 'sql-injection',
-        severity: 'Critical',
-        description: 'A login form parameter appears to be vulnerable to SQL Injection, potentially allowing attackers to bypass authentication.',
-        remediation: 'Use parameterized queries (prepared statements) for all database interactions. Never concatenate user input directly into SQL queries.'
-    },
-    {
-        title: 'Outdated Component: jQuery 3.1.0',
-        type: 'known-vulnerabilities',
-        severity: 'Low',
-        description: 'The application uses an outdated version of jQuery which has known vulnerabilities.',
-        remediation: 'Update jQuery to the latest stable version to patch known security issues.'
-    }
-];
 
 function ScannerResults() {
-  const { user, profile, recordScan } = useUser();
+  const { user, profile } = useUser();
   const searchParams = useSearchParams();
   const router = useRouter();
   const vulnerabilityType = searchParams.get('vulnerability');
@@ -80,9 +49,10 @@ function ScannerResults() {
     : '';
 
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
-  const [scanType, setScanType] = React.useState<ScanType>('quick');
   const [progress, setProgress] = React.useState(0);
   const [scannedUrl, setScannedUrl] = React.useState('');
+  const [scanResults, setScanResults] = React.useState<ScanResult | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
   
   const plan = user ? 'free' : 'guest';
   const scansToday = profile?.scansToday || 0;
@@ -96,57 +66,84 @@ function ScannerResults() {
     defaultValues: { url: '' },
   });
 
-  const handleScan = (scanType: ScanType) => {
-    form.handleSubmit((values) => {
-        if (!canScan) {
-          alert('You have reached your daily scan limit. Please sign up for unlimited scans.');
-          return;
-        }
-        
-        setScannedUrl(values.url);
-        setScanStatus('scanning');
-        setScanType(scanType);
-        if(user) {
-          recordScan?.();
-        }
-        
-        const scanTime = scanType === 'quick' ? 2000 : 4000;
-        const intervalTime = scanTime / 20;
+  const handleScan = form.handleSubmit(async (values) => {
+    if (!canScan) {
+      alert('You have reached your daily scan limit. Please sign up for unlimited scans.');
+      return;
+    }
 
-        setProgress(0);
-        const interval = setInterval(() => {
-            setProgress(prev => {
-                if (prev >= 95) {
-                    clearInterval(interval);
-                    return prev;
-                }
-                return prev + 5;
-            });
-        }, intervalTime);
+    setScannedUrl(values.url);
+    setScanStatus('scanning');
+    setError(null);
+    setScanResults(null);
+    
+    // Simulate progress
+    setProgress(0);
+    const interval = setInterval(() => {
+        setProgress(prev => Math.min(prev + 10, 90));
+    }, 500);
 
-        setTimeout(() => {
-          setProgress(100);
-          setScanStatus('complete');
-          clearInterval(interval);
-        }, scanTime);
-    })();
-  };
+    try {
+        const results = await performScan({ 
+            url: values.url, 
+            scanType: vulnerabilityType || 'general' 
+        });
+        setScanResults(results);
+        setScanStatus('complete');
+    } catch (err) {
+        console.error(err);
+        setError('An unexpected error occurred during the scan. Please try again.');
+        setScanStatus('error');
+    } finally {
+        clearInterval(interval);
+        setProgress(100);
+    }
+  });
+
 
   const handleNewScan = () => {
     setScanStatus('idle');
     setProgress(0);
     setScannedUrl('');
+    setScanResults(null);
+    setError(null);
     form.reset();
   }
+
+  const downloadReport = () => {
+    if (!scanResults) return;
+
+    let reportContent = `CyberWall Security Scan Report\n`;
+    reportContent += `URL: ${scannedUrl}\n`;
+    reportContent += `Date: ${new Date().toISOString()}\n\n`;
+    reportContent += `Overall Score: ${scanResults.overallScore}/100\n`;
+    reportContent += `Summary: ${scanResults.summary}\n\n`;
+    reportContent += `--- Found Vulnerabilities ---\n\n`;
+
+    if (scanResults.vulnerabilities.length > 0) {
+        scanResults.vulnerabilities.forEach((vuln, index) => {
+            reportContent += `Vulnerability ${index + 1}: ${vuln.title}\n`;
+            reportContent += `Severity: ${vuln.severity}\n`;
+            reportContent += `Description: ${vuln.description}\n`;
+            reportContent += `Remediation: ${vuln.remediation}\n\n`;
+        });
+    } else {
+        reportContent += 'No vulnerabilities were found during this scan.\n';
+    }
+
+    const blob = new Blob([reportContent], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `CyberWall-Report-${new URL(scannedUrl).hostname}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+};
+
   
   const scansRemaining = scanLimit === Infinity ? 'unlimited' : scanLimit - scansToday;
-
-  const filteredVulnerabilities = React.useMemo(() => {
-    if (!vulnerabilityType) {
-      return mockVulnerabilities;
-    }
-    return mockVulnerabilities.filter(v => v.type === vulnerabilityType);
-  }, [vulnerabilityType]);
 
   const pageTitle = vulnerabilityType 
     ? `Scan for ${vulnerabilityName}` 
@@ -181,7 +178,7 @@ function ScannerResults() {
                     </Alert>
 
                     <Form {...form}>
-                        <form onSubmit={(e) => e.preventDefault()} className="space-y-6 mt-6">
+                        <form onSubmit={handleScan} className="space-y-6 mt-6">
                             <FormField
                             control={form.control}
                             name="url"
@@ -197,7 +194,7 @@ function ScannerResults() {
                             />
                             {vulnerabilityType ? (
                                 <div className="flex flex-col gap-4">
-                                    <Button onClick={() => handleScan('targeted')} className="w-full text-lg" size="lg" disabled={!canScan}>
+                                    <Button type="submit" className="w-full text-lg" size="lg" disabled={!canScan}>
                                         <ScanLine className='mr-2 w-5 h-5'/> {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}
                                     </Button>
                                     <Button onClick={() => router.push('/services')} variant="ghost" className="w-full text-md hover:bg-transparent hover:text-muted-foreground hover:scale-100" size="lg">
@@ -206,19 +203,13 @@ function ScannerResults() {
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <Button onClick={() => router.back()} className="w-full text-lg" size="lg" variant="outline">
+                                     <Button onClick={() => router.back()} className="w-full text-lg" size="lg" variant="outline">
                                         <ArrowLeft className='mr-2 w-4 h-4'/> Back
                                     </Button>
-                                    <Button onClick={() => handleScan('quick')} className="w-full text-lg" size="lg" disabled={!canScan}>
+                                    <Button type="submit" className="w-full text-lg" size="lg" disabled={!canScan}>
                                         {canScan ? 'Quick Scan' : 'Limit Reached'}
                                     </Button>
                                 </div>
-                            )}
-                            {!vulnerabilityType && (
-                                <p className='text-center text-sm text-muted-foreground flex items-center justify-center gap-2'>
-                                    <Clock className='w-4 h-4' />
-                                    The "Full Scan" option has been removed for a streamlined experience.
-                                </p>
                             )}
                         </form>
                     </Form>
@@ -227,16 +218,16 @@ function ScannerResults() {
 
             {scanStatus === 'scanning' && (
                 <div className="text-center animate-fade-in space-y-4">
-                    <p className="text-lg text-muted-foreground">Performing {scanType} scan on <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
+                    <p className="text-lg text-muted-foreground">Performing scan on <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
                     <Progress value={progress} className="w-full" />
-                    <p className="text-sm text-muted-foreground">This may take a moment. Please don't close this page.</p>
+                    <p className="text-sm text-muted-foreground">AI is analyzing the target. Please don't close this page.</p>
                      <div className="flex justify-center items-center text-primary pt-4">
                         <Bot className="w-16 h-16 animate-pulse" />
                     </div>
                 </div>
             )}
             
-            {scanStatus === 'complete' && (
+            {(scanStatus === 'complete' && scanResults) && (
                 <div className="animate-fade-in">
                     <Card>
                         <CardHeader>
@@ -249,13 +240,13 @@ function ScannerResults() {
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
-                             {filteredVulnerabilities.length > 0 ? (
+                             {scanResults.vulnerabilities.length > 0 ? (
                                 <Accordion type="single" collapsible className="w-full" defaultValue='item-0'>
-                                    {filteredVulnerabilities.map((vuln, index) => (
+                                    {scanResults.vulnerabilities.map((vuln, index) => (
                                         <AccordionItem value={`item-${index}`} key={index}>
                                             <AccordionTrigger>
                                                 <div className="flex items-center gap-4">
-                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadge(vuln.severity as any)}`}>{vuln.severity}</span>
+                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadge(vuln.severity)}`}>{vuln.severity}</span>
                                                     <span className="font-semibold">{vuln.title}</span>
                                                 </div>
                                             </AccordionTrigger>
@@ -270,36 +261,38 @@ function ScannerResults() {
                             ) : (
                                  <Alert variant="default" className='mt-6 bg-green-500/10 border-green-500/20'>
                                      <CheckCircle className="h-4 w-4 text-green-500" />
-                                     <AlertTitle>No {vulnerabilityName} Vulnerabilities Found!</AlertTitle>
+                                     <AlertTitle>No Vulnerabilities Found!</AlertTitle>
                                      <AlertDescription>
-                                        Our scan did not find any issues related to {vulnerabilityName.toLowerCase()} on this URL. You can start a new, general scan to check for other issues.
+                                        Our AI-powered scan did not find any critical issues on this URL. You can start a new scan to check again.
                                      </AlertDescription>
                                  </Alert>
                             )}
                             
                         </CardContent>
                         <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
-                            {!user && !canScan ? (
-                                <div className="w-full flex justify-center">
-                                    <Button asChild className='w-full max-w-xs'>
-                                        <Link href="/signup">Sign Up for Unlimited Scans</Link>
-                                    </Button>
-                                </div>
-                            ) : (
-                                <>
-                                    <p className='text-sm text-muted-foreground'>
-                                        {user ? 'You have unlimited scans.' : `You have ${scansRemaining} scans remaining.`}
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <Button onClick={handleNewScan} variant="outline">
-                                            <ArrowLeft className='w-4 h-4 mr-2'/> Back
-                                        </Button>
-                                        <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
-                                    </div>
-                                </>
-                            )}
+                           <Button onClick={downloadReport} variant="secondary">
+                                <Download className='w-4 h-4 mr-2'/> Download Report
+                            </Button>
+                            <div className="flex gap-2">
+                                <Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button>
+                            </div>
                         </CardFooter>
                     </Card>
+                </div>
+            )}
+
+            {scanStatus === 'error' && (
+                <div className="animate-fade-in text-center">
+                    <Alert variant="destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Scan Failed</AlertTitle>
+                        <AlertDescription>
+                            {error || 'An unknown error occurred. Please try again.'}
+                        </AlertDescription>
+                    </Alert>
+                    <Button onClick={handleNewScan} className="mt-4">
+                        <ScanLine className='w-4 h-4 mr-2'/> Try Again
+                    </Button>
                 </div>
             )}
             
@@ -316,3 +309,5 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
+
+    
