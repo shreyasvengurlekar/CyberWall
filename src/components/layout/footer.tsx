@@ -39,12 +39,12 @@ export function Footer() {
       <div className="container py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Column 1: Brand & Creator */}
-            <div className="md:col-span-1 flex flex-col gap-4 items-center md:items-start">
+            <div className="md:col-span-1 flex flex-col gap-4 items-start">
                  <Link href="/" className="flex items-center gap-2 group mb-2">
                     <Shield className="h-7 w-7 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
                     <span className="font-bold text-xl text-foreground">CyberWall</span>
                 </Link>
-                <p className="text-sm text-center md:text-left">
+                <p className="text-sm text-left">
                   Designed & Built by{' '}
                   <a
                     href="https://linkedin.com/in/shreyasvengurlekar"
@@ -58,7 +58,7 @@ export function Footer() {
                 </p>
             </div>
             {/* Column 2: Navigation */}
-            <div className="text-center md:text-left">
+            <div className="text-left">
                 <h4 className="font-semibold text-foreground mb-4">Navigation</h4>
                 <ul className="space-y-2">
                     <li><Link href="/#features" className="hover:text-primary transition-colors">Features</Link></li>
@@ -68,7 +68,7 @@ export function Footer() {
                 </ul>
             </div>
              {/* Column 3: Legal */}
-            <div className="text-center md:text-left">
+            <div className="text-left">
                 <h4 className="font-semibold text-foreground mb-4">Legal</h4>
                 <ul className="space-y-2">
                     <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
@@ -76,9 +76,9 @@ export function Footer() {
                 </ul>
             </div>
              {/* Column 4: Social */}
-            <div className="text-center md:text-left">
+            <div className="text-left">
                 <h4 className="font-semibold text-foreground mb-4">Social</h4>
-                <div className="flex items-center justify-center md:justify-start gap-4">
+                <div className="flex items-center justify-start gap-4">
                   {socialLinks.map((link) => (
                     <Link
                       key={link.href}
