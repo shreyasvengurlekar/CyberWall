@@ -54,11 +54,12 @@ export default function AboutPage() {
         <section className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
           <div className="relative">
             <Image
-              src="/shreyas_portrait.png"
+              src="https://picsum.photos/seed/portrait/200/200"
               alt="Shreyas Vengurlekar portrait"
               width={200}
               height={200}
               className="rounded-full shadow-2xl border-4 border-primary/50 transition-all duration-300 hover:shadow-primary/20 hover:scale-105"
+              data-ai-hint="male portrait"
             />
           </div>
           <div className="text-center md:text-left">
@@ -212,3 +213,5 @@ export default function AboutPage() {
     </div>
   );
 }
+
+    
