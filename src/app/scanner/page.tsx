@@ -294,7 +294,7 @@ function ScannerResults() {
                                     {scanResults.vulnerabilities.map((vuln, index) => (
                                         <AccordionItem value={`item-${index}`} key={index}>
                                             <AccordionTrigger>
-                                                <div className="flex items-center gap-4">
+                                                <div className="flex items-center gap-4 text-left">
                                                     <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadgeClass(vuln.severity)}`}>{vuln.severity}</span>
                                                     <span className="font-semibold">{vuln.title}</span>
                                                 </div>
@@ -304,7 +304,7 @@ function ScannerResults() {
                                                     <>
                                                         <p>{vuln.description}</p>
                                                         <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
-                                                        <div dangerouslySetInnerHTML={{ __html: vuln.remediation.replace(/\n/g, '<br />') }} />
+                                                        <p>{vuln.remediation}</p>
                                                     </>
                                                 ) : (
                                                     <>
