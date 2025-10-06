@@ -68,11 +68,11 @@ const testimonials = [
     aiHint: 'female analyst',
   },
    {
-    name: 'David L.',
+    name: 'Sakharam Sarmalkar',
     role: 'Freelance Web Developer',
     testimonial: 'The best part is how educational it is. It doesn\'t just find flaws, it teaches you how to fix them securely. An invaluable tool for any developer.',
-    avatar: 'https://picsum.photos/seed/testimonial4/100/100',
-    aiHint: 'male developer',
+    avatar: 'https://picsum.photos/seed/sarmalkar/100/100',
+    aiHint: 'male face',
   },
 ];
 
