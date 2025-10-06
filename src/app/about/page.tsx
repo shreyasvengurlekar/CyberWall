@@ -70,7 +70,15 @@ export default function AboutPage() {
             </p>
             <div className="mt-6 flex justify-center md:justify-start gap-4">
               <Button asChild>
-                <a href="/SHREYAS_VENGURLEKAR_Resume_linkedin.pdf" download="SHREYAS_VENGURLEKAR_Resume.pdf">
+                {/* 
+                  TODO: Replace this href with your public resume link (e.g., from Google Drive).
+                  See instructions: 
+                  1. Upload PDF to Google Drive.
+                  2. Right-click > Share > Share.
+                  3. Set General access to "Anyone with the link".
+                  4. Copy the link and paste it here.
+                */}
+                <a href="https://docs.google.com/document/d/1Bvi_v243-6-A3e_s-WTs_3f_6Y-jYJ4k/edit?usp=sharing&ouid=103980313010533303646&rtpof=true&sd=true" target="_blank" rel="noopener noreferrer">
                   <Download className="mr-2" /> Download Resume
                 </a>
               </Button>
