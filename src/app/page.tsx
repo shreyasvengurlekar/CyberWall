@@ -64,14 +64,14 @@ const testimonials = [
     name: 'Emily Chen',
     role: 'Cybersecurity Analyst',
     testimonial: 'I was impressed by the breadth of vulnerabilities it detected. It\'s now an essential part of our CI/CD pipeline for continuous security monitoring.',
-    avatar: 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=100&h=100&fit=crop',
+    avatar: 'https://source.unsplash.com/n4KewLKFOZw/100x100',
     aiHint: 'female analyst',
   },
    {
     name: 'Sakharam Sarmalkar',
     role: 'Freelance Web Developer',
     testimonial: 'The best part is how educational it is. It doesn\'t just find flaws, it teaches you how to fix them securely. An invaluable tool for any developer.',
-    avatar: 'https://source.unsplash.com/n4KewLKFOZw/100x100',
+    avatar: 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=100&h=100&fit=crop',
     aiHint: 'male face',
   },
 ];
