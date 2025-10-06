@@ -6,7 +6,7 @@ import { z } from 'zod';
 import * as React from 'react';
 import { useUser } from '@/firebase/auth/use-user';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { useAlert } from '@/context/alert-provider';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -43,6 +43,7 @@ const passwordSchema = z
 export default function SettingsPage() {
   const { user, profile, isUserLoading, updateDisplayName, updateUserPassword, deleteUserAccount } = useUser();
   const router = useRouter();
+  const { showAlert } = useAlert();
 
   const profileForm = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
@@ -69,41 +70,34 @@ export default function SettingsPage() {
   }, [user, profile, isUserLoading, router, profileForm]);
 
   const handleProfileUpdate = async (values: z.infer<typeof profileSchema>) => {
-    const promise = updateDisplayName(values.displayName);
-    toast.promise(promise, {
-      loading: 'Updating profile...',
-      success: 'Profile updated successfully!',
-      error: (err) => `Failed to update profile: ${err.message}`,
-    });
+    try {
+        await updateDisplayName(values.displayName);
+        showAlert({ title: 'Success', message: 'Profile updated successfully!' });
+    } catch (err: any) {
+        showAlert({ title: 'Error', message: `Failed to update profile: ${err.message}`, variant: 'destructive' });
+    }
   };
 
   const handlePasswordUpdate = async (values: z.infer<typeof passwordSchema>) => {
-    const promise = updateUserPassword(values.newPassword);
-    toast.promise(promise, {
-      loading: 'Updating password...',
-      success: 'Password updated successfully!',
-      error: (err) => `Failed to update password: ${err.message}`,
-    });
     try {
-        await promise;
+        await updateUserPassword(values.newPassword);
+        showAlert({ title: 'Success', message: 'Password updated successfully!' });
         passwordForm.reset();
-    } catch (error) {
-        // handled by toast
+    } catch (err: any) {
+        showAlert({ title: 'Error', message: `Failed to update password: ${err.message}`, variant: 'destructive' });
     }
   };
 
   const handleDeleteAccount = async () => {
-    const promise = deleteUserAccount();
-    toast.promise(promise, {
-        loading: 'Deleting account...',
-        success: 'Account deleted successfully. Redirecting...',
-        error: (err) => `Failed to delete account: ${err.message}`,
-    });
     try {
-        await promise;
-        router.push('/');
-    } catch (error) {
-        // handled by toast
+        await deleteUserAccount();
+        showAlert({ 
+            title: 'Account Deleted', 
+            message: 'Your account has been successfully deleted.', 
+            onConfirm: () => router.push('/') 
+        });
+    } catch (err: any) {
+        showAlert({ title: 'Error', message: `Failed to delete account: ${err.message}`, variant: 'destructive' });
     }
   };
 

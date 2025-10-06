@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useUser } from '@/firebase/auth/use-user';
 import * as React from 'react';
-import { toast } from 'sonner';
+import { useAlert } from '@/context/alert-provider';
 
 const formSchema = z
   .object({
@@ -33,6 +33,7 @@ const formSchema = z
 export default function SignupPage() {
   const router = useRouter();
   const { user, signUp } = useUser();
+  const { showAlert } = useAlert();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -49,24 +50,27 @@ export default function SignupPage() {
   }, [user, router]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const promise = signUp(values.email, values.password);
-
-    toast.promise(promise, {
-        loading: 'Creating account...',
-        success: () => {
-            form.reset();
-            return 'Account Created! Please check your email to verify your account.';
-        },
-        error: (error) => {
-             console.error(error.code, error.message);
-            if (error.code === 'auth/email-already-in-use') {
-                return 'This email is already in use. Please try another email or log in.';
-            } else if (error.code === 'auth/weak-password') {
-                return 'The password is too weak. Please choose a stronger password.';
-            }
-            return 'An unexpected error occurred. Please try again.';
+    try {
+        await signUp(values.email, values.password);
+        showAlert({
+            title: 'Account Created!',
+            message: 'Please check your email to verify your account before logging in.',
+        });
+        form.reset();
+    } catch (error: any) {
+        console.error(error.code, error.message);
+        let message = 'An unexpected error occurred. Please try again.';
+        if (error.code === 'auth/email-already-in-use') {
+            message = 'This email is already in use. Please try another email or log in.';
+        } else if (error.code === 'auth/weak-password') {
+            message = 'The password is too weak. Please choose a stronger password.';
         }
-    });
+        showAlert({
+            title: 'Signup Failed',
+            message,
+            variant: 'destructive',
+        });
+    }
   }
 
   return (

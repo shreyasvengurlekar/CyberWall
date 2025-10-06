@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { useUser } from '@/firebase/auth/use-user';
-import { toast } from 'sonner';
+import { useAlert } from '@/context/alert-provider';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,6 +21,7 @@ const formSchema = z.object({
 
 export default function ForgotPasswordPage() {
   const { sendPasswordReset } = useUser();
+  const { showAlert } = useAlert();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -30,18 +31,20 @@ export default function ForgotPasswordPage() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const promise = sendPasswordReset(values.email);
-    toast.promise(promise, {
-      loading: 'Sending reset link...',
-      success: `If an account exists for ${values.email}, a password reset link has been sent.`,
-      error: 'Failed to send reset email. Please try again.',
-    });
-
     try {
-        await promise;
+        await sendPasswordReset(values.email);
+        showAlert({
+            title: 'Reset Link Sent',
+            message: `If an account exists for ${values.email}, a password reset link has been sent.`,
+        });
         form.reset();
     } catch (error) {
         console.error(error);
+        showAlert({
+            title: 'Error',
+            message: 'Failed to send reset email. Please try again.',
+            variant: 'destructive',
+        });
     }
   }
 

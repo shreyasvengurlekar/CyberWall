@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useUser } from '@/firebase/auth/use-user';
-import { toast } from 'sonner';
+import { useAlert } from '@/context/alert-provider';
 
 
 const navLinks = [
@@ -76,16 +76,23 @@ const searchableTerms = [
 export function Header() {
   const { user, signOut } = useUser();
   const router = useRouter();
+  const { showAlert } = useAlert();
 
   const handleLogout = async () => {
-    toast.promise(signOut(), {
-        loading: 'Logging out...',
-        success: () => {
-            router.push('/');
-            return 'You have been logged out.';
-        },
-        error: 'Failed to log out. Please try again.',
-    });
+    try {
+        await signOut();
+        showAlert({
+            title: 'Logged Out',
+            message: 'You have been successfully logged out.',
+            onConfirm: () => router.push('/')
+        });
+    } catch (error) {
+        showAlert({
+            title: 'Error',
+            message: 'Failed to log out. Please try again.',
+            variant: 'destructive'
+        });
+    }
   }
 
   return (

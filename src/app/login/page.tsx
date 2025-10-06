@@ -13,7 +13,7 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { useUser } from '@/firebase/auth/use-user';
 import * as React from 'react';
-import { toast } from 'sonner';
+import { useAlert } from '@/context/alert-provider';
 
 const formSchema = z.object({
   email: z.string().email({
@@ -27,6 +27,7 @@ const formSchema = z.object({
 export default function LoginPage() {
   const router = useRouter();
   const { user, signIn } = useUser();
+  const { showAlert } = useAlert();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,34 +44,32 @@ export default function LoginPage() {
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const promise = signIn(values.email, values.password);
-
-    toast.promise(promise, {
-        loading: 'Logging in...',
-        success: (user) => {
-            router.push('/dashboard');
-            return 'Login Successful! Redirecting to dashboard...';
-        },
-        error: (error) => {
-            console.error(error);
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-                return 'Invalid email or password. Please try again.';
-            } else if (error.code === 'auth/user-disabled') {
-                return 'This account has been disabled.';
-            } else if (error.code === 'auth/too-many-requests') {
-                return 'Too many login attempts. Please try again later.';
-            } else if (error.code === 'auth/email-not-verified' || (error.message && error.message.includes('auth/email-not-verified'))) {
-                return 'Please verify your email before logging in. Check your inbox for a verification link.';
-            }
-            return 'An unexpected error occurred. Please try again.';
-        }
-    });
-
     try {
-        await promise;
+        await signIn(values.email, values.password);
+        showAlert({
+            title: 'Login Successful!',
+            message: 'Redirecting to your dashboard...',
+            onConfirm: () => router.push('/dashboard'),
+        });
         form.reset();
-    } catch (error) {
-        // Errors are handled by the toast.promise, so we just catch to prevent unhandled promise rejections
+    } catch (error: any) {
+        console.error(error);
+        let message = 'An unexpected error occurred. Please try again.';
+        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+            message = 'Invalid email or password. Please try again.';
+        } else if (error.code === 'auth/user-disabled') {
+            message = 'This account has been disabled.';
+        } else if (error.code === 'auth/too-many-requests') {
+            message = 'Too many login attempts. Please try again later.';
+        } else if (error.code === 'auth/email-not-verified' || (error.message && error.message.includes('auth/email-not-verified'))) {
+            message = 'Please verify your email before logging in. Check your inbox for a verification link.';
+        }
+        
+        showAlert({
+            title: 'Login Failed',
+            message,
+            variant: 'destructive',
+        });
     }
   }
 
