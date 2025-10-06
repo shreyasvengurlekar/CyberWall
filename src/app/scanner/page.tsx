@@ -407,23 +407,26 @@ function ScannerResults() {
                                                         <p>{vuln.remediation}</p>
                                                     </>
                                                 ) : (
-                                                    <Card className="my-4 bg-muted/50 p-6 text-center">
-                                                        <div className="flex justify-center items-center mb-4">
-                                                          <LogIn className="w-8 h-8 text-primary" />
-                                                        </div>
-                                                        <h3 className="text-lg font-bold">Log In for Full Details</h3>
-                                                        <p className="text-muted-foreground mb-4">
-                                                          Create a free account or log in to see the full vulnerability description and AI-powered remediation steps.
-                                                        </p>
-                                                        <div className="flex gap-4 justify-center">
-                                                            <Button asChild>
-                                                                <Link href={`/login?redirect=/scanner`}>Log In</Link>
-                                                            </Button>
-                                                            <Button asChild variant="outline">
-                                                                <Link href="/signup">Sign Up</Link>
-                                                            </Button>
-                                                        </div>
-                                                    </Card>
+                                                    <>
+                                                        <p>{vuln.description.split('.')[0] + '.'}</p>
+                                                        <Card className="my-4 bg-muted/50 p-6 text-center">
+                                                            <div className="flex justify-center items-center mb-4">
+                                                              <LogIn className="w-8 h-8 text-primary" />
+                                                            </div>
+                                                            <h3 className="text-lg font-bold">Log In for Full Details</h3>
+                                                            <p className="text-muted-foreground mb-4">
+                                                              Create a free account or log in to see the full vulnerability description and AI-powered remediation steps.
+                                                            </p>
+                                                            <div className="flex gap-4 justify-center">
+                                                                <Button asChild>
+                                                                    <Link href={`/login?redirect=/scanner`}>Log In</Link>
+                                                                </Button>
+                                                                <Button asChild variant="outline">
+                                                                    <Link href="/signup">Sign Up</Link>
+                                                                </Button>
+                                                            </div>
+                                                        </Card>
+                                                    </>
                                                 )}
                                             </AccordionContent>
                                         </AccordionItem>
