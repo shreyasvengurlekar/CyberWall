@@ -50,28 +50,28 @@ const testimonials = [
     name: 'Sarah J.',
     role: 'Lead Developer',
     testimonial: 'CyberWall Scanner transformed our security workflow. The AI remediation advice is a game-changer and has saved us countless hours. Highly recommended!',
-    avatar: 'https://images.unsplash.com/photo-1621012649112-d1724740b0da?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTF8fGh1bWFuJTIwZmFjZXxlbnwwfHwwfHx8MA%3D%3D',
+    avatar: 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=100&h=100&fit=crop',
     aiHint: 'female developer',
   },
   {
     name: 'Atrarv Walavalkar',
     role: <>Founder of <a href="https://recircleprofront-3547939-15cbf.web.app/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Recircle</a></>,
     testimonial: 'As a startup, security is critical. This tool provided us with enterprise-level scanning at a fraction of the cost. The reports are incredibly detailed yet easy to understand.',
-    avatar: 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=100&h=100&fit=crop',
+    avatar: 'https://source.unsplash.com/rpF3p_RrE9g/100x100',
     aiHint: 'male executive',
   },
   {
     name: 'Emily Chen',
     role: 'Cybersecurity Analyst',
     testimonial: 'I was impressed by the breadth of vulnerabilities it detected. It\'s now an essential part of our CI/CD pipeline for continuous security monitoring.',
-    avatar: 'https://plus.unsplash.com/premium_photo-1664203068145-b1d7d1680f6c?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8aHVtYW4lMjBmYWNlfGVufDB8fDB8fHww',
+    avatar: 'https://images.unsplash.com/photo-1548544149-4835e62ee5b3?w=100&h=100&fit=crop',
     aiHint: 'female analyst',
   },
    {
     name: 'Sakharam Sarmalkar',
     role: 'Freelance Web Developer',
     testimonial: 'The best part is how educational it is. It doesn\'t just find flaws, it teaches you how to fix them securely. An invaluable tool for any developer.',
-    avatar: 'https://images.unsplash.com/photo-1548544149-4835e62ee5b3?w=100&h=100&fit=crop',
+    avatar: 'https://plus.unsplash.com/premium_photo-1664203068145-b1d7d1680f6c?w=100&h=100&fit=crop',
     aiHint: 'male face',
   },
 ];
@@ -213,8 +213,8 @@ export default function Home() {
                                         <Image 
                                             src={testimonial.avatar}
                                             alt={testimonial.name}
-                                            width={50}
-                                            height={50}
+                                            width={100}
+                                            height={100}
                                             className="rounded-full"
                                             data-ai-hint={testimonial.aiHint}
                                         />
