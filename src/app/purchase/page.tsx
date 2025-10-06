@@ -3,8 +3,7 @@
 import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Info, Star, Briefcase, Construction, ArrowLeft } from 'lucide-react';
+import { CheckCircle, Star, Briefcase, Construction, ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 type Plan = 'pro' | 'business';
@@ -43,18 +42,15 @@ export default function PurchasePage() {
 
   return (
     <div className="container mx-auto max-w-5xl py-20 md:py-32 px-4">
+      <div className='mb-8'>
+        <Button onClick={() => router.back()} variant="outline">
+            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+        </Button>
+      </div>
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold tracking-tight">Choose Your Plan</h1>
         <p className="text-lg text-muted-foreground mt-2">Unlock advanced features and take control of your security.</p>
       </div>
-
-       <Alert variant="default" className="mb-8 bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-950 dark:text-blue-300">
-        <Info className="h-4 w-4" />
-        <AlertTitle>This is a Project Demo</AlertTitle>
-        <AlertDescription>
-          The payment gateway is not implemented. No payment will be processed and no card details are required. Selecting a plan will show a notice about future implementation.
-        </AlertDescription>
-      </Alert>
 
       <div className="grid md:grid-cols-2 gap-8 items-start max-w-4xl mx-auto">
         {/* Pro Plan */}
