@@ -4,36 +4,37 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { CheckCircle, Info, Star, Briefcase } from 'lucide-react';
-import { toast } from 'sonner';
+import { CheckCircle, Info, Star, Briefcase, Construction, ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 type Plan = 'pro' | 'business';
 
 export default function PurchasePage() {
-    const [isConfirmed, setIsConfirmed] = React.useState(false);
-    const [confirmedPlan, setConfirmedPlan] = React.useState<Plan | null>(null);
+    const [isDevelopmentNotice, setIsDevelopmentNotice] = React.useState(false);
+    const router = useRouter();
 
     const handleSelectPlan = (plan: Plan) => {
-        setConfirmedPlan(plan);
-        setIsConfirmed(true);
-        toast.success(`Congratulations! You've upgraded to the ${plan === 'pro' ? 'Pro' : 'Business'} plan.`);
+        setIsDevelopmentNotice(true);
     };
 
-    if (isConfirmed) {
+    if (isDevelopmentNotice) {
         return (
             <div className="container mx-auto max-w-2xl py-20 md:py-32 px-4 text-center animate-fade-in">
                  <Card className="shadow-lg">
                     <CardHeader>
-                        <div className="mx-auto bg-green-100 dark:bg-green-900 rounded-full p-4 w-fit mb-4">
-                            <CheckCircle className="w-16 h-16 text-green-600 dark:text-green-400" />
+                        <div className="mx-auto bg-yellow-100 dark:bg-yellow-900 rounded-full p-4 w-fit mb-4">
+                            <Construction className="w-16 h-16 text-yellow-600 dark:text-yellow-400" />
                         </div>
-                        <CardTitle className="text-3xl font-bold">Upgrade Successful!</CardTitle>
+                        <CardTitle className="text-3xl font-bold">Payment Gateway Under Development</CardTitle>
                         <CardDescription className='text-lg'>
-                            You now have access to all features of the {confirmedPlan === 'pro' ? 'Pro' : 'Business'} plan.
+                            We are working hard to bring you a seamless payment experience.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">Thank you for trying out our demo. Explore your new features on the dashboard!</p>
+                        <p className="text-muted-foreground">This feature will be available in a future update. Thank you for your patience!</p>
+                        <Button onClick={() => router.back()} className="mt-6">
+                            <ArrowLeft className="mr-2 h-4 w-4" /> Go Back
+                        </Button>
                     </CardContent>
                  </Card>
             </div>
@@ -51,7 +52,7 @@ export default function PurchasePage() {
         <Info className="h-4 w-4" />
         <AlertTitle>This is a Project Demo</AlertTitle>
         <AlertDescription>
-          The payment gateway is not implemented. No payment will be processed and no card details are required. Selecting a plan will simulate a successful upgrade.
+          The payment gateway is not implemented. No payment will be processed and no card details are required. Selecting a plan will show a notice about future implementation.
         </AlertDescription>
       </Alert>
 
