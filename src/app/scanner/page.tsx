@@ -39,6 +39,18 @@ const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'In
   }
 };
 
+const scanningMessages = [
+    'Initializing scan engine...',
+    'Mapping website structure...',
+    'Probing for open ports and services...',
+    'Analyzing entry points for SQL injection...',
+    'Testing for Cross-Site Scripting (XSS)...',
+    'Checking for security misconfigurations...',
+    'Scanning dependencies for known vulnerabilities...',
+    'Compiling report with AI-powered remediation...',
+    'Finalizing analysis...',
+];
+
 
 function ScannerResults() {
   const { user, profile } = useUser();
@@ -51,6 +63,7 @@ function ScannerResults() {
 
   const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
   const [progress, setProgress] = React.useState(0);
+  const [loadingMessage, setLoadingMessage] = React.useState(scanningMessages[0]);
   const [scannedUrl, setScannedUrl] = React.useState('');
   const [scanResults, setScanResults] = React.useState<ScanResult | null>(null);
   const [error, setError] = React.useState<string | null>(null);
@@ -80,9 +93,26 @@ function ScannerResults() {
     
     // Simulate progress
     setProgress(0);
-    const interval = setInterval(() => {
-        setProgress(prev => Math.min(prev + 10, 90));
-    }, 500);
+    setLoadingMessage(scanningMessages[0]);
+    
+    const progressInterval = setInterval(() => {
+        setProgress(prev => {
+            if (prev >= 95) {
+                clearInterval(progressInterval);
+                return prev;
+            }
+            const increment = Math.random() * 10;
+            return Math.min(prev + increment, 95);
+        });
+    }, 400);
+
+    const messageInterval = setInterval(() => {
+        setLoadingMessage(prevMessage => {
+            const currentIndex = scanningMessages.indexOf(prevMessage);
+            const nextIndex = (currentIndex + 1) % scanningMessages.length;
+            return scanningMessages[nextIndex];
+        });
+    }, 1500);
 
     try {
         const results = await performScan({ 
@@ -90,13 +120,15 @@ function ScannerResults() {
             scanType: vulnerabilityType || 'general' 
         });
         setScanResults(results);
+        setProgress(100);
         setScanStatus('complete');
     } catch (err) {
         console.error(err);
         setError('An unexpected error occurred during the scan. Please try again.');
         setScanStatus('error');
     } finally {
-        clearInterval(interval);
+        clearInterval(progressInterval);
+        clearInterval(messageInterval);
         setProgress(100);
     }
   });
@@ -310,13 +342,16 @@ function ScannerResults() {
             )}
 
             {scanStatus === 'scanning' && (
-                <div className="text-center animate-fade-in space-y-4">
-                    <p className="text-lg text-muted-foreground">Performing scan on <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
-                    <Progress value={progress} className="w-full" />
-                    <p className="text-sm text-muted-foreground">AI is analyzing the target. Please don't close this page.</p>
-                     <div className="flex justify-center items-center text-primary pt-4">
-                        <Bot className="w-16 h-16 animate-pulse" />
+                <div className="text-center animate-fade-in space-y-4 pt-4 pb-8">
+                    <div className="relative w-24 h-24 mx-auto">
+                        <Bot className="w-full h-full text-primary animate-pulse" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <p className="text-xl font-bold text-primary-foreground">{Math.round(progress)}%</p>
+                        </div>
                     </div>
+                    <p className="text-lg text-muted-foreground">Scanning <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
+                    <Progress value={progress} className="w-full" />
+                    <p className="text-sm text-muted-foreground h-5">{loadingMessage}</p>
                 </div>
             )}
             
