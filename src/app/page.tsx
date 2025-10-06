@@ -2,7 +2,7 @@
 'use client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Check, ScanLine, Shield, WandSparkles, UserPlus, FileText, Star, Quote, Mail, DollarSign, Info } from 'lucide-react';
+import { Check, ScanLine, Shield, WandSparkles, UserPlus, FileText, Star, Quote, Mail, Info } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import * as React from 'react';
@@ -251,7 +251,7 @@ export default function Home() {
                 <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Free</h3>
-                    <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">₹0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
@@ -268,7 +268,7 @@ export default function Home() {
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 text-sm font-semibold" style={{clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)'}}>Popular</div>
                     <CardHeader className="pt-12">
                     <h3 className="text-2xl font-semibold">Pro</h3>
-                    <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">₹4,000<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
@@ -285,7 +285,7 @@ export default function Home() {
                  <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Business</h3>
-                    <p className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">₹8,000<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
@@ -326,7 +326,7 @@ export default function Home() {
                   </Card>
                   <Card className="flex flex-col items-center text-center p-6 hover:shadow-primary/10 hover:-translate-y-1 transition-all">
                     <div className="p-3 bg-primary/10 rounded-full mb-4">
-                      <DollarSign className="w-8 h-8 text-primary"/>
+                      <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-indian-rupee text-primary"><path d="M6 3h12"/><path d="M6 8h12"/><path d="m12 17-6-6"/><path d="M6 17h12"/></svg>
                     </div>
                     <h3 className="text-xl font-semibold mb-1">Sales</h3>
                     <a href="mailto:sales@cyberwall.com" className="text-primary hover:underline">sales@cyberwall.com</a>

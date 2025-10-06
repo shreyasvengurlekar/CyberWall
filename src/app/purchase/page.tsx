@@ -63,7 +63,7 @@ export default function PurchasePage() {
                 <Star className="w-8 h-8 text-primary" />
                 <CardTitle className="text-2xl">Pro Plan</CardTitle>
              </div>
-            <CardDescription className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
+            <CardDescription className="text-4xl font-bold">₹4,000<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
             <ul className="space-y-2 text-muted-foreground">
@@ -82,7 +82,7 @@ export default function PurchasePage() {
                 <Briefcase className="w-8 h-8 text-primary" />
                 <CardTitle className="text-2xl">Business Plan</CardTitle>
             </div>
-            <CardDescription className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
+            <CardDescription className="text-4xl font-bold">₹8,000<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
           </CardHeader>
           <CardContent className='space-y-4'>
              <ul className="space-y-2 text-muted-foreground">
