@@ -35,7 +35,7 @@ export default function TermsOfServicePage() {
 
           <h2 className="text-2xl font-bold">5. Contact Us</h2>
           <p>
-            If you have any questions about these Terms, please contact us at: <a href="mailto:terms@cyberwall.com" className="text-primary hover:underline">terms@cyberwall.com</a>
+            If you have any questions about these Terms, please contact us at: <a href="mailto:shreyasvengurlekar2004@gmail.com" className="text-primary hover:underline">terms@cyberwall.com</a>
           </p>
         </div>
       </div>
