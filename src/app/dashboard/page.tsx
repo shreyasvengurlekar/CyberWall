@@ -17,6 +17,7 @@ import { collection, query, orderBy, limit } from 'firebase/firestore';
 import { ScanResult } from '@/ai/flows/scanner-flow';
 
 interface ScanDoc {
+    id: string;
     url: string;
     createdAt: {
         seconds: number;
@@ -59,7 +60,7 @@ export default function DashboardPage() {
         }
     }, [user, isUserLoading, router]);
     
-    if (isUserLoading || !user || !profile || areScansLoading) {
+    if (isUserLoading || !user || !profile) {
         return (
             <div className="container mx-auto py-10 px-4 md:px-6">
                 <div className="grid gap-8">
@@ -150,7 +151,14 @@ export default function DashboardPage() {
                             <CardDescription>A summary of your most recent security scans.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                            {recentScans && recentScans.length > 0 ? (
+                            {areScansLoading && (
+                                <div className="space-y-4">
+                                    <Skeleton className="h-10 w-full" />
+                                    <Skeleton className="h-10 w-full" />
+                                    <Skeleton className="h-10 w-full" />
+                                </div>
+                            )}
+                            {!areScansLoading && recentScans && recentScans.length > 0 ? (
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
@@ -174,12 +182,14 @@ export default function DashboardPage() {
                                     </TableBody>
                                 </Table>
                             ) : (
-                                <div className='text-center py-10'>
-                                    <p className='text-muted-foreground'>You haven't performed any scans yet.</p>
-                                    <Button asChild className='mt-4'>
-                                        <Link href="/scanner">Start Your First Scan</Link>
-                                    </Button>
-                                </div>
+                                !areScansLoading && (
+                                    <div className='text-center py-10'>
+                                        <p className='text-muted-foreground'>You haven't performed any scans yet.</p>
+                                        <Button asChild className='mt-4'>
+                                            <Link href="/scanner">Start Your First Scan</Link>
+                                        </Button>
+                                    </div>
+                                )
                             )}
                         </CardContent>
                     </Card>
