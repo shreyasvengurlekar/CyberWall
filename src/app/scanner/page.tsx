@@ -385,5 +385,3 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
-
-    

@@ -83,5 +83,3 @@ const scannerFlow = ai.defineFlow(
     return output;
   }
 );
-
-    
