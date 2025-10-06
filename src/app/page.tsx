@@ -64,7 +64,7 @@ const testimonials = [
     name: 'Emily Chen',
     role: 'Cybersecurity Analyst',
     testimonial: 'I was impressed by the breadth of vulnerabilities it detected. It\'s now an essential part of our CI/CD pipeline for continuous security monitoring.',
-    avatar: 'https://picsum.photos/seed/testimonial3/100/100',
+    avatar: 'https://images.unsplash.com/photo-1542909168-82c3e7fdca5c?w=100&h=100&fit=crop',
     aiHint: 'female analyst',
   },
    {
