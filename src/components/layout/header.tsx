@@ -109,7 +109,7 @@ export function Header() {
                     ))}
                     <div className="mt-4 flex flex-col gap-2">
                       <SheetClose asChild>
-                          <Button asChild variant="outline">
+                          <Button asChild>
                             <Link href="/scanner">Scan Now</Link>
                           </Button>
                       </SheetClose>
@@ -179,7 +179,7 @@ export function Header() {
           <SearchFlyout />
           <ThemeToggle />
           <div className='hidden md:flex items-center gap-2'>
-            <Button asChild variant="outline">
+            <Button asChild variant="default">
               <Link href="/scanner">Scan Now</Link>
             </Button>
             {user ? (
