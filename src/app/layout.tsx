@@ -26,16 +26,16 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-body antialiased`}>
         <Providers>
-            <div className="flex flex-col min-h-screen">
-              <Header />
-              <main className="flex-1">
-                  <React.Suspense fallback={<PageLoader />}>
-                  {children}
-                  </React.Suspense>
-              </main>
-              <Footer />
-            </div>
-            <Toaster />
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-1">
+                <React.Suspense fallback={<PageLoader />}>
+                {children}
+                </React.Suspense>
+            </main>
+            <Footer />
+          </div>
+          <Toaster />
         </Providers>
       </body>
     </html>
