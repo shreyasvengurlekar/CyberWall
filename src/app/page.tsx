@@ -50,7 +50,7 @@ const testimonials = [
     name: 'Sarah J.',
     role: 'Lead Developer',
     testimonial: 'CyberWall Scanner transformed our security workflow. The AI remediation advice is a game-changer and has saved us countless hours. Highly recommended!',
-    avatar: 'https://picsum.photos/seed/testimonial1/100/100',
+    avatar: 'https://images.unsplash.com/photo-1548544149-4835e62ee5b3?w=100&h=100&fit=crop',
     aiHint: 'female developer',
   },
   {
