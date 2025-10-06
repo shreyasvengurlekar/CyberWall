@@ -17,6 +17,8 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { performScan, type ScanResult } from '@/ai/flows/scanner-flow';
 import jsPDF from 'jspdf';
 import Link from 'next/link';
+import { useFirebase } from '@/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 
 
 const formSchema = z.object({
@@ -55,6 +57,7 @@ const scanningMessages = [
 
 function ScannerResults() {
   const { user } = useUser();
+  const { firestore } = useFirebase();
   const searchParams = useSearchParams();
   const router = useRouter();
   const vulnerabilityType = searchParams.get('vulnerability');
@@ -146,6 +149,18 @@ function ScannerResults() {
         setScanResults(results);
         setProgress(100);
         setScanStatus('complete');
+        
+        // If user is logged in, save scan to Firestore
+        if (user && firestore) {
+            const scansCollectionRef = collection(firestore, `users/${user.uid}/scans`);
+            await addDoc(scansCollectionRef, {
+                url: values.url,
+                scanType: vulnerabilityType || 'general',
+                results: results,
+                createdAt: serverTimestamp(),
+            });
+        }
+
     } catch (err) {
         console.error(err);
         setError('An unexpected error occurred during the scan. Please try again.');
