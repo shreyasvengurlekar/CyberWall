@@ -30,7 +30,6 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Features' },
   { href: '/services', label: 'Services' },
-  { href: '/scanner', label: 'Scan Now' },
   { href: '/#pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
 ];
@@ -109,6 +108,11 @@ export function Header() {
                     </SheetClose>
                     ))}
                     <div className="mt-4 flex flex-col gap-2">
+                      <SheetClose asChild>
+                          <Button asChild variant="outline">
+                            <Link href="/scanner">Scan Now</Link>
+                          </Button>
+                      </SheetClose>
                       {user ? (
                         <>
                           <SheetClose asChild>
@@ -175,6 +179,9 @@ export function Header() {
           <SearchFlyout />
           <ThemeToggle />
           <div className='hidden md:flex items-center gap-2'>
+            <Button asChild variant="outline">
+              <Link href="/scanner">Scan Now</Link>
+            </Button>
             {user ? (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
