@@ -67,6 +67,8 @@ const searchableTerms = [
   { term: 'Terms of Service', path: '/terms'},
   { term: 'Scanner', path: '/scanner' },
   { term: 'Scan Now', path: '/scanner' },
+  { term: 'Settings', path: '/settings'},
+  { term: 'Manage Account', path: '/settings'},
 ];
 
 
@@ -205,8 +207,8 @@ export function Header() {
                         <DropdownMenuItem asChild>
                         <Link href="/dashboard"><LayoutDashboard className="mr-2" /> Dashboard</Link>
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
-                        <Settings className="mr-2" /> Settings
+                        <DropdownMenuItem asChild>
+                        <Link href="/settings"><Settings className="mr-2" /> Settings</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleLogout}>

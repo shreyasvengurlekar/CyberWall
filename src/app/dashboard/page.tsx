@@ -30,7 +30,6 @@ interface ScanDoc {
 const getSeverityBadge = (score: number) => {
   if (score < 40) return 'destructive';
   if (score < 70) return 'secondary';
-  if (score < 90) return 'outline';
   return 'default';
 };
 
@@ -101,7 +100,9 @@ export default function DashboardPage() {
                     <Button asChild>
                         <Link href="/scanner"><ScanLine className='mr-2 w-4 h-4' /> Start New Scan</Link>
                     </Button>
-                     <Button variant="outline"><Settings className='mr-2 w-4 h-4' /> Manage Account</Button>
+                     <Button asChild variant="outline">
+                        <Link href="/settings"><Settings className='mr-2 w-4 h-4' /> Manage Account</Link>
+                     </Button>
                 </div>
             </div>
 
@@ -170,7 +171,7 @@ export default function DashboardPage() {
                                     </TableHeader>
                                     <TableBody>
                                         {recentScans.map((scan) => (
-                                        <TableRow key={scan.id}>
+                                        <TableRow key={scan.id} className="cursor-pointer hover:bg-muted/50">
                                             <TableCell className="font-medium truncate max-w-xs">{scan.url}</TableCell>
                                             <TableCell>{new Date(scan.createdAt.seconds * 1000).toLocaleDateString()}</TableCell>
                                             <TableCell className="text-center">{scan.results.vulnerabilities.length}</TableCell>

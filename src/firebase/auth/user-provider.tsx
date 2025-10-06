@@ -11,22 +11,26 @@ import React, {
 import {
   Auth,
   createUserWithEmailAndPassword,
+  deleteUser,
   onAuthStateChanged,
   sendEmailVerification,
   sendPasswordResetEmail,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
+  updatePassword,
+  updateProfile,
   User,
 } from 'firebase/auth';
 import {
   doc,
-  DocumentReference,
+  deleteDoc,
   Firestore,
   onSnapshot,
-  serverTimestamp,
   setDoc,
 } from 'firebase/firestore';
 import { useFirebase } from '@/firebase/provider';
+import { errorEmitter } from '../error-emitter';
+import { FirestorePermissionError } from '../errors';
 
 type Plan = 'free' | 'pro' | 'business';
 
@@ -35,8 +39,6 @@ export interface UserProfile {
   email: string;
   displayName: string;
   plan: Plan;
-  scansToday: number;
-  lastScanDate: string; // ISO string
 }
 
 interface UserContextState {
@@ -47,7 +49,9 @@ interface UserContextState {
   signUp: (email: string, password: string) => Promise<User>;
   signOut: () => Promise<void>;
   sendPasswordReset: (email: string) => Promise<void>;
-  recordScan: () => Promise<void>;
+  updateDisplayName: (newName: string) => Promise<void>;
+  updateUserPassword: (newPassword: string) => Promise<void>;
+  deleteUserAccount: () => Promise<void>;
 }
 
 export const UserContext = createContext<UserContextState | undefined>(
@@ -64,17 +68,25 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [isUserLoading, setIsUserLoading] = useState(true);
 
-  const createProfile = useCallback(async (user: User) => {
+  const createProfileInFirestore = useCallback(async (user: User) => {
     const userRef = doc(firestore, 'users', user.uid);
     const newProfile: UserProfile = {
       uid: user.uid,
       email: user.email || '',
-      displayName: user.displayName || user.email?.split('@')[0] || 'User',
+      displayName: user.displayName || user.email?.split('@')[0] || 'New User',
       plan: 'free',
-      scansToday: 0,
-      lastScanDate: new Date(0).toISOString(),
     };
-    await setDoc(userRef, newProfile);
+    
+    // Use non-blocking write with error handling
+    setDoc(userRef, newProfile).catch(err => {
+      const contextualError = new FirestorePermissionError({
+        path: userRef.path,
+        operation: 'create',
+        requestResourceData: newProfile,
+      });
+      errorEmitter.emit('permission-error', contextualError);
+    });
+
     return newProfile;
   }, [firestore]);
   
@@ -100,17 +112,21 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   
         profileUnsubscribe = onSnapshot(userRef, async (docSnap) => {
           if (docSnap.exists()) {
-            const userProfile = docSnap.data() as UserProfile;
-             // Reset scans if last scan was not today
-            const today = new Date().toISOString().split('T')[0];
-            if (userProfile.lastScanDate !== today) {
-                userProfile.scansToday = 0;
-            }
-            setProfile(userProfile);
+            setProfile(docSnap.data() as UserProfile);
           } else {
-            const newProfile = await createProfile(firebaseUser);
+            // This might happen in a race condition or if doc creation fails
+            const newProfile = await createProfileInFirestore(firebaseUser);
             setProfile(newProfile);
           }
+          setIsUserLoading(false);
+        }, (error) => {
+          // Handle snapshot errors (e.g., permissions)
+          console.error("Error fetching user profile:", error);
+          const contextualError = new FirestorePermissionError({
+            path: userRef.path,
+            operation: 'get',
+          });
+          errorEmitter.emit('permission-error', contextualError);
           setIsUserLoading(false);
         });
       } else {
@@ -126,13 +142,12 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         profileUnsubscribe();
       }
     };
-  }, [auth, firestore, createProfile]);
-
+  }, [auth, firestore, createProfileInFirestore]);
 
   const signUp = async (email: string, password: string): Promise<User> => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    await createProfileInFirestore(userCredential.user);
     await sendEmailVerification(userCredential.user);
-    await createProfile(userCredential.user);
     return userCredential.user;
   };
 
@@ -152,21 +167,51 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const sendPasswordReset = async (email: string): Promise<void> => {
     await sendPasswordResetEmail(auth, email);
   };
-
-  const recordScan = async (): Promise<void> => {
-    if (!user) return; // Only record scans for logged-in users. Guests are handled client-side.
-    const userRef = doc(firestore, 'users', user.uid);
-    const today = new Date().toISOString().split('T')[0];
+  
+  const updateDisplayName = async (newName: string): Promise<void> => {
+    if (!user) throw new Error("No user logged in.");
     
-    // For logged-in users, scans are unlimited, but we can still track them if needed.
-    // For simplicity with the new requirement, we can just not update the count for logged-in users,
-    // or just track guest scans on the client.
-    // If we were to track logged-in user scans (even if unlimited), the logic would be here.
-    // For now, this function can be a no-op for logged-in users based on the new requirements.
+    // Update Firebase Auth display name
+    await updateProfile(user, { displayName: newName });
 
-    // If guest scan tracking is needed in Firestore (which is not, based on prompt)
-    // it would be more complex as they don't have a user record.
-    // The current implementation on the scanner page handles guest limits on the client.
+    // Update Firestore display name
+    const userRef = doc(firestore, 'users', user.uid);
+    setDoc(userRef, { displayName: newName }, { merge: true }).catch(err => {
+        const contextualError = new FirestorePermissionError({
+            path: userRef.path,
+            operation: 'update',
+            requestResourceData: { displayName: newName },
+        });
+        errorEmitter.emit('permission-error', contextualError);
+        // Re-throw to be caught by the UI layer
+        throw err;
+    });
+  };
+
+  const updateUserPassword = async (newPassword: string): Promise<void> => {
+    if (!user) throw new Error("No user logged in.");
+    await updatePassword(user, newPassword);
+  };
+
+  const deleteUserAccount = async (): Promise<void> => {
+    if (!user) throw new Error("No user logged in.");
+
+    const userId = user.uid;
+    // Step 1: Delete Firestore document
+    const userRef = doc(firestore, 'users', userId);
+    await deleteDoc(userRef).catch(err => {
+        const contextualError = new FirestorePermissionError({
+            path: userRef.path,
+            operation: 'delete',
+        });
+        errorEmitter.emit('permission-error', contextualError);
+        throw err; // Stop the process if we can't delete the doc
+    });
+
+    // Step 2: Delete Firebase Auth user
+    await deleteUser(user);
+    setUser(null);
+    setProfile(null);
   };
 
 
@@ -180,7 +225,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         signUp,
         signOut,
         sendPasswordReset,
-        recordScan,
+        updateDisplayName,
+        updateUserPassword,
+        deleteUserAccount,
       }}
     >
       {children}
