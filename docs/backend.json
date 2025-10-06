@@ -4,7 +4,7 @@
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "User",
       "type": "object",
-      "description": "Represents a user account within the CyberWall Scanner application.",
+      "description": "Represents a user of the CyberWall Scanner application.",
       "properties": {
         "id": {
           "type": "string",
@@ -12,41 +12,33 @@
         },
         "email": {
           "type": "string",
-          "description": "Email address of the user.",
+          "description": "User's email address.",
           "format": "email"
         },
-        "username": {
-          "type": "string",
-          "description": "Username of the user."
+        "scanIds": {
+          "type": "array",
+          "description": "References to Scans performed by this user. (Relationship: User 1:N Scan)",
+          "items": {
+            "type": "string"
+          }
         },
-        "emailVerificationToken": {
+        "createdAt": {
           "type": "string",
-          "description": "Token used for email verification.",
-          "format": "uuid"
-        },
-        "isEmailVerified": {
-          "type": "boolean",
-          "description": "Indicates whether the user's email address has been verified."
-        },
-        "creationDate": {
-          "type": "string",
-          "description": "Date and time when the user account was created.",
+          "description": "Timestamp indicating when the user account was created.",
           "format": "date-time"
         }
       },
       "required": [
         "id",
         "email",
-        "username",
-        "isEmailVerified",
-        "creationDate"
+        "createdAt"
       ]
     },
     "Scan": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Scan",
       "type": "object",
-      "description": "Represents a security scan performed on a URL.",
+      "description": "Represents a scan performed by a user.",
       "properties": {
         "id": {
           "type": "string",
@@ -64,10 +56,23 @@
           "type": "string",
           "description": "Type of scan performed (e.g., quick, advanced)."
         },
-        "scanDate": {
+        "startTime": {
           "type": "string",
-          "description": "Date and time when the scan was performed.",
+          "description": "Timestamp indicating when the scan started.",
           "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "Timestamp indicating when the scan finished.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the scan (e.g., pending, running, completed, error)."
+        },
+        "reportId": {
+          "type": "string",
+          "description": "Reference to the generated Report for this scan. (Relationship: Scan 1:1 Report)"
         }
       },
       "required": [
@@ -75,22 +80,61 @@
         "userId",
         "url",
         "scanType",
-        "scanDate"
+        "startTime",
+        "status"
+      ]
+    },
+    "Report": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Report",
+      "type": "object",
+      "description": "Represents a security scan report.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the report."
+        },
+        "scanId": {
+          "type": "string",
+          "description": "Reference to the Scan that generated this report. (Relationship: Scan 1:1 Report)"
+        },
+        "generatedTime": {
+          "type": "string",
+          "description": "Timestamp indicating when the report was generated.",
+          "format": "date-time"
+        },
+        "summary": {
+          "type": "string",
+          "description": "Summary of the scan findings."
+        },
+        "findingIds": {
+          "type": "array",
+          "description": "References to Findings included in the report. (Relationship: Report 1:N Finding)",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "required": [
+        "id",
+        "scanId",
+        "generatedTime",
+        "summary"
       ]
     },
     "Finding": {
       "$schema": "http://json-schema.org/draft-07/schema#",
       "title": "Finding",
       "type": "object",
-      "description": "Represents a security vulnerability finding from a scan.",
+      "description": "Represents a specific security vulnerability finding.",
       "properties": {
         "id": {
           "type": "string",
           "description": "Unique identifier for the finding."
         },
-        "scanId": {
+        "reportId": {
           "type": "string",
-          "description": "Reference to the Scan that generated this finding. (Relationship: Scan 1:N Finding)"
+          "description": "Reference to the Report this finding belongs to. (Relationship: Report 1:N Finding)"
         },
         "severity": {
           "type": "string",
@@ -111,7 +155,7 @@
       },
       "required": [
         "id",
-        "scanId",
+        "reportId",
         "severity",
         "type",
         "description",
@@ -134,11 +178,11 @@
           "schema": {
             "$ref": "#/backend/entities/User"
           },
-          "description": "Stores user account information.  This is a private collection; only the user (and potentially admins) can access their own document.",
+          "description": "Stores user profiles.  The 'userId' is the Firebase Authentication UID.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user, corresponding to their Firebase Auth UID."
+              "description": "The unique identifier for the user, corresponding to their Firebase Authentication UID."
             }
           ]
         }
@@ -150,60 +194,72 @@
           "schema": {
             "$ref": "#/backend/entities/Scan"
           },
-          "description": "Stores security scan data associated with a specific user. Path-based ownership ensures that only the user can access these scans.",
+          "description": "Stores scans performed by a user. 'userId' indicates ownership. 'scanId' is the unique ID of the scan.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user who initiated the scan."
+              "description": "The unique identifier for the user who performed the scan."
             },
             {
               "name": "scanId",
-              "description": "The unique identifier for the security scan."
+              "description": "The unique identifier for the scan."
             }
           ]
         }
       },
       {
-        "path": "/users/{userId}/scans/{scanId}/findings/{findingId}",
+        "path": "/users/{userId}/scans/{scanId}/reports/{reportId}",
+        "definition": {
+          "entityName": "Report",
+          "schema": {
+            "$ref": "#/backend/entities/Report"
+          },
+          "description": "Stores reports generated for a scan. 'userId' indicates ownership, and 'scanId' links the report to the scan. 'reportId' is the unique ID of the report.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier for the user who owns the scan and report."
+            },
+            {
+              "name": "scanId",
+              "description": "The unique identifier for the scan the report is associated with."
+            },
+            {
+              "name": "reportId",
+              "description": "The unique identifier for the report."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId}",
         "definition": {
           "entityName": "Finding",
           "schema": {
             "$ref": "#/backend/entities/Finding"
           },
-          "description": "Stores vulnerability findings for a specific scan, belonging to a specific user. Path-based ownership ensures that only the user can access these findings.",
+          "description": "Stores findings included in a report. 'userId' indicates ownership, 'scanId' links the finding to the scan, and 'reportId' links to the report. 'findingId' is the unique ID of the finding.",
           "params": [
             {
               "name": "userId",
-              "description": "The unique identifier of the user who owns the scan and its findings."
+              "description": "The unique identifier for the user who owns the scan, report, and finding."
             },
             {
               "name": "scanId",
-              "description": "The unique identifier of the scan to which the finding belongs."
+              "description": "The unique identifier for the scan the report and finding are associated with."
+            },
+            {
+              "name": "reportId",
+              "description": "The unique identifier for the report the finding belongs to."
             },
             {
               "name": "findingId",
-              "description": "The unique identifier of the vulnerability finding."
-            }
-          ]
-        }
-      },
-      {
-        "path": "/roles_admin/{userId}",
-        "definition": {
-          "entityName": "role",
-          "schema": {
-            "$ref": "#/backend/entities/User"
-          },
-          "description": "Collection to store admin roles. Presence of a document indicates admin status.",
-          "params": [
-            {
-              "name": "userId",
-              "description": "The unique identifier of the user."
+              "description": "The unique identifier for the finding."
             }
           ]
         }
       }
     ],
-    "reasoning": "The Firestore structure is designed to store user data, security scans, and findings in a way that prioritizes security, scalability, and ease of debugging.  It strictly adheres to the principles of Authorization Independence, Clarity of Intent, DBAC (Database-Based Access Control), and Rules are not Filters (QAPs).  \n\n**User Data:**  User data is stored in a private collection `/users/{userId}`. This path-based ownership model ensures that only the user (and potentially admins, via a separate `/roles_admin/{uid}` check) can access their data.  The `User` entity includes `emailVerificationToken` and `isEmailVerified` to support email verification as requested.\n\n**Scan Data:** Each user can create multiple scans. The scans are stored in a subcollection `/users/{userId}/scans/{scanId}`. This path enforces ownership. No denormalization is needed as access is controlled via the path.\n\n**Finding Data:** Each scan can generate multiple findings. The findings are stored in a subcollection `/users/{userId}/scans/{scanId}/findings/{findingId}`. This path enforces ownership and maintains hierarchy.\n\n**Authorization Independence:** The path-based ownership model (`/users/{userId}/...`) ensures that security rules do not need to perform `get()` operations to verify ownership. The security rules can directly use `request.auth.uid == userId` to grant access. This eliminates hierarchical authorization dependencies and ensures that atomic operations (transactions/batches) are possible and debugging is straightforward.\n\n**QAPs (Rules are not Filters):** The structure supports secure `list` operations. For instance, listing scans for a user is done via a query on `/users/{userId}/scans`. Because the path inherently restricts the results to the specified user's scans, the security rules do not need to filter the results based on user ID, ensuring efficient and secure list operations.  The segregation of data into user-specific subcollections eliminates the need for complex filtering logic within the rules.\n"
+    "reasoning": "The Firestore structure is designed to provide a clear, secure, and scalable data model for the CyberWall Scanner application. It leverages path-based ownership for user-specific data and denormalization to ensure authorization independence. The structure is optimized for querying and reporting on user activity and scan results.\n\nThe core principle is to organize data around users and their scans.  Each user has a dedicated subcollection for their scans, and each scan has a subcollection for its findings. This structure allows for easy retrieval of all scans for a given user and all findings for a specific scan.\n\n**Authorization Independence:** The structure enforces authorization independence by using path-based ownership for user data. Specifically, scans and reports are stored within the `/users/{userId}` path, eliminating the need for `get()` calls in security rules to verify ownership.\n\n**QAPs (Rules are not Filters):**\n*   Secure `list` operations for user-owned data are enabled by storing scans and reports as subcollections under `/users/{userId}`. This ensures that only the authenticated user can access their own data.\n*   The segregation of user data into separate `/users/{userId}` collections inherently supports QAPs, as rules are scoped to a specific user's data without needing to filter based on user ID within the documents themselves.\n\nThis structure supports the creation of robust and easily debuggable security rules because access control is primarily determined by the path, not by complex document properties. By following this structural segregation and access modeling, we can ensure a secure and efficient application."
   }
 }
