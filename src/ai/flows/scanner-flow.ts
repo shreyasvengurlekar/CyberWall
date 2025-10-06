@@ -54,7 +54,7 @@ const scannerPrompt = ai.definePrompt({
         Scan focus: {{{scanType}}}
         
         Your task is to:
-        1.  Create a list of 2 to 4 plausible vulnerabilities that a site like this might have, relevant to the requested scan type. If the scan type is 'general', include a mix of common vulnerabilities (XSS, SQLi, Security Misconfiguration, etc.). If no vulnerabilities are found for a specific scan type, the array should be empty.
+        1.  Create a list of 2 to 4 plausible vulnerabilities that a site like this might have, relevant to the requested scan type. If the scan type is 'general', include a mix of common vulnerabilities (XSS, SQLi, Security Misconfiguration, etc.). If a specific scan type is requested (e.g., 'xss'), focus primarily on that. If no vulnerabilities are found for a specific scan type, the array should be empty.
         2.  For each vulnerability, provide:
             - A clear title.
             - An appropriate severity.
