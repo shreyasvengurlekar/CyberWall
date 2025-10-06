@@ -162,15 +162,18 @@ function ScannerResults() {
                 createdAt: serverTimestamp(),
             };
             
-            // Non-blocking write with error handling
-            addDoc(scansCollectionRef, scanData).catch(err => {
-                console.error("Firestore write failed:", err);
+            // Non-blocking write with contextual error handling
+            addDoc(scansCollectionRef, scanData).catch(async (err) => {
                 const contextualError = new FirestorePermissionError({
                     path: scansCollectionRef.path,
                     operation: 'create',
                     requestResourceData: scanData,
                 });
+                // Emit the error globally for the dev overlay
                 errorEmitter.emit('permission-error', contextualError);
+                // Also update local state to show a user-friendly message
+                setError('Failed to save scan results due to a permission issue.');
+                setScanStatus('error');
             });
         }
 
@@ -513,5 +516,7 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
+
+    
 
     
