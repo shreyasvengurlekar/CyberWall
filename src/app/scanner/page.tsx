@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Progress } from '@/components/ui/progress';
-import { ScanLine, ShieldCheck, AlertTriangle, Bot, CheckCircle, ArrowLeft, Download, Shield, LogIn } from 'lucide-react';
+import { ScanLine, ShieldCheck, AlertTriangle, Bot, CheckCircle, ArrowLeft, Download, LogIn, Shield } from 'lucide-react';
 import { useUser } from '@/firebase/auth/use-user';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { performScan, type ScanResult } from '@/ai/flows/scanner-flow';
@@ -19,6 +19,8 @@ import jsPDF from 'jspdf';
 import Link from 'next/link';
 import { useFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { FirestorePermissionError } from '@/firebase/errors';
+import { errorEmitter } from '@/firebase/error-emitter';
 
 
 const formSchema = z.object({
@@ -153,11 +155,22 @@ function ScannerResults() {
         // If user is logged in, save scan to Firestore
         if (user && firestore) {
             const scansCollectionRef = collection(firestore, `users/${user.uid}/scans`);
-            await addDoc(scansCollectionRef, {
+            const scanData = {
                 url: values.url,
                 scanType: vulnerabilityType || 'general',
                 results: results,
                 createdAt: serverTimestamp(),
+            };
+            
+            // Non-blocking write with error handling
+            addDoc(scansCollectionRef, scanData).catch(err => {
+                console.error("Firestore write failed:", err);
+                const contextualError = new FirestorePermissionError({
+                    path: scansCollectionRef.path,
+                    operation: 'create',
+                    requestResourceData: scanData,
+                });
+                errorEmitter.emit('permission-error', contextualError);
             });
         }
 

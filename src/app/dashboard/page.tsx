@@ -4,39 +4,54 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Progress } from '@/components/ui/progress';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { FileText, ScanLine, Settings, Shield, User, Zap } from 'lucide-react';
+import { FileText, ScanLine, Settings, Shield } from 'lucide-react';
 import * as React from 'react';
 import { useUser } from '@/firebase/auth/use-user';
 import { useRouter } from 'next/navigation';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useCollection } from '@/firebase/firestore/use-collection';
+import { useFirebase, useMemoFirebase } from '@/firebase/provider';
+import { collection, query, orderBy, limit } from 'firebase/firestore';
+import { ScanResult } from '@/ai/flows/scanner-flow';
 
-const recentScans = [
-    { id: 1, url: 'https://my-e-commerce-site.com', date: '2024-07-28', findings: 3, severity: 'High' },
-    { id: 2, url: 'https://my-blog-platform.dev', date: '2024-07-27', findings: 1, severity: 'Medium' },
-    { id: 3, url: 'https://my-saas-app.io', date: '2024-07-25', findings: 0, severity: 'None' },
-    { id: 4, url: 'https://my-portfolio-page.net', date: '2024-07-24', findings: 8, severity: 'Critical' },
-]
+interface ScanDoc {
+    url: string;
+    createdAt: {
+        seconds: number;
+        nanoseconds: number;
+    };
+    results: ScanResult;
+    scanType: string;
+}
 
-const getSeverityBadge = (severity: 'Critical' | 'High' | 'Medium' | 'None') => {
-  switch (severity) {
-    case 'Critical':
-      return 'destructive';
-    case 'High':
-      return 'secondary';
-    case 'Medium':
-      return 'outline';
-    default:
-      return 'default';
-  }
+const getSeverityBadge = (score: number) => {
+  if (score < 40) return 'destructive';
+  if (score < 70) return 'secondary';
+  if (score < 90) return 'outline';
+  return 'default';
 };
 
+const getSeverityText = (score: number) => {
+    if (score < 40) return 'Critical';
+    if (score < 70) return 'High';
+    if (score < 90) return 'Medium';
+    return 'Low';
+}
 
 export default function DashboardPage() {
     const { user, profile, isUserLoading } = useUser();
+    const { firestore } = useFirebase();
     const router = useRouter();
+
+    const scansQuery = useMemoFirebase(() => {
+        if (!user || !firestore) return null;
+        const scansCollection = collection(firestore, `users/${user.uid}/scans`);
+        return query(scansCollection, orderBy('createdAt', 'desc'), limit(10));
+    }, [user, firestore]);
+
+    const { data: recentScans, isLoading: areScansLoading } = useCollection<ScanDoc>(scansQuery);
 
     React.useEffect(() => {
         if (!isUserLoading && !user) {
@@ -44,7 +59,7 @@ export default function DashboardPage() {
         }
     }, [user, isUserLoading, router]);
     
-    if (isUserLoading || !user || !profile) {
+    if (isUserLoading || !user || !profile || areScansLoading) {
         return (
             <div className="container mx-auto py-10 px-4 md:px-6">
                 <div className="grid gap-8">
@@ -135,28 +150,37 @@ export default function DashboardPage() {
                             <CardDescription>A summary of your most recent security scans.</CardDescription>
                         </CardHeader>
                         <CardContent>
-                           <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                    <TableHead>URL</TableHead>
-                                    <TableHead>Date</TableHead>
-                                    <TableHead className="text-center">Findings</TableHead>
-                                    <TableHead className="text-right">Severity</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {recentScans.map((scan) => (
-                                    <TableRow key={scan.id}>
-                                        <TableCell className="font-medium truncate max-w-xs">{scan.url}</TableCell>
-                                        <TableCell>{scan.date}</TableCell>
-                                        <TableCell className="text-center">{scan.findings}</TableCell>
-                                        <TableCell className="text-right">
-                                            <Badge variant={getSeverityBadge(scan.severity as any)}>{scan.severity}</Badge>
-                                        </TableCell>
-                                    </TableRow>
-                                    ))}
-                                </TableBody>
-                            </Table>
+                            {recentScans && recentScans.length > 0 ? (
+                                <Table>
+                                    <TableHeader>
+                                        <TableRow>
+                                        <TableHead>URL</TableHead>
+                                        <TableHead>Date</TableHead>
+                                        <TableHead className="text-center">Findings</TableHead>
+                                        <TableHead className="text-right">Risk Level</TableHead>
+                                        </TableRow>
+                                    </TableHeader>
+                                    <TableBody>
+                                        {recentScans.map((scan) => (
+                                        <TableRow key={scan.id}>
+                                            <TableCell className="font-medium truncate max-w-xs">{scan.url}</TableCell>
+                                            <TableCell>{new Date(scan.createdAt.seconds * 1000).toLocaleDateString()}</TableCell>
+                                            <TableCell className="text-center">{scan.results.vulnerabilities.length}</TableCell>
+                                            <TableCell className="text-right">
+                                                <Badge variant={getSeverityBadge(scan.results.overallScore)}>{getSeverityText(scan.results.overallScore)}</Badge>
+                                            </TableCell>
+                                        </TableRow>
+                                        ))}
+                                    </TableBody>
+                                </Table>
+                            ) : (
+                                <div className='text-center py-10'>
+                                    <p className='text-muted-foreground'>You haven't performed any scans yet.</p>
+                                    <Button asChild className='mt-4'>
+                                        <Link href="/scanner">Start Your First Scan</Link>
+                                    </Button>
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>

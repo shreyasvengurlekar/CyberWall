@@ -207,7 +207,7 @@ export default function Home() {
                                         <div className="flex items-center gap-2 mb-2">
                                             {[...Array(5)].map((_, i) => <Star key={i} className="w-5 h-5 text-yellow-400 fill-yellow-400" />)}
                                         </div>
-                                        <p className="text-muted-foreground italic mb-4">"{testimonial.testimonial}"</p>
+                                        <p className="text-muted-foreground italic">"{testimonial.testimonial}"</p>
                                     </div>
                                     <div className="flex items-center gap-4 mt-auto">
                                         <Image 
@@ -251,7 +251,7 @@ export default function Home() {
                 <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Free</h3>
-                    <p className="text-4xl font-bold">₹0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">$0<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
@@ -268,7 +268,7 @@ export default function Home() {
                     <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-4 py-1 text-sm font-semibold" style={{clipPath: 'polygon(25% 0%, 100% 0%, 100% 100%, 0% 100%)'}}>Popular</div>
                     <CardHeader className="pt-12">
                     <h3 className="text-2xl font-semibold">Pro</h3>
-                    <p className="text-4xl font-bold">₹49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">
@@ -285,7 +285,7 @@ export default function Home() {
                  <Card className="flex flex-col transition-transform hover:scale-[1.03]">
                     <CardHeader>
                     <h3 className="text-2xl font-semibold">Business</h3>
-                    <p className="text-4xl font-bold">₹99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
+                    <p className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></p>
                     </CardHeader>
                     <CardContent className="flex-1 space-y-4">
                     <ul className="space-y-2 text-muted-foreground">

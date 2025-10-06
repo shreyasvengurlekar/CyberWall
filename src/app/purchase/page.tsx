@@ -79,7 +79,7 @@ export default function PurchasePage() {
         <Card className={`transition-all ${selectedPlan === 'pro' ? 'ring-2 ring-primary' : ''}`}>
           <CardHeader>
             <CardTitle className="text-2xl">Pro Plan</CardTitle>
-            <CardDescription className="text-4xl font-bold">₹49<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
+            <CardDescription className="text-4xl font-bold">$49<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
           </CardHeader>
           <CardContent>
             {selectedPlan === 'pro' ? (
@@ -99,7 +99,7 @@ export default function PurchasePage() {
                         <FormItem className="w-1/2"><FormLabel>CVC</FormLabel><FormControl><Input {...field} placeholder="•••" /></FormControl><FormMessage /></FormItem>
                     )} />
                   </div>
-                  <Button type="submit" className="w-full"><CreditCard className='mr-2 w-4 h-4' /> Pay ₹49</Button>
+                  <Button type="submit" className="w-full"><CreditCard className='mr-2 w-4 h-4' /> Pay $49</Button>
                 </form>
               </Form>
             ) : (
@@ -112,7 +112,7 @@ export default function PurchasePage() {
          <Card className={`transition-all ${selectedPlan === 'business' ? 'ring-2 ring-primary' : ''}`}>
           <CardHeader>
             <CardTitle className="text-2xl">Business Plan</CardTitle>
-            <CardDescription className="text-4xl font-bold">₹99<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
+            <CardDescription className="text-4xl font-bold">$99<span className="text-sm font-normal text-muted-foreground">/month</span></CardDescription>
           </CardHeader>
           <CardContent>
             {selectedPlan === 'business' ? (
@@ -132,7 +132,7 @@ export default function PurchasePage() {
                             <FormItem className="w-1/2"><FormLabel>CVC</FormLabel><FormControl><Input {...field} placeholder="•••" /></FormControl><FormMessage /></FormItem>
                         )} />
                     </div>
-                    <Button type="submit" className="w-full"><CreditCard className='mr-2 w-4 h-4' /> Pay ₹99</Button>
+                    <Button type="submit" className="w-full"><CreditCard className='mr-2 w-4 h-4' /> Pay $99</Button>
                     </form>
               </Form>
             ) : (
