@@ -30,6 +30,7 @@ import { useAlert } from '@/context/alert-provider';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/#features', label: 'Features' },
+  { href: '/#how-it-works', label: 'How It Works' },
   { href: '/services', label: 'Services' },
   { href: '/#pricing', label: 'Pricing' },
   { href: '/#testimonials', label: 'Testimonials' },
