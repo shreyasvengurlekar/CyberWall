@@ -36,56 +36,67 @@ export function Footer() {
   };
 
   return (
-    <footer className="border-t bg-background">
-      <div className="container py-8">
-        <div className="flex flex-col-reverse items-center justify-between gap-8 md:flex-row">
-          <div className="flex flex-col items-center gap-2 md:items-start">
-            <Link href="/" className="flex items-center gap-2 group mb-2">
-              <Shield className="h-6 w-6 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
-              <span className="font-bold">CyberWall</span>
-            </Link>
-            <p className="text-sm text-muted-foreground">
-              &copy; {new Date().getFullYear()} CyberWall. All rights reserved.
-            </p>
-             <p className="text-sm text-muted-foreground">
-              Designed & Built by{' '}
-              <a
-                href="https://linkedin.com/in/shreyasvengurlekar"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-medium text-foreground hover:text-primary transition-colors"
-              >
-                Shreyas Vengurlekar
-              </a>
-              .
-            </p>
-          </div>
-
-          <div className="flex flex-col items-center gap-4">
-            <div className="flex gap-4 text-sm text-muted-foreground">
-              <Link href="/services" className="hover:text-foreground">Services</Link>
-              <Link href="/#pricing" className="hover:text-foreground">Pricing</Link>
-              <Link href="/#how-it-works" className="hover:text-foreground">How It Works</Link>
-              <Link href="/#testimonials" className="hover:text-foreground">Testimonials</Link>
-              <Link href="/about" className="hover:text-foreground">About</Link>
-              <Link href="/privacy" className="hover:text-foreground">Privacy Policy</Link>
-              <Link href="/terms" className="hover:text-foreground">Terms of Service</Link>
-            </div>
-            <div className="flex items-center gap-4">
-              {socialLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:text-primary transition-colors"
-                  aria-label={link.label}
-                >
-                  {link.icon}
+    <footer className="border-t bg-muted text-muted-foreground">
+      <div className="container py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Column 1: Brand & Creator */}
+            <div className="md:col-span-1 flex flex-col gap-4 items-center md:items-start">
+                 <Link href="/" className="flex items-center gap-2 group mb-2">
+                    <Shield className="h-7 w-7 text-primary transition-all duration-300 group-hover:drop-shadow-[0_0_4px_hsl(var(--primary))]" />
+                    <span className="font-bold text-xl text-foreground">CyberWall</span>
                 </Link>
-              ))}
+                <p className="text-sm text-center md:text-left">
+                  Designed & Built by{' '}
+                  <a
+                    href="https://linkedin.com/in/shreyasvengurlekar"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-foreground hover:text-primary transition-colors"
+                  >
+                    Shreyas Vengurlekar
+                  </a>
+                  .
+                </p>
             </div>
-          </div>
+            {/* Column 2: Navigation */}
+            <div className="text-center md:text-left">
+                <h4 className="font-semibold text-foreground mb-4">Navigation</h4>
+                <ul className="space-y-2">
+                    <li><Link href="/#features" className="hover:text-primary transition-colors">Features</Link></li>
+                    <li><Link href="/services" className="hover:text-primary transition-colors">Services</Link></li>
+                    <li><Link href="/#pricing" className="hover:text-primary transition-colors">Pricing</Link></li>
+                    <li><Link href="/about" className="hover:text-primary transition-colors">About</Link></li>
+                </ul>
+            </div>
+             {/* Column 3: Legal */}
+            <div className="text-center md:text-left">
+                <h4 className="font-semibold text-foreground mb-4">Legal</h4>
+                <ul className="space-y-2">
+                    <li><Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                    <li><Link href="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
+                </ul>
+            </div>
+             {/* Column 4: Social */}
+            <div className="text-center md:text-left">
+                <h4 className="font-semibold text-foreground mb-4">Social</h4>
+                <div className="flex items-center justify-center md:justify-start gap-4">
+                  {socialLinks.map((link) => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground hover:text-primary transition-colors"
+                      aria-label={link.label}
+                    >
+                      {link.icon}
+                    </Link>
+                  ))}
+                </div>
+            </div>
+        </div>
+        <div className="border-t mt-8 pt-6 text-center text-sm">
+            <p>&copy; {new Date().getFullYear()} CyberWall. All rights reserved.</p>
         </div>
       </div>
       {showBackToTop && (
