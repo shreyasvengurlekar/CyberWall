@@ -158,6 +158,10 @@ function ScannerResults() {
     doc.setFont('helvetica', 'bold');
     doc.text('CyberWall Security Report', pageWidth / 2, y, { align: 'center' });
     y += 10;
+    doc.setDrawColor(200); // divider color
+    doc.line(margin, y, pageWidth - margin, y);
+    y += 10;
+
 
     // --- Scan Details ---
     doc.setFontSize(12);
@@ -165,15 +169,11 @@ function ScannerResults() {
     doc.text(`URL Scanned: ${scannedUrl}`, margin, y);
     y += 7;
     doc.text(`Scan Date: ${new Date().toLocaleString()}`, margin, y);
-    y += 10;
+    y += 12;
 
-    // --- Divider ---
-    doc.setDrawColor(200);
-    doc.line(margin, y, pageWidth - margin, y);
-    y += 10;
     
     // --- Summary ---
-    doc.setFontSize(14);
+    doc.setFontSize(16);
     doc.setFont('helvetica', 'bold');
     doc.text('Scan Summary', margin, y);
     y += 7;
@@ -213,18 +213,18 @@ function ScannerResults() {
             if (vuln.severity === 'Low') severityColor = '#3b82f6'; // blue-500
             
             doc.setFillColor(severityColor);
-            doc.roundedRect(margin, y - 4, 20, 6, 2, 2, 'F');
+            doc.roundedRect(margin, y - 4, 25, 6, 2, 2, 'F');
             doc.setFontSize(10);
             doc.setTextColor('#ffffff');
             doc.setFont('helvetica', 'bold');
-            doc.text(vuln.severity, margin + 10, y, { align: 'center' });
+            doc.text(vuln.severity, margin + 12.5, y, { align: 'center' });
 
             // Title
             doc.setFontSize(14);
             doc.setTextColor('#000000');
             doc.setFont('helvetica', 'bold');
-            doc.text(vuln.title, margin + 25, y);
-            y += 10;
+            doc.text(vuln.title, margin + 30, y);
+            y += 12;
 
             // Description
             doc.setFontSize(12);
@@ -237,7 +237,7 @@ function ScannerResults() {
             const descLines = doc.splitTextToSize(vuln.description, usableWidth);
             checkAndAddPage(descLines.length * 5);
             doc.text(descLines, margin, y);
-            y += descLines.length * 5 + 5;
+            y += descLines.length * 5 + 8;
 
              // Remediation
             doc.setFontSize(12);
@@ -345,10 +345,10 @@ function ScannerResults() {
                 <div className="text-center animate-fade-in space-y-4 pt-4 pb-8">
                     <div className="relative w-24 h-24 mx-auto">
                         <Bot className="w-full h-full text-primary animate-pulse" />
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <p className="text-xl font-bold text-primary-foreground">{Math.round(progress)}%</p>
-                        </div>
                     </div>
+                    <p className="text-xl font-bold text-foreground">
+                        {Math.round(progress)}%
+                    </p>
                     <p className="text-lg text-muted-foreground">Scanning <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
                     <Progress value={progress} className="w-full" />
                     <p className="text-sm text-muted-foreground h-5">{loadingMessage}</p>
@@ -437,5 +437,3 @@ export default function ScannerPage() {
         </React.Suspense>
     )
 }
-
-    
