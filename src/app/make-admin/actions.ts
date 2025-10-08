@@ -36,13 +36,13 @@ export async function setAdminClaim(uid: string): Promise<{ success: boolean; er
         throw new Error('Failed to verify admin claim on user record.');
     }
 
-    // After setting a claim, the user's ID token must be refreshed on the client.
-    // The easiest way to force this is to sign them out and have them sign back in.
-
     return { success: true };
   } catch (error: any) {
-    console.error('Failed to set admin claim:', error);
-    // Provide a more generic error message to the client for security.
-    return { success: false, error: 'An internal error occurred. Could not set admin claim.' };
+    console.error('Error setting admin claim:', error);
+    // Provide a more detailed error message for debugging, but be cautious in production
+    if (error.code === 'permission-denied' || error.code === 'insufficient-permission') {
+         return { success: false, error: 'The backend service does not have sufficient permissions to set admin claims. Please check the IAM roles for the App Hosting service account.' };
+    }
+     return { success: false, error: `An internal error occurred: ${error.message}` };
   }
 }
