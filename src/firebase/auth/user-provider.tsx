@@ -27,6 +27,9 @@ import {
   Firestore,
   onSnapshot,
   setDoc,
+  collectionGroup,
+  query,
+  getDocs,
 } from 'firebase/firestore';
 import { useFirebase } from '@/firebase/provider';
 import { errorEmitter } from '../error-emitter';
@@ -44,6 +47,7 @@ export interface UserProfile {
 interface UserContextState {
   user: User | null;
   profile: UserProfile | null;
+  isAdmin: boolean;
   isUserLoading: boolean;
   signIn: (email: string, password: string) => Promise<User>;
   signUp: (email: string, password: string) => Promise<User>;
@@ -66,6 +70,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const { auth, firestore } = useFirebase();
   const [user, setUser] = useState<User | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isUserLoading, setIsUserLoading] = useState(true);
 
   const createProfileInFirestore = useCallback(async (user: User) => {
@@ -91,58 +96,54 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   }, [firestore]);
   
   useEffect(() => {
-    if (!auth) {
+    if (!auth || !firestore) {
       setIsUserLoading(false);
       return;
     }
-  
+
     let profileUnsubscribe: (() => void) | null = null;
-  
+
     const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setIsUserLoading(true);
-  
-      if (profileUnsubscribe) {
-        profileUnsubscribe();
-        profileUnsubscribe = null;
-      }
-  
+      if (profileUnsubscribe) profileUnsubscribe();
+
       if (firebaseUser) {
+        const idTokenResult = await firebaseUser.getIdTokenResult(true);
+        const isAdminUser = !!idTokenResult.claims.admin;
+
         setUser(firebaseUser);
+        setIsAdmin(isAdminUser);
+
         const userRef = doc(firestore, 'users', firebaseUser.uid);
-  
         profileUnsubscribe = onSnapshot(userRef, async (docSnap) => {
           if (docSnap.exists()) {
             setProfile(docSnap.data() as UserProfile);
           } else {
-            // This might happen in a race condition or if doc creation fails
             const newProfile = await createProfileInFirestore(firebaseUser);
             setProfile(newProfile);
           }
           setIsUserLoading(false);
         }, (error) => {
-          // Handle snapshot errors (e.g., permissions)
           console.error("Error fetching user profile:", error);
-          const contextualError = new FirestorePermissionError({
-            path: userRef.path,
-            operation: 'get',
-          });
+          const contextualError = new FirestorePermissionError({ path: userRef.path, operation: 'get' });
           errorEmitter.emit('permission-error', contextualError);
           setIsUserLoading(false);
         });
+
       } else {
         setUser(null);
         setProfile(null);
+        setIsAdmin(false);
         setIsUserLoading(false);
       }
     });
-  
+
     return () => {
       authUnsubscribe();
-      if (profileUnsubscribe) {
-        profileUnsubscribe();
-      }
+      if (profileUnsubscribe) profileUnsubscribe();
     };
   }, [auth, firestore, createProfileInFirestore]);
+
 
   const signUp = async (email: string, password: string): Promise<User> => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -157,6 +158,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         await firebaseSignOut(auth);
         throw new Error('auth/email-not-verified');
     }
+    // Force refresh of token to get latest claims
+    await userCredential.user.getIdToken(true);
     return userCredential.user;
   };
 
@@ -171,10 +174,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
   const updateDisplayName = async (newName: string): Promise<void> => {
     if (!user) throw new Error("No user logged in.");
     
-    // Update Firebase Auth display name
     await updateProfile(user, { displayName: newName });
 
-    // Update Firestore display name
     const userRef = doc(firestore, 'users', user.uid);
     setDoc(userRef, { displayName: newName }, { merge: true }).catch(err => {
         const contextualError = new FirestorePermissionError({
@@ -183,7 +184,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
             requestResourceData: { displayName: newName },
         });
         errorEmitter.emit('permission-error', contextualError);
-        // Re-throw to be caught by the UI layer
         throw err;
     });
   };
@@ -197,21 +197,32 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     if (!user) throw new Error("No user logged in.");
 
     const userId = user.uid;
-    // Step 1: Delete Firestore document
     const userRef = doc(firestore, 'users', userId);
+    
+    // This is a simplified deletion. In a real app, you'd want to delete all subcollections too.
+    const scansQuery = query(collectionGroup(firestore, 'scans'));
+    const scansSnapshot = await getDocs(scansQuery);
+    const deletePromises: Promise<void>[] = [];
+    scansSnapshot.forEach(doc => {
+      if (doc.ref.path.startsWith(`users/${userId}/`)) {
+        deletePromises.push(deleteDoc(doc.ref));
+      }
+    });
+    await Promise.all(deletePromises);
+
     await deleteDoc(userRef).catch(err => {
         const contextualError = new FirestorePermissionError({
             path: userRef.path,
             operation: 'delete',
         });
         errorEmitter.emit('permission-error', contextualError);
-        throw err; // Stop the process if we can't delete the doc
+        throw err;
     });
 
-    // Step 2: Delete Firebase Auth user
     await deleteUser(user);
     setUser(null);
     setProfile(null);
+    setIsAdmin(false);
   };
 
 
@@ -220,6 +231,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       value={{
         user,
         profile,
+        isAdmin,
         isUserLoading,
         signIn,
         signUp,

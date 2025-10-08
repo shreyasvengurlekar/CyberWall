@@ -1,7 +1,7 @@
 
 'use client';
 
-import { Shield, Menu, Search, X, LayoutDashboard, User, Settings, LogOut } from 'lucide-react';
+import { Shield, Menu, Search, X, LayoutDashboard, User, Settings, LogOut, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import * as React from 'react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -64,6 +64,7 @@ const searchableTerms = [
   { term: 'Technologies', path: '/about' },
   { term: 'Skills', path: '/about' },
   { term: 'Dashboard', path: '/dashboard' },
+  { term: 'Admin Dashboard', path: '/admin' },
   { term: 'Login', path: '/login' },
   { term: 'Sign Up', path: '/signup' },
   { term: 'Privacy Policy', path: '/privacy'},
@@ -76,7 +77,7 @@ const searchableTerms = [
 
 
 export function Header() {
-  const { user, signOut } = useUser();
+  const { user, signOut, isAdmin } = useUser();
   const router = useRouter();
   const { showAlert } = useAlert();
 
@@ -98,7 +99,7 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center">
         {/* Mobile Nav Trigger */}
         <Sheet>
@@ -133,6 +134,13 @@ export function Header() {
                       </SheetClose>
                       {user ? (
                         <>
+                           {isAdmin && (
+                            <SheetClose asChild>
+                              <Button asChild>
+                                <Link href="/admin">Admin</Link>
+                              </Button>
+                            </SheetClose>
+                          )}
                           <SheetClose asChild>
                             <Button asChild>
                               <Link href="/dashboard">Dashboard</Link>
@@ -213,13 +221,18 @@ export function Header() {
                     <DropdownMenuContent className="w-56" align="end" forceMount>
                         <DropdownMenuLabel className="font-normal">
                         <div className="flex flex-col space-y-1">
-                            <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
+                            <p className="text-sm font-medium leading-none">{isAdmin && <span className='text-primary font-bold'>ADMIN </span>}{user.displayName || 'User'}</p>
                             <p className="text-xs leading-none text-muted-foreground">
                             {user.email}
                             </p>
                         </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
+                        {isAdmin && (
+                            <DropdownMenuItem asChild>
+                                <Link href="/admin"><ShieldCheck className="mr-2" /> Admin Dashboard</Link>
+                            </DropdownMenuItem>
+                        )}
                         <DropdownMenuItem asChild>
                         <Link href="/dashboard"><LayoutDashboard className="mr-2" /> Dashboard</Link>
                         </DropdownMenuItem>

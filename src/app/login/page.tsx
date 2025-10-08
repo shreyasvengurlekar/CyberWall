@@ -26,7 +26,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, signIn } = useUser();
+  const { user, signIn, isAdmin } = useUser();
   const { showAlert } = useAlert();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -38,20 +38,20 @@ export default function LoginPage() {
 
   React.useEffect(() => {
     if (user) {
-      router.push('/dashboard');
+      if (isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
     }
-  }, [user, router]);
+  }, [user, isAdmin, router]);
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
         await signIn(values.email, values.password);
-        showAlert({
-            title: 'Login Successful!',
-            message: 'Redirecting to your dashboard...',
-            onConfirm: () => router.push('/dashboard'),
-        });
         form.reset();
+        // The useEffect will handle redirection.
     } catch (error: any) {
         console.error(error);
         let message = 'An unexpected error occurred. Please try again.';
