@@ -7,12 +7,15 @@ import { getAuth } from 'firebase-admin/auth';
 
 // Initialize Firebase Admin SDK
 function initializeAdminApp(): App {
-    const apps = getApps();
-    if (apps.length > 0) {
-        return apps[0];
+    // If the admin app is already initialized, return it.
+    const alreadyInitialized = getApps().find(app => app.name === '[DEFAULT]');
+    if (alreadyInitialized) {
+        return alreadyInitialized;
     }
+
     // In a Google Cloud environment like Firebase App Hosting, calling initializeApp()
     // with no arguments will automatically use the project's default service account credentials.
+    // This is the simplest and most reliable method in this context.
     return initializeApp();
 }
 
