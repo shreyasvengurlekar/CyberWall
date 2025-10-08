@@ -37,7 +37,6 @@ export default function LoginPage() {
   });
 
   React.useEffect(() => {
-    // Only redirect if user is loaded and present
     if (!isUserLoading && user) {
       if (isAdmin) {
         router.push('/admin');
@@ -52,7 +51,7 @@ export default function LoginPage() {
     try {
         await signIn(values.email, values.password);
         form.reset();
-        // The useEffect will handle redirection after state update.
+        // The useEffect hook will now handle redirection correctly
     } catch (error: any) {
         console.error(error);
         let message = 'An unexpected error occurred. Please try again.';
@@ -117,7 +116,7 @@ export default function LoginPage() {
                   )}
                 />
                 <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || isUserLoading}>
-                  {form.formState.isSubmitting ? 'Logging in...' : 'Log In'}
+                  {form.formState.isSubmitting || isUserLoading ? 'Logging in...' : 'Log In'}
                 </Button>
               </form>
             </Form>
