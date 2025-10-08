@@ -70,11 +70,22 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   const createProfileInFirestore = useCallback(async (user: User) => {
     const userRef = doc(firestore, 'users', user.uid);
-    const newProfile: UserProfile = {
+    const newProfile: UserProfile & {
+      emailVerified: boolean;
+      createdAt: Date;
+      lastLoginAt: Date;
+      lastActive: Date;
+      isOnline: boolean;
+    } = {
       uid: user.uid,
       email: user.email || '',
       displayName: user.displayName || user.email?.split('@')[0] || 'New User',
       plan: 'free',
+      emailVerified: user.emailVerified,
+      createdAt: new Date(),
+      lastLoginAt: new Date(),
+      lastActive: new Date(),
+      isOnline: true,
     };
     
     // Use non-blocking write with error handling
@@ -95,7 +106,21 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       setIsUserLoading(false);
       return;
     }
-  
+
+    // Handle online/offline status
+    const updateOnlineStatus = async () => {
+      if (user) {
+        const userRef = doc(firestore, 'users', user.uid);
+        await setDoc(userRef, {
+          isOnline: navigator.onLine,
+          lastActive: new Date(),
+        }, { merge: true });
+      }
+    };
+
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    
     let profileUnsubscribe: (() => void) | null = null;
   
     const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -141,6 +166,8 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       if (profileUnsubscribe) {
         profileUnsubscribe();
       }
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
     };
   }, [auth, firestore, createProfileInFirestore]);
 
@@ -157,10 +184,27 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         await firebaseSignOut(auth);
         throw new Error('auth/email-not-verified');
     }
+
+    // Update last login time and online status
+    const userRef = doc(firestore, 'users', userCredential.user.uid);
+    await setDoc(userRef, {
+      lastLoginAt: new Date(),
+      lastActive: new Date(),
+      isOnline: true,
+    }, { merge: true });
+
     return userCredential.user;
   };
 
   const signOut = async (): Promise<void> => {
+    if (user) {
+      // Update user's online status before signing out
+      const userRef = doc(firestore, 'users', user.uid);
+      await setDoc(userRef, {
+        lastActive: new Date(),
+        isOnline: false,
+      }, { merge: true });
+    }
     await firebaseSignOut(auth);
   };
 
