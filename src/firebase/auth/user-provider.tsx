@@ -82,7 +82,6 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       plan: 'free',
     };
     
-    // Use non-blocking write with error handling
     setDoc(userRef, newProfile).catch(err => {
       const contextualError = new FirestorePermissionError({
         path: userRef.path,
@@ -104,37 +103,43 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     let profileUnsubscribe: (() => void) | null = null;
 
     const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // Always start loading when auth state changes
       setIsUserLoading(true);
       if (profileUnsubscribe) profileUnsubscribe();
 
       if (firebaseUser) {
+        // Set user immediately
+        setUser(firebaseUser);
+        
+        // Then, get token and check for admin claims
         const idTokenResult = await firebaseUser.getIdTokenResult(true);
         const isAdminUser = !!idTokenResult.claims.admin;
-
-        setUser(firebaseUser);
         setIsAdmin(isAdminUser);
 
+        // Now, set up profile listener
         const userRef = doc(firestore, 'users', firebaseUser.uid);
         profileUnsubscribe = onSnapshot(userRef, async (docSnap) => {
           if (docSnap.exists()) {
             setProfile(docSnap.data() as UserProfile);
           } else {
+            // If profile doesn't exist, create it
             const newProfile = await createProfileInFirestore(firebaseUser);
             setProfile(newProfile);
           }
+          // Only stop loading after profile is fetched/created
           setIsUserLoading(false);
         }, (error) => {
           console.error("Error fetching user profile:", error);
           const contextualError = new FirestorePermissionError({ path: userRef.path, operation: 'get' });
           errorEmitter.emit('permission-error', contextualError);
-          setIsUserLoading(false);
+          setIsUserLoading(false); // Stop loading even on error
         });
-
       } else {
+        // No user, reset all states
         setUser(null);
         setProfile(null);
         setIsAdmin(false);
-        setIsUserLoading(false);
+        setIsUserLoading(false); // Stop loading
       }
     });
 

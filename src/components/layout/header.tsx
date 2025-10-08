@@ -230,18 +230,18 @@ export function Header() {
                         <DropdownMenuSeparator />
                         {isAdmin && (
                             <DropdownMenuItem asChild>
-                                <Link href="/admin"><ShieldCheck className="mr-2" /> Admin Dashboard</Link>
+                                <Link href="/admin"><ShieldCheck className="mr-2 h-4 w-4" /> Admin Dashboard</Link>
                             </DropdownMenuItem>
                         )}
                         <DropdownMenuItem asChild>
-                        <Link href="/dashboard"><LayoutDashboard className="mr-2" /> Dashboard</Link>
+                        <Link href="/dashboard"><LayoutDashboard className="mr-2 h-4 w-4" /> Dashboard</Link>
                         </DropdownMenuItem>
                         <DropdownMenuItem asChild>
-                        <Link href="/settings"><Settings className="mr-2" /> Settings</Link>
+                        <Link href="/settings"><Settings className="mr-2 h-4 w-4" /> Settings</Link>
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={handleLogout}>
-                        <LogOut className="mr-2" /> Log out
+                        <LogOut className="mr-2 h-4 w-4" /> Log out
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>

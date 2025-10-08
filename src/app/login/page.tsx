@@ -26,7 +26,7 @@ const formSchema = z.object({
 
 export default function LoginPage() {
   const router = useRouter();
-  const { user, signIn, isAdmin } = useUser();
+  const { user, signIn, isAdmin, isUserLoading } = useUser();
   const { showAlert } = useAlert();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -37,21 +37,22 @@ export default function LoginPage() {
   });
 
   React.useEffect(() => {
-    if (user) {
+    // Only redirect if user is loaded and present
+    if (!isUserLoading && user) {
       if (isAdmin) {
         router.push('/admin');
       } else {
         router.push('/dashboard');
       }
     }
-  }, [user, isAdmin, router]);
+  }, [user, isAdmin, isUserLoading, router]);
 
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
         await signIn(values.email, values.password);
         form.reset();
-        // The useEffect will handle redirection.
+        // The useEffect will handle redirection after state update.
     } catch (error: any) {
         console.error(error);
         let message = 'An unexpected error occurred. Please try again.';
@@ -115,7 +116,7 @@ export default function LoginPage() {
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+                <Button type="submit" className="w-full" disabled={form.formState.isSubmitting || isUserLoading}>
                   {form.formState.isSubmitting ? 'Logging in...' : 'Log In'}
                 </Button>
               </form>
