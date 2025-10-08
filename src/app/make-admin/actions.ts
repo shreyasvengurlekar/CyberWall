@@ -1,6 +1,6 @@
 'use server';
 import 'server-only';
-import { initializeApp, getApps, App } from 'firebase-admin/app';
+import { initializeApp, getApps, App, applicationDefault } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 // This is a server-only file. It will not be sent to the client.
@@ -13,7 +13,9 @@ function initializeAdminApp(): App {
     }
     // This will use the GOOGLE_APPLICATION_CREDENTIALS environment variable
     // for authentication, which is automatically set in the App Hosting environment.
-    return initializeApp();
+    return initializeApp({
+        credential: applicationDefault(),
+    });
 }
 
 /**
