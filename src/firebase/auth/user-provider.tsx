@@ -103,34 +103,54 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     let profileUnsubscribe: (() => void) | null = null;
 
     const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
+      // Always start loading when auth state might change
       setIsUserLoading(true);
       if (profileUnsubscribe) profileUnsubscribe();
-      
+
       if (firebaseUser) {
         setUser(firebaseUser);
-        
-        // Force refresh the token to get the latest claims.
-        const idTokenResult = await firebaseUser.getIdTokenResult(true);
-        const isAdminUser = !!idTokenResult.claims.admin;
-        setIsAdmin(isAdminUser);
 
         const userRef = doc(firestore, 'users', firebaseUser.uid);
-        profileUnsubscribe = onSnapshot(userRef, async (docSnap) => {
-          if (docSnap.exists()) {
-            setProfile(docSnap.data() as UserProfile);
-          } else {
-            const newProfile = await createProfileInFirestore(firebaseUser);
-            setProfile(newProfile);
-          }
-          // Final step: Stop loading after all user data is fetched/set.
-          setIsUserLoading(false);
-        }, (error) => {
-          console.error("Error fetching user profile:", error);
-          const contextualError = new FirestorePermissionError({ path: userRef.path, operation: 'get' });
-          errorEmitter.emit('permission-error', contextualError);
-          setIsUserLoading(false);
+        
+        // Asynchronously get the token and listen for profile changes
+        const tokenPromise = firebaseUser.getIdTokenResult(true);
+        const profilePromise = new Promise<UserProfile>((resolve, reject) => {
+            profileUnsubscribe = onSnapshot(userRef, async (docSnap) => {
+                if (docSnap.exists()) {
+                    resolve(docSnap.data() as UserProfile);
+                } else {
+                    const newProfile = await createProfileInFirestore(firebaseUser);
+                    resolve(newProfile);
+                }
+            }, (error) => {
+                console.error("Error fetching user profile:", error);
+                const contextualError = new FirestorePermissionError({ path: userRef.path, operation: 'get' });
+                errorEmitter.emit('permission-error', contextualError);
+                reject(error);
+            });
         });
+
+        try {
+            // Wait for both the token and profile to be resolved
+            const [idTokenResult, userProfile] = await Promise.all([tokenPromise, profilePromise]);
+            
+            // Now set the state based on the resolved promises
+            setIsAdmin(!!idTokenResult.claims.admin);
+            setProfile(userProfile);
+            
+        } catch (error) {
+            console.error("Failed to load user session:", error);
+            // If anything fails, ensure we are in a clean, logged-out state
+            setUser(null);
+            setProfile(null);
+            setIsAdmin(false);
+        } finally {
+            // Only stop loading after all async operations are complete
+            setIsUserLoading(false);
+        }
+
       } else {
+        // No user, reset all state and stop loading
         setUser(null);
         setProfile(null);
         setIsAdmin(false);
@@ -156,7 +176,10 @@ export const UserProvider = ({ children }: UserProviderProps) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     if (!userCredential.user.emailVerified) {
         await firebaseSignOut(auth);
-        throw new Error('auth/email-not-verified');
+        const error = new Error('auth/email-not-verified');
+        error.name = 'FirebaseError';
+        (error as any).code = 'auth/email-not-verified';
+        throw error;
     }
     // Force refresh of token to get latest claims
     await userCredential.user.getIdToken(true);

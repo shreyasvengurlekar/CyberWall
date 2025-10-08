@@ -37,6 +37,8 @@ export default function LoginPage() {
   });
 
   React.useEffect(() => {
+    // This effect runs when user, isAdmin, or loading state changes.
+    // It handles redirection AFTER a successful login and state update.
     if (!isUserLoading && user) {
       if (isAdmin) {
         router.push('/admin');
@@ -50,19 +52,28 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {
         await signIn(values.email, values.password);
+        // On successful sign-in, the onAuthStateChanged listener in UserProvider
+        // will update the user state, which will trigger the useEffect above for redirection.
         form.reset();
-        // The useEffect hook will now handle redirection correctly
     } catch (error: any) {
         console.error(error);
         let message = 'An unexpected error occurred. Please try again.';
-        if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-            message = 'Invalid email or password. Please try again.';
-        } else if (error.code === 'auth/user-disabled') {
-            message = 'This account has been disabled.';
-        } else if (error.code === 'auth/too-many-requests') {
-            message = 'Too many login attempts. Please try again later.';
-        } else if (error.code === 'auth/email-not-verified' || (error.message && error.message.includes('auth/email-not-verified'))) {
-            message = 'Please verify your email before logging in. Check your inbox for a verification link.';
+        // Use a switch for cleaner error handling
+        switch (error.code) {
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
+                message = 'Invalid email or password. Please try again.';
+                break;
+            case 'auth/user-disabled':
+                message = 'This account has been disabled.';
+                break;
+            case 'auth/too-many-requests':
+                message = 'Too many login attempts. Please try again later.';
+                break;
+            case 'auth/email-not-verified':
+                message = 'Please verify your email before logging in. Check your inbox for a verification link.';
+                break;
         }
         
         showAlert({
