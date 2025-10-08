@@ -1,6 +1,6 @@
 'use server';
 import 'server-only';
-import { initializeApp, getApps, App, applicationDefault } from 'firebase-admin/app';
+import { initializeApp, getApps, App } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 // This is a server-only file. It will not be sent to the client.
@@ -11,11 +11,9 @@ function initializeAdminApp(): App {
     if (apps.length > 0) {
         return apps[0];
     }
-    // This will use the GOOGLE_APPLICATION_CREDENTIALS environment variable
-    // for authentication, which is automatically set in the App Hosting environment.
-    return initializeApp({
-        credential: applicationDefault(),
-    });
+    // In a Google Cloud environment like Firebase App Hosting, calling initializeApp()
+    // with no arguments will automatically use the project's default service account credentials.
+    return initializeApp();
 }
 
 /**
@@ -40,11 +38,14 @@ export async function setAdminClaim(uid: string): Promise<{ success: boolean; er
 
     return { success: true };
   } catch (error: any) {
-    console.error('Error setting admin claim:', error);
-    // Provide a more detailed error message for debugging, but be cautious in production
+    console.error(`Error in setAdminClaim: ${error.code} - ${error.message}`);
+    // Provide a more detailed error message for debugging
+    let detailedError = `An internal error occurred: ${error.message}`;
     if (error.code === 'permission-denied' || error.code === 'insufficient-permission') {
-         return { success: false, error: 'The backend service does not have sufficient permissions to set admin claims. Please check the IAM roles for the App Hosting service account.' };
+         detailedError = 'The backend service does not have sufficient permissions to set admin claims. Please check the IAM roles for the App Hosting service account.';
+    } else if (error.message.includes('Google OAuth2 access token')) {
+        detailedError = `An internal error occurred: Credential implementation provided to initializeApp() via the "credential" property failed to fetch a valid Google OAuth2 access token with the following error: "${error.message}"`;
     }
-     return { success: false, error: `An internal error occurred: ${error.message}` };
+     return { success: false, error: detailedError };
   }
 }
