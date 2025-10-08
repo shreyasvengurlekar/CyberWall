@@ -1,22 +1,29 @@
 'use server';
 import 'server-only';
-import { initializeApp, getApps, App } from 'firebase-admin/app';
+import { initializeApp, getApps, App, deleteApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
 // This is a server-only file. It will not be sent to the client.
 
 // Initialize Firebase Admin SDK
 function initializeAdminApp(): App {
-    // If the admin app is already initialized, return it.
-    const alreadyInitialized = getApps().find(app => app.name === '[DEFAULT]');
-    if (alreadyInitialized) {
-        return alreadyInitialized;
+    const appName = 'firebase-admin-app-for-claims';
+    // Find if the app is already initialized
+    const existingApp = getApps().find(app => app.name === appName);
+    if (existingApp) {
+        return existingApp;
     }
 
     // In a Google Cloud environment like Firebase App Hosting, calling initializeApp()
-    // with no arguments will automatically use the project's default service account credentials.
+    // with no arguments *should* automatically use the project's default service account credentials.
     // This is the simplest and most reliable method in this context.
-    return initializeApp();
+    try {
+        return initializeApp({}, appName);
+    } catch (e: any) {
+        // If there's an error during initialization, we re-throw it to be caught by the calling function.
+        console.error(`Failed to initialize Firebase Admin SDK: ${e.message}`);
+        throw e;
+    }
 }
 
 /**
@@ -26,8 +33,9 @@ function initializeAdminApp(): App {
  * @returns An object indicating success or failure.
  */
 export async function setAdminClaim(uid: string): Promise<{ success: boolean; error?: string }> {
+  let adminApp: App | undefined;
   try {
-    const adminApp = initializeAdminApp();
+    adminApp = initializeAdminApp();
     const auth = getAuth(adminApp);
 
     // Set the custom claim. This overwrites existing claims.
@@ -38,17 +46,27 @@ export async function setAdminClaim(uid: string): Promise<{ success: boolean; er
     if (userRecord.customClaims?.['admin'] !== true) {
         throw new Error('Failed to verify admin claim on user record.');
     }
+    
+    // Clean up the app instance if it's safe to do so. In a serverless environment,
+    // this might not be necessary, but it's good practice if the function is long-lived.
+    // await deleteApp(adminApp);
 
     return { success: true };
   } catch (error: any) {
     console.error(`Error in setAdminClaim: ${error.code} - ${error.message}`);
+    
     // Provide a more detailed error message for debugging
     let detailedError = `An internal error occurred: ${error.message}`;
     if (error.code === 'permission-denied' || error.code === 'insufficient-permission') {
-         detailedError = 'The backend service does not have sufficient permissions to set admin claims. Please check the IAM roles for the App Hosting service account.';
+         detailedError = 'The backend service does not have sufficient permissions to set admin claims. Please check the IAM roles for the App Hosting service account. It may require the "Firebase Authentication Admin" role.';
     } else if (error.message.includes('Google OAuth2 access token')) {
         detailedError = `An internal error occurred: Credential implementation provided to initializeApp() via the "credential" property failed to fetch a valid Google OAuth2 access token with the following error: "${error.message}"`;
     }
-     return { success: false, error: detailedError };
+
+    // if (adminApp) {
+    //     await deleteApp(adminApp);
+    // }
+
+    return { success: false, error: detailedError };
   }
 }
