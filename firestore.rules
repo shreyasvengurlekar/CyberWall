@@ -1,164 +1,167 @@
+/**
+ * @fileoverview Firestore Security Rules for CyberWall Scanner application.
+ *
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model. Each user can only access their own data.
+ *
+ * Data Structure:
+ * All data is nested under /users/{userId}, ensuring path-based ownership.
+ * - /users/{userId}: Stores user profiles.
+ * - /users/{userId}/scans/{scanId}: Stores scans performed by a user.
+ * - /users/{userId}/scans/{scanId}/reports/{reportId}: Stores reports generated for a scan.
+ * - /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId}: Stores findings included in a report.
+ *
+ * Key Security Decisions:
+ * - Users can only list their own documents.
+ * - All write operations are restricted to the owner of the data.
+ * - Data consistency is enforced between the path and the document's internal fields.
+ *
+ * Denormalization for Authorization:
+ * The data model uses path-based ownership, so no denormalization is required. The userId is always available from the path.
+ *
+ * Structural Segregation:
+ * User-specific data is segregated under /users/{userId}, enabling secure and performant list operations.
+ */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Enforces user-based access control for user profile documents. Only the authenticated user can read or write their own profile.
-     * @path /users/{userId}
-     * @allow (create) User with ID 'user123' creates their profile.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'user123', email: 'test@example.com', createdAt: '2024-01-01T00:00:00Z'}}
-     * @allow (get) User with ID 'user123' retrieves their profile.
-     *   - Auth: {uid: 'user123'}
-     * @allow (update) User with ID 'user123' updates their profile.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'user123', email: 'new_email@example.com', createdAt: '2024-01-01T00:00:00Z'}}
-     * @allow (delete) User with ID 'user123' deletes their profile.
-     *   - Auth: {uid: 'user123'}
-     * @deny (create) User with ID 'user123' attempts to create a profile with a mismatched ID.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'user456', email: 'test@example.com', createdAt: '2024-01-01T00:00:00Z'}}
-     * @deny (get) User with ID 'user456' attempts to retrieve user 'user123's profile.
-     *   - Auth: {uid: 'user456'}
-     * @deny (update) User with ID 'user456' attempts to update user 'user123's profile.
-     *   - Auth: {uid: 'user456'}
-     *   - Request: {data: {id: 'user123', email: 'new_email@example.com', createdAt: '2024-01-01T00:00:00Z'}}
-     * @deny (delete) User with ID 'user456' attempts to delete user 'user123's profile.
-     *   - Auth: {uid: 'user456'}
+     * @description Secures the /users/{userId} collection, allowing only the owner to read and write their own profile.
+     * @path /databases/{database}/documents/users/{userId}
+     * @allow (create) User with ID 'user123' can create their profile.
+     *   - Auth: { uid: 'user123' }
+     *   - Request: { id: 'user123', email: 'test@example.com', createdAt: '2024-01-01T00:00:00Z' }
+     * @allow (get) User with ID 'user123' can read their profile.
+     *   - Auth: { uid: 'user123' }
+     * @allow (update) User with ID 'user123' can update their profile.
+     *   - Auth: { uid: 'user123' }
+     * @allow (delete) User with ID 'user123' can delete their profile.
+     *   - Auth: { uid: 'user123' }
+     * @deny (get) User with ID 'user456' cannot read user 'user123' profile.
+     *   - Auth: { uid: 'user456' }
+     * @deny (create) User with ID 'user456' cannot create user 'user123' profile.
+     *   - Auth: { uid: 'user456' }
+     *   - Request: { id: 'user123', email: 'test@example.com', createdAt: '2024-01-01T00:00:00Z' }
      * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
-      // Helper function to check if the user is signed in
-      function isSignedIn() {
-        return request.auth != null;
-      }
-
-      // Helper function to check if the authenticated user is the owner of the resource
       function isOwner(userId) {
-        return isSignedIn() && request.auth.uid == userId;
+        return request.auth != null && request.auth.uid == userId;
       }
-
-      // Helper function to check if the authenticated user is the owner of the existing resource
       function isExistingOwner(userId) {
-        return isSignedIn() && request.auth.uid == userId;
+        return isOwner(userId) && resource != null;
       }
-
       allow get: if isOwner(userId);
-      allow list: if false; // Listing users is not allowed.
-      allow create: if request.auth.uid == userId;
-      allow update: if isExistingOwner(userId);
+      allow list: if false;
+      allow create: if isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
       allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Enforces user-based access control for scan documents. Only the authenticated user (owner) can create, read, update, or delete their own scans.
-     * @path /users/{userId}/scans/{scanId}
-     * @allow (create) User with ID 'user123' creates a new scan.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'scan456', userId: 'user123', url: 'http://example.com', scanType: 'quick', startTime: '2024-01-01T00:00:00Z', status: 'pending'}}
-     * @allow (get) User with ID 'user123' retrieves their scan with ID 'scan456'.
-     *   - Auth: {uid: 'user123'}
-     * @allow (list) User with ID 'user123' lists their own scans.
-     *   - Auth: {uid: 'user123'}
-     * @allow (update) User with ID 'user123' updates their scan with ID 'scan456'.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'scan456', userId: 'user123', url: 'http://example.com', scanType: 'quick', startTime: '2024-01-01T00:00:00Z', status: 'completed'}}
-     * @allow (delete) User with ID 'user123' deletes their scan with ID 'scan456'.
-     *   - Auth: {uid: 'user123'}
-     * @deny (create) User with ID 'user456' attempts to create a scan for user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     *   - Request: {data: {id: 'scan456', userId: 'user123', url: 'http://example.com', scanType: 'quick', startTime: '2024-01-01T00:00:00Z', status: 'pending'}}
-     * @deny (get) User with ID 'user456' attempts to retrieve a scan owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @deny (list) User with ID 'user456' attempts to list scans owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @deny (update) User with ID 'user456' attempts to update a scan owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     *   - Request: {data: {id: 'scan456', userId: 'user123', url: 'http://example.com', scanType: 'quick', startTime: '2024-01-01T00:00:00Z', status: 'completed'}}
-     * @deny (delete) User with ID 'user456' attempts to delete a scan owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @principle Enforces document ownership for all operations within the user's scans subcollection.
+     * @description Secures the /users/{userId}/scans/{scanId} collection, allowing only the owner to read and write their own scans.
+     * @path /databases/{database}/documents/users/{userId}/scans/{scanId}
+     * @allow (create) User with ID 'user123' can create a scan.
+     *   - Auth: { uid: 'user123' }
+     *   - Request: { userId: 'user123', id: 'scan123', url: 'http://example.com' }
+     * @allow (get) User with ID 'user123' can read their scan.
+     *   - Auth: { uid: 'user123' }
+     * @allow (list) User with ID 'user123' can list their scans.
+     *   - Auth: { uid: 'user123' }
+     * @allow (update) User with ID 'user123' can update their scan.
+     *   - Auth: { uid: 'user123' }
+     * @allow (delete) User with ID 'user123' can delete their scan.
+     *   - Auth: { uid: 'user123' }
+     * @deny (get) User with ID 'user456' cannot read user 'user123' scan.
+     *   - Auth: { uid: 'user456' }
+     * @deny (create) User with ID 'user456' cannot create user 'user123' scan.
+     *   - Auth: { uid: 'user456' }
+     *   - Request: { userId: 'user123', id: 'scan123', url: 'http://example.com' }
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId}/scans/{scanId} {
-      allow get: if request.auth.uid == userId;
-      allow list: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
-      allow update: if request.auth.uid == userId;
-      allow delete: if request.auth.uid == userId;
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && request.resource.data.userId == userId;
+      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+      allow delete: if isExistingOwner(userId);
     }
 
     /**
-     * @description Enforces user-based access control for report documents. Only the authenticated user (owner) can create, read, update, or delete their own reports.
-     * @path /users/{userId}/scans/{scanId}/reports/{reportId}
-     * @allow (create) User with ID 'user123' creates a new report for their scan.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'report789', scanId: 'scan456', generatedTime: '2024-01-02T00:00:00Z', summary: 'No vulnerabilities found'}}
-     * @allow (get) User with ID 'user123' retrieves their report with ID 'report789'.
-     *   - Auth: {uid: 'user123'}
-     * @allow (list) User with ID 'user123' lists their own reports for a specific scan.
-     *   - Auth: {uid: 'user123'}
-     * @allow (update) User with ID 'user123' updates their report with ID 'report789'.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'report789', scanId: 'scan456', generatedTime: '2024-01-02T00:00:00Z', summary: 'Minor vulnerabilities found'}}
-     * @allow (delete) User with ID 'user123' deletes their report with ID 'report789'.
-     *   - Auth: {uid: 'user123'}
-     * @deny (create) User with ID 'user456' attempts to create a report for user 'user123's scan.
-     *   - Auth: {uid: 'user456'}
-     *   - Request: {data: {id: 'report789', scanId: 'scan456', generatedTime: '2024-01-02T00:00:00Z', summary: 'No vulnerabilities found'}}
-     * @deny (get) User with ID 'user456' attempts to retrieve a report owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @deny (list) User with ID 'user456' attempts to list reports owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @deny (update) User with ID 'user456' attempts to update a report owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     *   - Request: {data: {id: 'report789', scanId: 'scan456', generatedTime: '2024-01-02T00:00:00Z', summary: 'Minor vulnerabilities found'}}
-     * @deny (delete) User with ID 'user456' attempts to delete a report owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @principle Enforces document ownership for all operations within the user's reports subcollection.
+     * @description Secures the /users/{userId}/scans/{scanId}/reports/{reportId} collection, allowing only the owner to read and write their own reports.
+     * @path /databases/{database}/documents/users/{userId}/scans/{scanId}/reports/{reportId}
+     * @allow (create) User with ID 'user123' can create a report.
+     *   - Auth: { uid: 'user123' }
+     *   - Request: { scanId: 'scan123', id: 'report123', generatedTime: '2024-01-02T00:00:00Z', summary: '...' }
+     * @allow (get) User with ID 'user123' can read their report.
+     *   - Auth: { uid: 'user123' }
+     * @allow (list) User with ID 'user123' can list their reports.
+     *   - Auth: { uid: 'user123' }
+     * @allow (update) User with ID 'user123' can update their report.
+     *   - Auth: { uid: 'user123' }
+     * @allow (delete) User with ID 'user123' can delete their report.
+     *   - Auth: { uid: 'user123' }
+     * @deny (get) User with ID 'user456' cannot read user 'user123' report.
+     *   - Auth: { uid: 'user456' }
+     * @deny (create) User with ID 'user456' cannot create user 'user123' report.
+     *   - Auth: { uid: 'user456' }
+     *   - Request: { scanId: 'scan123', id: 'report123', generatedTime: '2024-01-02T00:00:00Z', summary: '...' }
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId}/scans/{scanId}/reports/{reportId} {
-      allow get: if request.auth.uid == userId;
-      allow list: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
-      allow update: if request.auth.uid == userId;
-      allow delete: if request.auth.uid == userId;
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)/scans/$(scanId)).data.userId == userId && request.resource.data.scanId == scanId;
+      allow update: if isExistingOwner(userId) && get(/databases/$(database)/documents/users/$(userId)/scans/$(scanId)).data.userId == userId && request.resource.data.scanId == resource.data.scanId;
+      allow delete: if isExistingOwner(userId) && get(/databases/$(database)/documents/users/$(userId)/scans/$(scanId)).data.userId == userId;
     }
 
     /**
-     * @description Enforces user-based access control for finding documents. Only the authenticated user (owner) can create, read, update, or delete their own findings.
-     * @path /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId}
-     * @allow (create) User with ID 'user123' creates a new finding for their report.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'finding101', reportId: 'report789', severity: 'high', type: 'XSS', description: 'Cross-site scripting vulnerability', suggestedFix: 'Sanitize user inputs'}}
-     * @allow (get) User with ID 'user123' retrieves their finding with ID 'finding101'.
-     *   - Auth: {uid: 'user123'}
-     * @allow (list) User with ID 'user123' lists their own findings for a specific report.
-     *   - Auth: {uid: 'user123'}
-     * @allow (update) User with ID 'user123' updates their finding with ID 'finding101'.
-     *   - Auth: {uid: 'user123'}
-     *   - Request: {data: {id: 'finding101', reportId: 'report789', severity: 'critical', type: 'SQL injection', description: 'SQL injection vulnerability', suggestedFix: 'Use parameterized queries'}}
-     * @allow (delete) User with ID 'user123' deletes their finding with ID 'finding101'.
-     *   - Auth: {uid: 'user123'}
-     * @deny (create) User with ID 'user456' attempts to create a finding for user 'user123's report.
-     *   - Auth: {uid: 'user456'}
-     *   - Request: {data: {id: 'finding101', reportId: 'report789', severity: 'high', type: 'XSS', description: 'Cross-site scripting vulnerability', suggestedFix: 'Sanitize user inputs'}}
-     * @deny (get) User with ID 'user456' attempts to retrieve a finding owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @deny (list) User with ID 'user456' attempts to list findings owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @deny (update) User with ID 'user456' attempts to update a finding owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     *   - Request: {data: {id: 'finding101', reportId: 'report789', severity: 'critical', type: 'SQL injection', description: 'SQL injection vulnerability', suggestedFix: 'Use parameterized queries'}}
-     * @deny (delete) User with ID 'user456' attempts to delete a finding owned by user 'user123'.
-     *   - Auth: {uid: 'user456'}
-     * @principle Enforces document ownership for all operations within the user's findings subcollection.
+     * @description Secures the /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId} collection, allowing only the owner to read and write their own findings.
+     * @path /databases/{database}/documents/users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId}
+     * @allow (create) User with ID 'user123' can create a finding.
+     *   - Auth: { uid: 'user123' }
+     *   - Request: { reportId: 'report123', id: 'finding123', severity: 'high', type: 'xss', description: '...', suggestedFix: '...' }
+     * @allow (get) User with ID 'user123' can read their finding.
+     *   - Auth: { uid: 'user123' }
+     * @allow (list) User with ID 'user123' can list their findings.
+     *   - Auth: { uid: 'user123' }
+     * @allow (update) User with ID 'user123' can update their finding.
+     *   - Auth: { uid: 'user123' }
+     * @allow (delete) User with ID 'user123' can delete their finding.
+     *   - Auth: { uid: 'user123' }
+     * @deny (get) User with ID 'user456' cannot read user 'user123' finding.
+     *   - Auth: { uid: 'user456' }
+     * @deny (create) User with ID 'user456' cannot create user 'user123' finding.
+     *   - Auth: { uid: 'user456' }
+     *   - Request: { reportId: 'report123', id: 'finding123', severity: 'high', type: 'xss', description: '...', suggestedFix: '...' }
+     * @principle Enforces document ownership for all operations.
      */
     match /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId} {
-      allow get: if request.auth.uid == userId;
-      allow list: if request.auth.uid == userId;
-      allow create: if request.auth.uid == userId;
-      allow update: if request.auth.uid == userId;
-      allow delete: if request.auth.uid == userId;
+      function isOwner(userId) {
+        return request.auth != null && request.auth.uid == userId;
+      }
+      function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+      }
+      allow get: if isOwner(userId);
+      allow list: if isOwner(userId);
+      allow create: if isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)/scans/$(scanId)/reports/$(reportId)).data.scanId == scanId && request.resource.data.reportId == reportId;
+      allow update: if isExistingOwner(userId) && get(/databases/$(database)/documents/users/$(userId)/scans/$(scanId)/reports/$(reportId)).data.scanId == scanId && request.resource.data.reportId == resource.data.reportId;
+      allow delete: if isExistingOwner(userId) && get(/databases/$(database)/documents/users/$(userId)/scans/$(scanId)/reports/$(reportId)).data.scanId == scanId;
     }
   }
 }
