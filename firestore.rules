@@ -2,128 +2,192 @@
  * @fileoverview Firestore Security Rules for CyberWall Scanner application.
  *
  * Core Philosophy:
- * This ruleset enforces a strict user-ownership model. Each user can only access their own data.
+ * This ruleset enforces a strict user-ownership model. Each user can only access their own data (profile, scans, reports, findings).
  *
  * Data Structure:
- * All data is nested under /users/{userId}, ensuring path-based authorization.
- * - /users/{userId}: User profile information.
- * - /users/{userId}/scans/{scanId}: Scan data for a specific user.
- * - /users/{userId}/scans/{scanId}/reports/{reportId}: Reports associated with a scan.
- * - /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId}: Findings within a report.
+ * The data is hierarchically organized under /users/{userId}, ensuring that all scans, reports, and findings are tied to a specific user.
+ * - /users/{userId} (User profile)
+ * - /users/{userId}/scans/{scanId} (Scans performed by the user)
+ * - /users/{userId}/scans/{scanId}/reports/{reportId} (Reports generated for each scan)
+ * - /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId} (Findings within each report)
  *
  * Key Security Decisions:
- * - Users can only create, read, update, and delete data under their own user ID.
- * - The rules are structured to prevent unauthorized access to user data.
- * - List operations are restricted to the owner of the data.
+ * - Users can only create, read, update, and delete their own data.
+ * - Listing of all users is disallowed.
+ * - No global admin roles are defined; access is strictly user-centric.
  *
  * Denormalization for Authorization:
- * The data structure is organized to avoid the need for `get()` calls in the rules.
- * Ownership is determined by the path, and the `userId` parameter corresponds to the authenticated user's UID.
+ * The data model uses path-based authorization, with all user-owned data located under the /users/{userId} path. This eliminates the need for additional reads to verify ownership.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Controls access to user profiles.
+     * @description Secure access to user profiles. Only the authenticated user can manage their own profile.
      * @path /users/{userId}
-     * @allow (create) User with matching UID can create their profile.
-     * @allow (get, list, update, delete) User with matching UID can read, update, and delete their profile.
-     * @deny (create) User cannot create a profile with a mismatched UID.
-     * @deny (get, list, update, delete) User cannot read, update, or delete another user's profile.
+     * @allow (create) - User with UID 'user_abc' can create their profile if request.auth.uid == 'user_abc'.
+     * @allow (get) - User with UID 'user_abc' can get their profile if request.auth.uid == 'user_abc'.
+     * @allow (update) - User with UID 'user_abc' can update their profile if request.auth.uid == 'user_abc'.
+     * @allow (delete) - User with UID 'user_abc' can delete their profile if request.auth.uid == 'user_abc'.
+     * @deny (create) - User with UID 'user_def' cannot create a profile for 'user_abc'.
+     * @deny (get) - User with UID 'user_def' cannot get the profile for 'user_abc'.
+     * @deny (update) - User with UID 'user_def' cannot update the profile for 'user_abc'.
+     * @deny (delete) - User with UID 'user_def' cannot delete the profile for 'user_abc'.
      * @principle Enforces document ownership for all operations.
      */
     match /users/{userId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
       function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
+        return request.auth.uid == userId;
       }
 
-      function isExistingOwner(userId) {
-        return isOwner(userId) && resource != null;
-      }
+      // Allow the user to create their own profile, enforcing that the userId matches the authenticated user's UID.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
 
-      allow get: if isOwner(userId);
-      allow list: if false; // Listing all users is not permitted.
+      // Allow read access to the user's own profile.
+      allow get: if isSignedIn() && isOwner(userId);
 
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.id == resource.data.id;
-      allow delete: if isExistingOwner(userId);
+      // Allow updates to the user's own profile. Enforce immutability of the 'id' field.
+      allow update: if isSignedIn() && isOwner(userId) && request.resource.data.id == resource.data.id;
+
+      // Allow deletion of the user's own profile.
+      allow delete: if isSignedIn() && isOwner(userId) && resource != null;
+
+      // Disallow listing all users.
+      allow list: if false;
     }
 
     /**
-     * @description Controls access to scans performed by a user.
+     * @description Secure access to scans performed by a user. Only the owning user can manage their scans.
      * @path /users/{userId}/scans/{scanId}
-     * @allow (create) User with matching UID can create a scan under their profile.
-     * @allow (get, list, update, delete) User with matching UID can read, update, and delete their scans.
-     * @deny (create) User cannot create a scan with a mismatched UID.
-     * @deny (get, list, update, delete) User cannot read, update, or delete another user's scan.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) - User 'user_abc' can create a scan under their profile.
+     * @allow (get) - User 'user_abc' can get a scan under their profile.
+     * @allow (update) - User 'user_abc' can update a scan under their profile.
+     * @allow (delete) - User 'user_abc' can delete a scan under their profile.
+     * @allow (list) - User 'user_abc' can list their own scans.
+     * @deny (create) - User 'user_def' cannot create a scan under 'user_abc's profile.
+     * @deny (get) - User 'user_def' cannot get a scan under 'user_abc's profile.
+     * @deny (update) - User 'user_def' cannot update a scan under 'user_abc's profile.
+     * @deny (delete) - User 'user_def' cannot delete a scan under 'user_abc's profile.
+     * @principle Enforces user-specific data isolation.
      */
     match /users/{userId}/scans/{scanId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
       function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
+        return request.auth.uid == userId;
       }
 
       function isExistingOwner(userId) {
         return isOwner(userId) && resource != null;
       }
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
 
-      allow create: if isOwner(userId) && request.resource.data.userId == userId;
-      allow update: if isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
-      allow delete: if isExistingOwner(userId);
+      // Allow creation of scans only by the owning user, and validate the userId on create.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.userId == userId;
+
+      // Allow read access to scans only by the owning user.
+      allow get: if isSignedIn() && isOwner(userId);
+
+      // Allow updates to scans only by the owning user. Enforce immutability of the userId.
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.userId == resource.data.userId;
+
+      // Allow deletion of scans only by the owning user.
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+
+      // Allow listing of scans only by the owning user.
+      allow list: if isSignedIn() && isOwner(userId);
     }
 
     /**
-     * @description Controls access to reports generated for a scan.
+     * @description Secure access to reports generated for a scan. Only the owning user can manage the reports associated with their scans.
      * @path /users/{userId}/scans/{scanId}/reports/{reportId}
-     * @allow (create) User with matching UID can create a report under their scan.
-     * @allow (get, list, update, delete) User with matching UID can read, update, and delete their reports.
-     * @deny (create) User cannot create a report with a mismatched UID.
-     * @deny (get, list, update, delete) User cannot read, update, or delete another user's report.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) - User 'user_abc' can create a report for their scan.
+     * @allow (get) - User 'user_abc' can get a report for their scan.
+     * @allow (update) - User 'user_abc' can update a report for their scan.
+     * @allow (delete) - User 'user_abc' can delete a report for their scan.
+     * @allow (list) - User 'user_abc' can list reports for their scan.
+     * @deny (create) - User 'user_def' cannot create a report for 'user_abc's scan.
+     * @deny (get) - User 'user_def' cannot get a report for 'user_abc's scan.
+     * @deny (update) - User 'user_def' cannot update a report for 'user_abc's scan.
+     * @deny (delete) - User 'user_def' cannot delete a report for 'user_abc's scan.
+     * @principle Enforces user-specific data isolation and scan-report relationship.
      */
     match /users/{userId}/scans/{scanId}/reports/{reportId} {
-      function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
+      function isSignedIn() {
+        return request.auth != null;
       }
 
-      function isExistingOwner(userId) {
+      function isOwner(userId) {
+        return request.auth.uid == userId;
+      }
+
+       function isExistingOwner(userId) {
         return isOwner(userId) && resource != null;
       }
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
 
-      allow create: if isOwner(userId) && request.resource.data.scanId == scanId;
-      allow update: if isExistingOwner(userId) && request.resource.data.scanId == resource.data.scanId;
-      allow delete: if isExistingOwner(userId);
+      // Allow creation of reports only by the owning user, and validate scanId on create.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.scanId == scanId;
+
+      // Allow read access to reports only by the owning user.
+      allow get: if isSignedIn() && isOwner(userId);
+
+      // Allow updates to reports only by the owning user. Enforce immutability of the scanId.
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.scanId == resource.data.scanId;
+
+      // Allow deletion of reports only by the owning user.
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+
+      // Allow listing of reports only by the owning user.
+      allow list: if isSignedIn() && isOwner(userId);
     }
 
     /**
-     * @description Controls access to findings included in a report.
+     * @description Secure access to findings included in a report. Only the owning user can manage the findings associated with their reports.
      * @path /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId}
-     * @allow (create) User with matching UID can create a finding under their report.
-     * @allow (get, list, update, delete) User with matching UID can read, update, and delete their findings.
-     * @deny (create) User cannot create a finding with a mismatched UID.
-     * @deny (get, list, update, delete) User cannot read, update, or delete another user's finding.
-     * @principle Enforces document ownership for all operations.
+     * @allow (create) - User 'user_abc' can create a finding for their report.
+     * @allow (get) - User 'user_abc' can get a finding for their report.
+     * @allow (update) - User 'user_abc' can update a finding for their report.
+     * @allow (delete) - User 'user_abc' can delete a finding for their report.
+     * @allow (list) - User 'user_abc' can list findings for their report.
+     * @deny (create) - User 'user_def' cannot create a finding for 'user_abc's report.
+     * @deny (get) - User 'user_def' cannot get a finding for 'user_abc's report.
+     * @deny (update) - User 'user_def' cannot update a finding for 'user_abc's report.
+     * @deny (delete) - User 'user_def' cannot delete a finding for 'user_abc's report.
+     * @principle Enforces user-specific data isolation and report-finding relationship.
      */
     match /users/{userId}/scans/{scanId}/reports/{reportId}/findings/{findingId} {
+      function isSignedIn() {
+        return request.auth != null;
+      }
+
       function isOwner(userId) {
-        return request.auth != null && request.auth.uid == userId;
+        return request.auth.uid == userId;
       }
 
       function isExistingOwner(userId) {
         return isOwner(userId) && resource != null;
       }
 
-      allow get: if isOwner(userId);
-      allow list: if isOwner(userId);
+      // Allow creation of findings only by the owning user, and validate reportId on create.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.reportId == reportId;
 
-      allow create: if isOwner(userId) && request.resource.data.reportId == reportId;
-      allow update: if isExistingOwner(userId) && request.resource.data.reportId == resource.data.reportId;
-      allow delete: if isExistingOwner(userId);
+      // Allow read access to findings only by the owning user.
+      allow get: if isSignedIn() && isOwner(userId);
+
+      // Allow updates to findings only by the owning user. Enforce immutability of the reportId.
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.reportId == resource.data.reportId;
+
+      // Allow deletion of findings only by the owning user.
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+
+      // Allow listing of findings only by the owning user.
+      allow list: if isSignedIn() && isOwner(userId);
     }
   }
 }
