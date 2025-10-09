@@ -85,8 +85,8 @@ To get this project running locally:
 
 1.  **Clone the repository:**
     ```bash
-    git clone <your-repository-url>
-    cd cyberwall-scanner
+    git clone [<your-repository-url>](https://github.com/shreyasvengurlekar/CyberWall.git)
+    cd cyberwall
     ```
 
 2.  **Install dependencies:**
