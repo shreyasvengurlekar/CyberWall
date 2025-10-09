@@ -1,7 +1,7 @@
 
 # 🛡️ CyberWall 
 
-![CyberWall Hero](https://picsum.photos/seed/cyberwall-readme/1200/600?data-ai-hint=cybersecurity%20abstract)
+[![CyberWall Shield](https://picsum.photos/seed/cyberwall-shield/1200/600?data-ai-hint=cybersecurity%20shield)](https://cyberwallshreyas.vercel.app)
 
 **An intelligent, AI-powered web vulnerability scanner designed to help developers and students identify, understand, and remediate common security threats.**
 
@@ -26,7 +26,7 @@ This project was built to make web security more accessible, turning complex vul
 - **📄 PDF Report Downloads:** Generate professional PDF reports for your scans to share with your team or keep for your records.
 - **👤 User Authentication:** Secure user accounts with Firebase Authentication, including sign-up, login, and password reset functionality.
 - **👑 Admin Dashboard:** A protected route for administrators to view all registered users and every scan performed across the platform.
-- **📚 Educational Resources:** Dedicated pages explaining the nature and impact of each vulnerability type, turning the tool into a study resource.
+- **📚 Educational Resources:** Dedicated pages explaining the nature and impact of each vulnerability type, a great study resource.
 - **🎨 Sleek & Responsive UI:** A modern, fully responsive interface built with Next.js, Tailwind CSS, and ShadCN/UI.
 
 ## 🚀 Technology Stack
