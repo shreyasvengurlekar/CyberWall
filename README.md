@@ -1,7 +1,8 @@
 
 # 🛡️ CyberWall 
 
-[![CyberWall Shield]([[(https://drive.google.com/file/d/1Y-SdaDo0N1zNSe9th8uv541gwRsSkyzN/view?usp=sharing)](https://drive.google.com/file/d/1Y-SdaDo0N1zNSe9th8uv541gwRsSkyzN/view?usp=sharing)](https://drive.google.com/file/d/1Y-SdaDo0N1zNSe9th8uv541gwRsSkyzN/view?usp=sharing))](https://cyberwallshreyas.vercel.app)
+[![CyberWall Shield](https://placehold.co/1200x600/222b3c/7c8ac4?text=🛡️&font=source-sans-pro)](https://cyberwallshreyas.vercel.app)
+
 
 **An intelligent, AI-powered web vulnerability scanner designed to help developers and students identify, understand, and remediate common security threats.**
 
