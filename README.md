@@ -1,8 +1,11 @@
 
-# 🛡️ CyberWall 
+# <a href="https://cyberwallshreyas.vercel.app">🛡️CyberWall</a>
 
-[![CyberWall Shield](https://placehold.co/1200x600/222b3c/7c8ac4?text=🛡️&font=source-sans-pro)](https://cyberwallshreyas.vercel.app)
-
+<p align="center">
+  <a href="https://cyberwallshreyas.vercel.app">
+    <img src="https://drive.google.com/uc?export=view&id=1Y-SdaDo0N1zNSe9th8uv541gwRsSkyzN" alt="CyberWall Shield" width="150"/>
+  </a>
+</p>
 
 **An intelligent, AI-powered web vulnerability scanner designed to help developers and students identify, understand, and remediate common security threats.**
 
