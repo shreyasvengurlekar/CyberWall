@@ -192,17 +192,17 @@ export default function AboutPage() {
             I'm always open to discussing new projects, creative ideas, or opportunities to be part of an amazing team.
           </p>
           <div className="flex justify-center gap-4">
-            <Button variant="outline" size="icon" asChild>
+            <Button variant="outline" size="icon" asChild className="transition-all hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
                 <a href="https://github.com/shreyasvengurlekar" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                     <Github />
                 </a>
             </Button>
-            <Button variant="outline" size="icon" asChild>
+            <Button variant="outline" size="icon" asChild className="transition-all hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
                 <a href="https://www.linkedin.com/in/shreyasvengurlekar" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
                     <Linkedin />
                 </a>
             </Button>
-             <Button variant="outline" size="icon" asChild>
+             <Button variant="outline" size="icon" asChild className="transition-all hover:scale-110 hover:shadow-lg hover:shadow-primary/20">
                 <a href="mailto:shreyasvengurlekar2004@gmail.com" aria-label="Email">
                     <Mail />
                 </a>
