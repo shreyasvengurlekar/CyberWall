@@ -22,6 +22,19 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { errorEmitter } from '@/firebase/error-emitter';
 
+// Restrict URLs to safe protocols for rendering links
+function sanitizeUrl(url: string): string {
+  // Only allow http and https protocols
+  try {
+    const parsed = new URL(url, window.location.origin);
+    if (parsed.protocol === "http:" || parsed.protocol === "https:") {
+      return url;
+    }
+  } catch (e) {
+    // Invalid URLs fallback
+  }
+  return "#";
+}
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL (e.g., https://example.com)' }),
@@ -285,7 +298,7 @@ function ScannerResults() {
                                 Scan Complete
                             </CardTitle>
                             <CardDescription>
-                                Results for: <a href={scannedUrl} target='_blank' rel='noopener noreferrer' className='text-primary hover:underline'>{scannedUrl}</a>
+                                Results for: <a href={sanitizeUrl(scannedUrl)} target='_blank' rel='noopener noreferrer' className='text-primary hover:underline'>{scannedUrl}</a>
                             </CardDescription>
                         </CardHeader>
                         <CardContent>
