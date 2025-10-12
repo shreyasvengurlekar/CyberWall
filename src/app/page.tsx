@@ -322,21 +322,21 @@ export default function Home() {
                       <Mail className="w-8 h-8 text-primary"/>
                     </div>
                     <h3 className="text-xl font-semibold mb-1">General Inquiries</h3>
-                    <a href="mailto:info@cyberwall.com" className="text-primary hover:underline">info@cyberwall.com</a>
+                    <a href="mailto:teamcyberwall@gmail.com" className="text-primary hover:underline">info@cyberwall.com</a>
                   </Card>
                   <Card className="flex flex-col items-center text-center p-6 hover:shadow-primary/10 hover:-translate-y-1 transition-all">
                     <div className="p-3 bg-primary/10 rounded-full mb-4">
                       <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-indian-rupee text-primary"><path d="M6 3h12"/><path d="M6 8h12"/><path d="m12 17-6-6"/><path d="M6 17h12"/></svg>
                     </div>
                     <h3 className="text-xl font-semibold mb-1">Sales</h3>
-                    <a href="mailto:sales@cyberwall.com" className="text-primary hover:underline">sales@cyberwall.com</a>
+                    <a href="mailto:teamcyberwall@gmail.com" className="text-primary hover:underline">sales@cyberwall.com</a>
                   </Card>
                   <Card className="flex flex-col items-center text-center p-6 hover:shadow-primary/10 hover:-translate-y-1 transition-all">
                     <div className="p-3 bg-primary/10 rounded-full mb-4">
                       <Info className="w-8 h-8 text-primary"/>
                     </div>
                     <h3 className="text-xl font-semibold mb-1">Support</h3>
-                    <a href="mailto:support@cyberwall.com" className="text-primary hover:underline">support@cyberwall.com</a>
+                    <a href="mailto:teamcyberwall@gmail.com" className="text-primary hover:underline">support@cyberwall.com</a>
                   </Card>
                 </div>
               </CardContent>

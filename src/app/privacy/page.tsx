@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
 
           <h2 className="text-2xl font-bold">5. Contact Us</h2>
           <p>
-            If you have questions or comments about this Privacy Policy, please contact us at: <a href="mailto:shreyasvengurlekar2004@gmail.com" className="text-primary hover:underline">shreyasvengurlekar2004@gmail.com</a>
+            If you have questions or comments about this Privacy Policy, please contact us at: <a href="mailto:teamcyberwall@gmail.com" className="text-primary hover:underline">teamcyberwall@gmail.com</a>
           </p>
         </div>
       </div>
