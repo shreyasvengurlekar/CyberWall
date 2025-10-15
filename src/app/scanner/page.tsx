@@ -21,7 +21,8 @@ import { useFirebase } from '@/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { FirestorePermissionError } from '@/firebase/errors';
 import { errorEmitter } from '@/firebase/error-emitter';
-
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const formSchema = z.object({
   url: z.string().url({ message: 'Please enter a valid URL (e.g., https://example.com)' }),
@@ -299,14 +300,14 @@ function ScannerResults() {
                                                     <span className="font-semibold">{vuln.title}</span>
                                                 </div>
                                             </AccordionTrigger>
-                                            <AccordionContent className='prose dark:prose-invert prose-sm max-w-none'>
+                                            <AccordionContent className='prose dark:prose-invert prose-sm max-w-none px-4 py-2'>
                                                 {user ? (
-                                                    <>
-                                                        <p>{vuln.description}</p>
-                                                        <h4 className='font-bold mt-2'>AI-Powered Remediation</h4>
-                                                        <p>{vuln.remediation}</p>
-                                                    </>
-                                                ) : (
+                                                <>
+                                                    <p>{vuln.description}</p>
+                                                    <h4 className='font-bold mt-4 mb-2'>AI-Powered Remediation</h4>
+                                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{vuln.remediation}</ReactMarkdown>
+                                                </>
+                                            ) : (
                                                     <>
                                                         <p>{vuln.description.split('.')[0] + '.'}</p>
                                                         <Card className="my-4 bg-muted/50 p-6 text-center">
