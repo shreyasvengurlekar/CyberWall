@@ -1,3 +1,4 @@
+// src/ai/flows/scanner-flow.ts
 
 'use server';
 /**
@@ -33,6 +34,40 @@ const ScanResultSchema = z.object({
     vulnerabilities: z.array(VulnerabilitySchema).describe('An array of all vulnerabilities found.'),
 });
 export type ScanResult = z.infer<typeof ScanResultSchema>;
+
+// --- THIS IS THE NEW, PERMANENT FIX ---
+/**
+ * A "safety net" function to clean and format the AI's remediation text.
+ * It takes the raw, often messy, output from the AI and forces it into a 
+ * clean, reliable Markdown format.
+ * @param text The raw remediation string from the AI.
+ * @returns A clean string with proper Markdown formatting.
+ */
+function formatRemediation(text: string): string {
+  if (!text) return "";
+
+  let formattedText = text;
+
+  // Step 1: Add newlines before bolded headings (e.g., "**Input Validation:**")
+  formattedText = formattedText.replace(/\*\*(.*?):\*\*/g, '\n\n**$1:**');
+
+  // Step 2: Add newlines before numbered points stuck to sentences (e.g., "...end.2. Start...")
+  formattedText = formattedText.replace(/(\.)(\d\.)/g, '$1\n\n$2');
+  
+  // Step 3: Find common code examples and wrap them in proper Markdown code fences.
+  // This looks for language hints like "in Python:" or "Example CSP Header:"
+  formattedText = formattedText.replace(/(For example, in Python:|Example CSP Header:|Example \(HTTP Header\):)/g, '\n\n$1');
+  formattedText = formattedText.replace(/(```\w*\n[\s\S]*?\n```)/g, (match) => `\n${match}\n`);
+
+  // Step 4: Ensure numbered lists start correctly.
+  formattedText = formattedText.replace(/(\s|^)1\./g, '\n\n1.');
+  
+  // Final cleanup: remove multiple consecutive newlines, leaving just two.
+  formattedText = formattedText.replace(/\n{3,}/g, '\n\n');
+
+  return formattedText.trim();
+}
+// --- END OF FIX ---
 
 
 // The exported function that will be called from the frontend
@@ -76,10 +111,23 @@ const scannerFlow = ai.defineFlow(
     outputSchema: ScanResultSchema,
   },
   async (input) => {
+    // Step 1: Get the raw output from the AI model
     const { output } = await scannerPrompt(input);
     if (!output) {
       throw new Error('The AI model did not return a valid response.');
     }
+
+    // --- THIS IS THE FINAL, PERMANENT FIX ---
+    // Step 2: Loop through each vulnerability and clean up its remediation text
+    // before sending the data back to the frontend.
+    if (output.vulnerabilities && output.vulnerabilities.length > 0) {
+      output.vulnerabilities.forEach(vuln => {
+        vuln.remediation = formatRemediation(vuln.remediation);
+      });
+    }
+    // --- END OF FIX ---
+
+    // Step 3: Return the now clean and perfectly formatted data.
     return output;
   }
 );

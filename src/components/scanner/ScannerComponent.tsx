@@ -32,82 +32,253 @@ const formSchema = z.object({
 
 type ScanStatus = 'idle' | 'scanning' | 'complete' | 'error';
 
-// --- THIS IS THE NEW HELPER FUNCTION ---
-/**
- * Formats the AI remediation text by inserting line breaks before numbered points.
- * This ensures ReactMarkdown renders it as a proper list.
- * @param text The raw string from the AI.
- * @returns A formatted string with newlines.
- */
-const formatRemediationText = (text: string) => {
+const formatRemediationText = (text: string): string => {
   if (!text) return "";
-  // This regular expression finds any number followed by a period (like "2." or "3.")
-  // and inserts two line breaks before it, creating a new paragraph in Markdown.
-  return text.replace(/(\d\.)/g, '\n\n$1');
+  let formattedText = text;
+  formattedText = formattedText.replace(/\*\*(.*?):\*\*/g, '\n\n**$1:**');
+  formattedText = formattedText.replace(/(\.)(\d\.)/g, '$1\n\n$2');
+  formattedText = formattedText.replace(/(For example, in Python:|Example CSP Header:|Example \(HTTP Header\):)/g, '\n\n$1');
+  formattedText = formattedText.replace(/(```\w*\n[\s\S]*?\n```)/g, (match) => `\n${match}\n`);
+  return formattedText.trim();
 };
-// --- END OF NEW FUNCTION ---
-
 
 const getSeverityBadgeClass = (severity: 'Critical' | 'High' | 'Medium' | 'Low' | 'Informational') => {
-    // ... (this function remains the same)
+    switch (severity) {
+        case 'Critical': return 'bg-destructive text-destructive-foreground';
+        case 'High': return 'bg-orange-500 text-white';
+        case 'Medium': return 'bg-yellow-500 text-black';
+        case 'Low': return 'bg-blue-500 text-white';
+        default: return 'bg-gray-500 text-white';
+    }
 };
 
 const scanningMessages = [
-    // ... (this array remains the same)
+    'Initializing scan engine...', 'Mapping website structure...', 'Probing for open ports and services...',
+    'Analyzing entry points for SQL injection...', 'Testing for Cross-Site Scripting (XSS)...',
+    'Checking for security misconfigurations...', 'Scanning dependencies for known vulnerabilities...',
+    'Compiling report with AI-powered remediation...', 'Finalizing analysis...',
 ];
 
-
 export default function ScannerComponent({ vulnerabilityType }: { vulnerabilityType?: string }) {
-  // ... (all your existing state hooks and functions remain the same)
   const { user } = useUser();
   const { firestore } = useFirebase();
   const router = useRouter();
-  // ... etc.
+  const vulnerabilityName = vulnerabilityType ? vulnerabilityType.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : '';
 
-  // --- THE JSX PART IS THE ONLY THING THAT CHANGES ---
+  const [scanStatus, setScanStatus] = React.useState<ScanStatus>('idle');
+  const [progress, setProgress] = React.useState(0);
+  const [loadingMessage, setLoadingMessage] = React.useState(scanningMessages[0]);
+  const [scannedUrl, setScannedUrl] = React.useState('');
+  const [scanResults, setScanResults] = React.useState<ScanResult | null>(null);
+  const [error, setError] = React.useState<string | null>(null);
+  const [guestScans, setGuestScans] = React.useState(0);
+  const GUEST_SCAN_LIMIT = 2;
+
+  React.useEffect(() => {
+    if (!user) {
+        const storedScans = localStorage.getItem('guestScans');
+        const storedDate = localStorage.getItem('guestScansDate');
+        const today = new Date().toISOString().split('T')[0];
+        if (storedDate === today && storedScans) {
+            setGuestScans(parseInt(storedScans, 10));
+        } else {
+            localStorage.setItem('guestScans', '0');
+            localStorage.setItem('guestScansDate', today);
+            setGuestScans(0);
+        }
+    }
+  }, [user]);
+
+  const scansRemaining = user ? Infinity : GUEST_SCAN_LIMIT - guestScans;
+  const canScan = user ? true : guestScans < GUEST_SCAN_LIMIT;
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { url: '' },
+  });
+
+  const handleScan = form.handleSubmit(async (values) => {
+    if (!canScan) {
+      alert('You have reached your daily scan limit. Please sign up for unlimited scans.');
+      return;
+    }
+    setScannedUrl(values.url);
+    setScanStatus('scanning');
+    setError(null);
+    setScanResults(null);
+    setProgress(0);
+    setLoadingMessage(scanningMessages[0]);
+    const progressInterval = setInterval(() => { setProgress(prev => Math.min(prev + Math.random() * 10, 95)); }, 400);
+    const messageInterval = setInterval(() => { setLoadingMessage(prev => scanningMessages[(scanningMessages.indexOf(prev) + 1) % scanningMessages.length]); }, 1500);
+    try {
+        const results = await performScan({ url: values.url, scanType: vulnerabilityType || 'general' });
+        if (!results) { throw new Error("AI model did not return a valid result."); }
+        setScanResults(results);
+        setScanStatus('complete');
+        setProgress(100);
+        if (user && firestore) {
+            const scansCollectionRef = collection(firestore, `users/${user.uid}/scans`);
+            const scanData = { url: values.url, scanType: vulnerabilityType || 'general', results, createdAt: serverTimestamp() };
+            addDoc(scansCollectionRef, scanData).catch(async (err) => {
+                const contextualError = new FirestorePermissionError({ path: scansCollectionRef.path, operation: 'create', requestResourceData: scanData });
+                errorEmitter.emit('permission-error', contextualError);
+                setError('Failed to save scan results due to a permission issue.');
+                setScanStatus('error');
+            });
+        }
+        if (!user) {
+            const newScanCount = guestScans + 1;
+            setGuestScans(newScanCount);
+            localStorage.setItem('guestScans', newScanCount.toString());
+        }
+    } catch (err) {
+        console.error(err);
+        setError('An unexpected error occurred during the scan. Please try again.');
+        setScanStatus('error');
+    } finally {
+        clearInterval(progressInterval);
+        clearInterval(messageInterval);
+        setProgress(100);
+    }
+  });
+
+  const handleNewScan = () => {
+    setScanStatus('idle');
+    setProgress(0);
+    setScannedUrl('');
+    setScanResults(null);
+    setError(null);
+    form.reset();
+  };
+
+  const handleDownloadReport = () => {
+    if (!scanResults) return;
+    generatePdf(scannedUrl, scanResults);
+  };
+  
+  const pageTitle = vulnerabilityType 
+    ? `Scan for ${vulnerabilityName}` 
+    : 'Website Security Scanner';
+
   return (
     <div className="container mx-auto max-w-4xl py-12 px-4">
       <Card className="shadow-lg">
-        {/* ... (CardHeader and other JSX is unchanged) ... */}
+        <CardHeader className="text-center">
+            <div className='flex justify-center items-center gap-3'>
+                <ScanLine className="w-10 h-10 text-primary" />
+                <CardTitle className="text-4xl font-bold tracking-tight">{pageTitle}</CardTitle>
+            </div>
+          <CardDescription className="text-lg">Enter a URL to scan for web vulnerabilities. Educational use only.</CardDescription>
+        </CardHeader>
         <CardContent>
-            {/* ... (idle, scanning, and error states are unchanged) ... */}
+            {scanStatus === 'idle' && (
+                <div className='animate-fade-in'>
+                    <Alert className="bg-yellow-50 border-yellow-300 text-yellow-800 dark:bg-yellow-950 dark:border-yellow-800 dark:text-yellow-300">
+                        <AlertTriangle className="h-4 w-4 text-yellow-500 dark:text-yellow-400" />
+                        <AlertTitle>{user ? `Welcome, ${user.displayName || 'User'}!` : 'Welcome, Guest!'}</AlertTitle>
+                        <AlertDescription>
+                            {user ? (
+                                <b>You have unlimited scans.</b>
+                            ) : (
+                                <b>You have {scansRemaining} scans remaining today. <Link href="/signup" className="underline font-bold">Sign up</Link> for unlimited scans.</b>
+                            )}
+                        </AlertDescription>
+                    </Alert>
+                    <Form {...form}>
+                        <form onSubmit={handleScan} className="space-y-6 mt-6">
+                            <FormField control={form.control} name="url" render={({ field }) => (
+                                <FormItem><FormLabel className="text-lg">URL to Scan</FormLabel><FormControl><Input placeholder="https://example.com" {...field} /></FormControl><FormMessage /></FormItem>
+                            )}/>
+                            {vulnerabilityType ? (
+                                <div className="flex flex-col gap-4">
+                                    <Button type="submit" className="w-full text-lg" size="lg" disabled={!canScan}><ScanLine className='mr-2 w-5 h-5'/> {canScan ? `Scan for ${vulnerabilityName}` : 'Limit Reached'}</Button>
+                                    <Button onClick={() => router.push('/services')} variant="ghost" className="w-full text-md hover:bg-transparent hover:text-muted-foreground"><ArrowLeft className='mr-2 w-4 h-4'/> Back to Services</Button>
+                                </div>
+                            ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                     <Button onClick={() => router.back()} className="w-full text-lg" size="lg" variant="outline"><ArrowLeft className='mr-2 w-4 h-4'/> Back</Button>
+                                    <Button type="submit" className="w-full text-lg" size="lg" disabled={!canScan}>{canScan ? 'Quick Scan' : 'Limit Reached'}</Button>
+                                </div>
+                            )}
+                        </form>
+                    </Form>
+                </div>
+            )}
+            {scanStatus === 'scanning' && (
+                <div className="text-center animate-fade-in space-y-4 pt-4 pb-8">
+                    <div className="relative w-24 h-24 mx-auto"><Bot className="w-full h-full text-primary animate-pulse" /></div>
+                    <p className="text-2xl font-bold text-foreground">{Math.round(progress)}%</p>
+                    <p className="text-lg text-muted-foreground">Scanning <span className='font-bold text-primary'>{scannedUrl}</span>...</p>
+                    <Progress value={progress} className="w-full" />
+                    <p className="text-sm text-muted-foreground h-5">{loadingMessage}</p>
+                </div>
+            )}
             {(scanStatus === 'complete' && scanResults) && (
                 <div className="animate-fade-in">
                     <Card>
-                        <CardHeader>{/* ... */}</CardHeader>
+                        <CardHeader>
+                            <CardTitle className='flex items-center gap-2 text-2xl'><ShieldCheck className='w-8 h-8 text-green-500'/>Scan Complete</CardTitle>
+                            <CardDescription>Results for: <a href={scannedUrl} target='_blank' rel='noopener noreferrer' className='text-primary hover:underline'>{scannedUrl}</a></CardDescription>
+                        </CardHeader>
                         <CardContent>
                              {scanResults.vulnerabilities.length > 0 ? (
                                 <Accordion type="single" collapsible className="w-full" defaultValue='item-0'>
                                     {scanResults.vulnerabilities.map((vuln, index) => (
                                         <AccordionItem value={`item-${index}`} key={index}>
-                                            <AccordionTrigger>{/* ... */}</AccordionTrigger>
+                                            <AccordionTrigger>
+                                                <div className="flex items-center gap-4 text-left">
+                                                    <span className={`px-2 py-1 rounded text-xs font-bold ${getSeverityBadgeClass(vuln.severity)}`}>{vuln.severity}</span>
+                                                    <span className="font-semibold">{vuln.title}</span>
+                                                </div>
+                                            </AccordionTrigger>
                                             <AccordionContent className='prose dark:prose-invert prose-sm max-w-none px-4 py-2'>
                                                 {user ? (
                                                     <>
                                                         <p>{vuln.description}</p>
                                                         <h4 className='font-bold mt-4 mb-2'>AI-Powered Remediation</h4>
-                                                        
-                                                        {/* --- THIS IS THE FIX --- */}
-                                                        {/* We now pass the text through our new formatting function */}
-                                                        {/* before giving it to ReactMarkdown. */}
-                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                                          {formatRemediationText(vuln.remediation)}
-                                                        </ReactMarkdown>
-                                                        {/* --- END OF FIX --- */}
+                                                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{formatRemediationText(vuln.remediation)}</ReactMarkdown>
                                                     </>
                                                 ) : (
-                                                    <>{/* ... */}</>
+                                                    <>
+                                                        <p>{vuln.description.split('.')[0] + '.'}</p>
+                                                        <Card className="my-4 bg-muted/50 p-6 text-center">
+                                                            <div className="flex justify-center items-center mb-4"><LogIn className="w-8 h-8 text-primary" /></div>
+                                                            <h3 className="text-lg font-bold">Log In for Full Details</h3>
+                                                            <p className="text-muted-foreground mb-4">Create a free account or log in to see the full vulnerability description and AI-powered remediation steps.</p>
+                                                            <div className="flex gap-4 justify-center">
+                                                                <Button asChild><Link href={`/login?redirect=/scanner`}>Log In</Link></Button>
+                                                                <Button asChild variant="outline"><Link href="/signup">Sign Up</Link></Button>
+                                                            </div>
+                                                        </Card>
+                                                    </>
                                                 )}
                                             </AccordionContent>
                                         </AccordionItem>
                                     ))}
                                 </Accordion>
                             ) : (
-                                 <Alert variant="default">{/* ... */}</Alert>
+                                 <Alert variant="default" className='mt-6 bg-green-500/10 border-green-500/20'>
+                                     <CheckCircle className="h-4 w-4 text-green-500" />
+                                     <AlertTitle>No Vulnerabilities Found!</AlertTitle>
+                                     <AlertDescription>Our AI-powered scan did not find any critical issues on this URL. You can start a new scan to check again.</AlertDescription>
+                                 </Alert>
                             )}
                         </CardContent>
-                        <CardFooter>{/* ... */}</CardFooter>
+                        <CardFooter className='flex-col sm:flex-row justify-between items-center gap-4'>
+                           {user && (<Button onClick={handleDownloadReport} variant="secondary"><Download className='w-4 h-4 mr-2'/> Download Report</Button>)}
+                            <div className="flex gap-2"><Button onClick={handleNewScan}><ScanLine className='w-4 h-4 mr-2'/> Start New Scan</Button></div>
+                        </CardFooter>
                     </Card>
+                </div>
+            )}
+            {scanStatus === 'error' && (
+                <div className="animate-fade-in text-center">
+                    <Alert variant="destructive">
+                        <AlertTriangle className="h-4 w-4" />
+                        <AlertTitle>Scan Failed</AlertTitle>
+                        <AlertDescription>{error || 'An unknown error occurred. Please try again.'}</AlertDescription>
+                    </Alert>
+                    <Button onClick={handleNewScan} className="mt-4"><ScanLine className='w-4 h-4 mr-2'/> Try Again</Button>
                 </div>
             )}
         </CardContent>
