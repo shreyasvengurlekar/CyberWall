@@ -54,7 +54,7 @@ export default function AboutPage() {
         <section className="flex flex-col md:flex-row items-center gap-8 md:gap-12 mb-20">
           <div className="relative">
             <Image
-              src="https://media.licdn.com/dms/image/v2/D5603AQGdJSecUkT31A/profile-displayphoto-scale_400_400/B56ZlvdjtsKAAg-/0/1758511645378?e=1762387200&v=beta&t=Lw7GquCyd_lkw2oPIFwNAD-u5PHHrE5_BmVc8uLNR30"
+              src="https://drive.google.com/uc?export=view&id=1FcVF-CcnFKp8WR7BIPGXJGRVvQCyU-DC"
               alt="Shreyas Vengurlekar portrait"
               width={200}
               height={200}
