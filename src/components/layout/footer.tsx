@@ -9,7 +9,7 @@ export function Footer() {
   const socialLinks = [
     { icon: <Github className="h-5 w-5" />, href: 'https://github.com/shreyasvengurlekar', label: 'GitHub' },
     { icon: <Linkedin className="h-5 w-5" />, href: 'https://www.linkedin.com/in/shreyasvengurlekar', label: 'LinkedIn' },
-    { icon: <Mail className="h-5 w-5" />, href: 'mailto:shreyasvengurlekar2004@gmail.com', label: 'Email' },
+    { icon: <Mail className="h-5 w-5" />, href: 'mailto:teamcyberwall@gmail.com', label: 'Email' },
   ];
 
   const [showBackToTop, setShowBackToTop] = React.useState(false);

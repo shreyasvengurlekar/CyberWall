@@ -75,11 +75,22 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
   const createProfileInFirestore = useCallback(async (user: User) => {
     const userRef = doc(firestore, 'users', user.uid);
-    const newProfile: UserProfile = {
+    const newProfile: UserProfile & {
+      emailVerified: boolean;
+      createdAt: Date;
+      lastLoginAt: Date;
+      lastActive: Date;
+      isOnline: boolean;
+    } = {
       uid: user.uid,
       email: user.email || '',
       displayName: user.displayName || user.email?.split('@')[0] || 'New User',
       plan: 'free',
+      emailVerified: user.emailVerified,
+      createdAt: new Date(),
+      lastLoginAt: new Date(),
+      lastActive: new Date(),
+      isOnline: true,
     };
     
     setDoc(userRef, newProfile).catch(err => {
@@ -99,7 +110,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
       setIsUserLoading(false);
       return;
     }
-
+  
     let profileUnsubscribe: (() => void) | null = null;
 
     const authUnsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
@@ -140,7 +151,9 @@ export const UserProvider = ({ children }: UserProviderProps) => {
 
     return () => {
       authUnsubscribe();
-      if (profileUnsubscribe) profileUnsubscribe();
+      if (profileUnsubscribe) {
+        profileUnsubscribe();
+      }
     };
   }, [auth, firestore, createProfileInFirestore]);
 
@@ -161,11 +174,18 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         (error as any).code = 'auth/email-not-verified';
         throw error;
     }
-    await userCredential.user.getIdToken(true);
     return userCredential.user;
   };
 
   const signOut = async (): Promise<void> => {
+    if (user) {
+      // Update user's online status before signing out
+      const userRef = doc(firestore, 'users', user.uid);
+      await setDoc(userRef, {
+        lastActive: new Date(),
+        isOnline: false,
+      }, { merge: true });
+    }
     await firebaseSignOut(auth);
   };
 
